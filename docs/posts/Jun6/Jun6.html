@@ -8,7 +8,7 @@
 
 <meta name="author" content="Ruby Krasnow">
 <meta name="dcterms.date" content="2023-06-06">
-<meta name="description" content="This is my first post. I include a brief summary of some of the articles I read today.">
+<meta name="description" content="This is my first post. I include a brief summary of some of the articles I read today and a description of what I learned about Git, GitHub, R Markdown, and Quarto.">
 
 <title>Ruby’s Lab Notebook - Summer 2023 - June 6</title>
 <style>
@@ -123,7 +123,7 @@ div.csl-indent {
       <h1 class="title">June 6</h1>
                   <div>
         <div class="description">
-          This is my first post. I include a brief summary of some of the articles I read today.
+          This is my first post. I include a brief summary of some of the articles I read today and a description of what I learned about Git, GitHub, R Markdown, and Quarto.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -161,7 +161,21 @@ div.csl-indent {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#edm-background" id="toc-edm-background" class="nav-link active" data-scroll-target="#edm-background">EDM Background</a></li>
+  <li><a href="#papers" id="toc-papers" class="nav-link active" data-scroll-target="#papers">Papers</a>
+  <ul class="collapse">
+  <li><a href="#edm-papers---theory" id="toc-edm-papers---theory" class="nav-link" data-scroll-target="#edm-papers---theory">EDM Papers - Theory</a></li>
+  <li><a href="#edm-papers---applications-to-fisheries" id="toc-edm-papers---applications-to-fisheries" class="nav-link" data-scroll-target="#edm-papers---applications-to-fisheries">EDM Papers - Applications to Fisheries</a></li>
+  <li><a href="#scallops" id="toc-scallops" class="nav-link" data-scroll-target="#scallops">Scallops</a>
+  <ul class="collapse">
+  <li><a href="#why-scallops" id="toc-why-scallops" class="nav-link" data-scroll-target="#why-scallops">Why scallops?</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#building-this-notebook" id="toc-building-this-notebook" class="nav-link" data-scroll-target="#building-this-notebook">Building this notebook</a>
+  <ul class="collapse">
+  <li><a href="#git-and-github" id="toc-git-and-github" class="nav-link" data-scroll-target="#git-and-github">Git and GitHub</a></li>
+  <li><a href="#quarto-and-markdown" id="toc-quarto-and-markdown" class="nav-link" data-scroll-target="#quarto-and-markdown">Quarto and Markdown</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -171,9 +185,41 @@ div.csl-indent {
 
 
 
-<section id="edm-background" class="level1">
-<h1>EDM Background</h1>
-<p>EDM Papers I started with <span class="citation" data-cites="sugihara_detecting_2012">(<a href="#ref-sugihara_detecting_2012" role="doc-biblioref">Sugihara et al. 2012</a>)</span>, the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).</p>
+<section id="papers" class="level1">
+<h1>Papers</h1>
+<section id="edm-papers---theory" class="level2">
+<h2 class="anchored" data-anchor-id="edm-papers---theory">EDM Papers - Theory</h2>
+<p>I started with <span class="citation" data-cites="sugihara_detecting_2012">(<a href="#ref-sugihara_detecting_2012" role="doc-biblioref">Sugihara et al. 2012</a>)</span>, the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).</p>
+</section>
+<section id="edm-papers---applications-to-fisheries" class="level2">
+<h2 class="anchored" data-anchor-id="edm-papers---applications-to-fisheries">EDM Papers - Applications to Fisheries</h2>
+<p>EDM has been applied to a variety of fisheries to investigate the complex relationships between stock biomass, recruitment, and environmental variables.</p>
+</section>
+<section id="scallops" class="level2">
+<h2 class="anchored" data-anchor-id="scallops">Scallops</h2>
+<p>My project will tentatively focus on the Atlantic sea scallop, <em>Placopecten magellanicus</em>.</p>
+<section id="why-scallops" class="level3">
+<h3 class="anchored" data-anchor-id="why-scallops">Why scallops?</h3>
+<ul>
+<li>Economic value</li>
+<li>Data quality</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="building-this-notebook" class="level1">
+<h1>Building this notebook</h1>
+<section id="git-and-github" class="level2">
+<h2 class="anchored" data-anchor-id="git-and-github">Git and GitHub</h2>
+<p>Unfortunately, I had to spend several hours today wrangling with Git and GitHub in order to create the new repository for this notebook and successfully connect it to GitHub. The main issues were related to inconsistent authentication protocols (HTTPS vs.&nbsp;ssh) between my GitHub account, GitHub CLI, and local repo. Eventually, I resolved the issues and successfully link the local and remote directories and deploy this notebook as a GitHub pages site associated with the repository.</p>
+</section>
+<section id="quarto-and-markdown" class="level2">
+<h2 class="anchored" data-anchor-id="quarto-and-markdown">Quarto and Markdown</h2>
+<p>It has been several years since I last worked in Markdown, and I reviewed the basic syntax: headers, italics, bullet points, inserting links, etc. My previous experience using Markdown syntax was in R Markdown, but for this lab notebook I decided to learn Quarto. <a href="https://quarto.org/">Quarto</a> is an “open-source scientific and technical publishing system” that is used by academics to create static and dynamic documents, personal websites, CVs, books, and other media. Called the next generation of R Markdown, knowing how to use Quarto will be a valuable skill for this REU project as well as future research endeavors.</p>
+</section>
+</section>
+<section id="references" class="level1">
+
 
 
 
