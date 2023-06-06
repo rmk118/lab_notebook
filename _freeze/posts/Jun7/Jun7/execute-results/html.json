@@ -1,0 +1,14 @@
+{
+  "hash": "50487d8fc955f58f7f71788034b52c34",
+  "result": {
+    "markdown": "---\ntitle: 'June 7'\ndate: '2023-06-07'\ncategories: ['Intro']\ndescription: 'This is my second post. I include a brief summary of some of the articles I read today.'\nexecute: \n  message: false\n  warning: false\neditor_options: \n  chunk_output_type: console\n---\n\n\n# EDM Background2\n\nEDM Papers",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

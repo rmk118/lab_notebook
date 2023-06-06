@@ -1,0 +1,15 @@
+---
+title: 'June 7'
+date: '2023-06-07'
+categories: ['Intro']
+description: 'This is my second post. I include a brief summary of some of the articles I read today.'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+# EDM Background2
+
+EDM Papers
