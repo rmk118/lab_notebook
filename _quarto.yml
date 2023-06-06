@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "Ruby's Lab Notebook - Summer 2023"
@@ -9,8 +10,7 @@ website:
         href: blog.qmd 
       - icon: github
         href: https://github.com/rmk118 
-      - icon: twitter
-        href: https://twitter.com/rmk118
+
 format:
   html:
     theme: flatly

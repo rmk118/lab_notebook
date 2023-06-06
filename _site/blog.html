@@ -70,9 +70,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -120,11 +120,6 @@ ul.task-list li input[type="checkbox"] {
 </i> 
  <span class="menu-text"></span></a>
   </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/rmk118"><i class="bi bi-twitter" role="img">
-</i> 
- <span class="menu-text"></span></a>
-  </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
@@ -134,7 +129,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
+    <div class="quarto-title column-page">
       <h1 class="title">Ruby’s Lab Notebook - Summer 2023</h1>
                       </div>
   </div>
@@ -151,11 +146,9 @@ ul.task-list li input[type="checkbox"] {
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Intro">Intro <span class="quarto-category-count">(2)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
 
@@ -164,73 +157,47 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Intro" data-listing-date-sort="1686024000000" data-listing-file-modified-sort="1686076795619" data-listing-reading-time-sort="3.005">
-<div class="body">
-<a href="./posts/Jun6/dummy.html">
-<h3 class="no-anchor listing-title">
-Example code
-</h3>
-<div class="listing-subtitle">
+<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
 
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Intro'); return false;">
-Intro
-</div>
-</div>
-<a href="./posts/Jun6/dummy.html">
-<div class="listing-description">
-<p>This is a dummy post with examples of how to include interesting elements (like columns) that I might want to incorporate in future posts.</p>
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/Jun6/dummy.html">
-<div class="listing-date">
-Jun 6, 2023
-</div>
-<div class="listing-author">
+<table class="quarto-listing-table table">
+<thead>
+<tr>
+<th>
+Date
+</th>
+<th>
+Title
+</th>
+<th>
+Author
+</th>
+</tr>
+</thead>
+<tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1686082362994" data-listing-reading-time-sort="3.005" data-listing-title-sort="Heading 1" data-listing-filename-sort="dummy.qmd">
+<td class="listing-date">
+</td>
+<td class="listing-title">
+<a href="./posts/Jun6/dummy.html" class="title">Heading 1</a>
+</td>
+<td class="listing-author">
 Ruby Krasnow
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Intro" data-listing-date-sort="1686024000000" data-listing-file-modified-sort="1686080494408" data-listing-reading-time-sort="0.01">
-<div class="body">
-<a href="./posts/Jun6/Jun6.html">
-<h3 class="no-anchor listing-title">
-June 6
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Intro'); return false;">
-Intro
-</div>
-</div>
-<a href="./posts/Jun6/Jun6.html">
-<div class="listing-description">
-<p>This is my first post. I include a brief summary of some of the articles I read today.</p>
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/Jun6/Jun6.html">
-<div class="listing-date">
+</td>
+</tr>
+<tr data-index="1" data-categories="Intro" data-listing-date-sort="1686024000000" data-listing-file-modified-sort="1686080494408" data-listing-reading-time-sort="0.01" data-listing-title-sort="June 6" data-listing-filename-sort="Jun6.qmd">
+<td class="listing-date">
 Jun 6, 2023
-</div>
-<div class="listing-author">
+</td>
+<td class="listing-title">
+<a href="./posts/Jun6/Jun6.html" class="title">June 6</a>
+</td>
+<td class="listing-author">
 Ruby Krasnow
-</div>
-</a>
-</div>
-</div>
-</div>
+</td>
+</tr>
+</tbody>
+
+</table>
 <div class="listing-no-matching d-none">
 No matching items
 </div>

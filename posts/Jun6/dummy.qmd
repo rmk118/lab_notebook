@@ -1,13 +1,17 @@
 ---
 title: 'Example code'
-date: '2023-06-06'
-categories: ['Intro']
+date: '2023-06-05'
+# categories: ['Intro']
 description: 'This is a dummy post with examples of how to include interesting elements (like columns) that I might want to incorporate in future posts.'
+draft: true
+
 execute: 
   message: false
   warning: false
 editor_options: 
   chunk_output_type: console
+  
+
 ---
 
 # Heading 1

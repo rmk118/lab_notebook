@@ -3,8 +3,8 @@ title: "Ruby's Lab Notebook - Summer 2023"
 listing:
   contents: posts
   sort: "date desc"
-  type: default
-  categories: true
+  type: table
+  categories: false
   sort-ui: false
   filter-ui: false
 page-layout: full
