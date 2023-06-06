@@ -1,7 +1,7 @@
 ---
 title: 'Example code'
 date: '2023-06-05'
-# categories: ['Intro']
+categories: ['Intro']
 description: 'This is a dummy post with examples of how to include interesting elements (like columns) that I might want to incorporate in future posts.'
 draft: true
 
