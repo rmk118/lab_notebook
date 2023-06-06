@@ -2,7 +2,8 @@
 title: 'June 6'
 date: '2023-06-06'
 categories: ['Intro']
-description: 'This is my first post. I include a brief summary of some of the articles I read today.'
+description: 'This is my first post. I include a brief summary of some of the articles I read today and a description of what I learned about Git, GitHub, R Markdown, and Quarto.'
+
 execute: 
   message: false
   warning: false
@@ -10,6 +11,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-# EDM Background
+# Papers
 
-EDM Papers
+##EDM Papers
+I started with [@sugihara_detecting_2012], the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).
+
+
+# Building this notebook
+
+##Git and GitHub
+
+
+## Quarto and Markdown
