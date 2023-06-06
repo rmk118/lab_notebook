@@ -2,9 +2,8 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/posts/post-with-code/index.html",
-      "/posts/Jun6/jun6.html",
-      "/posts/welcome/index.html"
+      "/posts/Jun6/dummy.html",
+      "/posts/Jun6/Jun6.html"
     ]
   }
 ]
