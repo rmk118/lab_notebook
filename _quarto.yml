@@ -2,17 +2,18 @@ project:
   type: website
 
 website:
-  title: "files"
+  title: "Ruby's Lab Notebook - Summer 2023"
   navbar:
     right:
-      - about.qmd
+      - text: Project Updates
+        href: blog.qmd 
       - icon: github
-        href: https://github.com/
+        href: https://github.com/rmk118 
       - icon: twitter
-        href: https://twitter.com
+        href: https://twitter.com/rmk118
 format:
   html:
-    theme: cosmo
+    theme: flatly
     css: styles.css
 
 
