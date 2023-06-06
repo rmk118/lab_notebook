@@ -30,8 +30,11 @@ EDM has been applied to a variety of fisheries to investigate the complex relati
 My project will tentatively focus on the Atlantic sea scallop, *Placopecten magellanicus*.
 
 ### Why scallops?
-* Economic value
-* Data quality
+* Economic importance: among the most valuable fisheries in the country
+* Data quality: 
+* Benthic-pelagic coupling
+
+New research has revealed that ocean acidification 
 
 
 # Building this notebook
