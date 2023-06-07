@@ -18,9 +18,9 @@ website:
     style: "docked"
     search: false
     contents:
-     - section: "About"
-       contents:
-          - index.qmd
+     # - section: "About"
+     #   contents:
+     #      - index.qmd
      - section: "Project Updates"
        contents:
          - posts/Jun7/Jun7.Rmd

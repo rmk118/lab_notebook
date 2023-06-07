@@ -1,0 +1,14 @@
+---
+title: 'Intro to EDM'
+date: '2023-07-06'
+categories: ['Resources']
+description: 'An overview of Empirical Dynamic Modeling (EDM) as I understand it.'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+# Basic idea
+Empirical Dynamic Modeling (EDM) is...
