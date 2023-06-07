@@ -161,24 +161,13 @@ div.csl-indent {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#papers" id="toc-papers" class="nav-link active" data-scroll-target="#papers">Papers</a>
-  <ul class="collapse">
-  <li><a href="#edm-papers---theory" id="toc-edm-papers---theory" class="nav-link" data-scroll-target="#edm-papers---theory">EDM Papers - Theory</a>
-  <ul class="collapse">
-  <li><a href="#set-1" id="toc-set-1" class="nav-link" data-scroll-target="#set-1">Set 1</a></li>
-  <li><a href="#sets-2-3" id="toc-sets-2-3" class="nav-link" data-scroll-target="#sets-2-3">Sets 2 &amp; 3</a></li>
-  </ul></li>
-  <li><a href="#edm-papers---applications-to-fisheries" id="toc-edm-papers---applications-to-fisheries" class="nav-link" data-scroll-target="#edm-papers---applications-to-fisheries">EDM Papers - Applications to Fisheries</a></li>
-  <li><a href="#scallops" id="toc-scallops" class="nav-link" data-scroll-target="#scallops">Scallops</a>
-  <ul class="collapse">
-  <li><a href="#why-scallops" id="toc-why-scallops" class="nav-link" data-scroll-target="#why-scallops">Why scallops?</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#papers" id="toc-papers" class="nav-link active" data-scroll-target="#papers">Papers</a></li>
   <li><a href="#building-this-notebook" id="toc-building-this-notebook" class="nav-link" data-scroll-target="#building-this-notebook">Building this notebook</a>
   <ul class="collapse">
   <li><a href="#git-and-github" id="toc-git-and-github" class="nav-link" data-scroll-target="#git-and-github">Git and GitHub</a></li>
   <li><a href="#quarto-and-markdown" id="toc-quarto-and-markdown" class="nav-link" data-scroll-target="#quarto-and-markdown">Quarto and Markdown</a></li>
   </ul></li>
+  <li><a href="#goalsfuture-work" id="toc-goalsfuture-work" class="nav-link" data-scroll-target="#goalsfuture-work">Goals/Future Work</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -191,31 +180,9 @@ div.csl-indent {
 
 <section id="papers" class="level1">
 <h1>Papers</h1>
-<section id="edm-papers---theory" class="level2">
-<h2 class="anchored" data-anchor-id="edm-papers---theory">EDM Papers - Theory</h2>
-<section id="set-1" class="level3">
-<h3 class="anchored" data-anchor-id="set-1">Set 1</h3>
-<p>I started with <span class="citation" data-cites="sugihara_detecting_2012">(<a href="#ref-sugihara_detecting_2012" role="doc-biblioref">Sugihara et al. 2012</a>)</span>, the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).</p>
-</section>
-<section id="sets-2-3" class="level3">
-<h3 class="anchored" data-anchor-id="sets-2-3">Sets 2 &amp; 3</h3>
-</section>
-</section>
-<section id="edm-papers---applications-to-fisheries" class="level2">
-<h2 class="anchored" data-anchor-id="edm-papers---applications-to-fisheries">EDM Papers - Applications to Fisheries</h2>
-<p>EDM has been applied to a variety of fisheries to investigate the complex relationships between stock biomass, recruitment, and environmental variables.</p>
-</section>
-<section id="scallops" class="level2">
-<h2 class="anchored" data-anchor-id="scallops">Scallops</h2>
-<p>My project will tentatively focus on the Atlantic sea scallop, <em>Placopecten magellanicus</em>.</p>
-<section id="why-scallops" class="level3">
-<h3 class="anchored" data-anchor-id="why-scallops">Why scallops?</h3>
-<ul>
-<li>Economic value</li>
-<li>Data quality</li>
-</ul>
-</section>
-</section>
+<p>I spent much of today reading the papers that Dr.&nbsp;Deyle provided related to EDM and quantitative fisheries. The EDM papers included applications of the approach to specific case studies, as well as the mathematical background. For example, <span class="citation" data-cites="sugihara_detecting_2012">(<a href="#ref-sugihara_detecting_2012" role="doc-biblioref">Sugihara et al. 2012</a>)</span> is the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).</p>
+<p>I also familiarized myself with recent modeling studies related to the Atlantic sea scallop fishery. The economic value of the scallop fishery and the availability of high-quality time series data make scallops a good choice for meaningful applied data science. There have been various models created to estimate biomass (stock assessments), estimate natural mortality, and to develop an Integrated Assessment Model to inform fishery management under changing oceanographic conditions. However, these models depend on assumptions (especially about stock-recruitment relationships) that may not be justified, and EDM could potentially provide new insights into the factors that impact scallop abundance.</p>
+<p>There are also many interesting spatial dynamics to consider, particularly related to the rotational management plans implemented by the New England Fishery Management Council. Another potential area of investigation relates to new research by Pousse et al., <span class="citation" data-cites="pousse_juvenile_2023">(<a href="#ref-pousse_juvenile_2023" role="doc-biblioref">2023</a>)</span> indicating that ocean acidification depresses the growth of juvenile Atlantic sea scallops. This research highlights the need for accurate forecasting of scallop populations under projected acidification conditions in order to ensure the continued prosperity of the fishery.</p>
 </section>
 <section id="building-this-notebook" class="level1">
 <h1>Building this notebook</h1>
@@ -228,6 +195,19 @@ div.csl-indent {
 <p>It has been several years since I last worked in Markdown, and I reviewed the basic syntax: headers, italics, bullet points, inserting links, etc. My previous experience using Markdown syntax was in R Markdown, but for this lab notebook I decided to learn Quarto. <a href="https://quarto.org/">Quarto</a> is an “open-source scientific and technical publishing system” that is used by academics to create static and dynamic documents, personal websites, CVs, books, and other media. Called the next generation of R Markdown, knowing how to use Quarto will be a valuable skill for this REU project as well as future research endeavors.</p>
 </section>
 </section>
+<section id="goalsfuture-work" class="level1">
+<h1>Goals/Future Work</h1>
+<ol type="1">
+<li>Finish reading the all of the quantitative fisheries papers that Dr.&nbsp;Deyle provided</li>
+<li>Create a blog page (blog = lab notebook website) to collect and organize my list of relevant papers</li>
+<li>EDM
+<ol type="a">
+<li>Create an “Intro to EDM” blog page where I can summarize my understanding of EDM and associated analytical techniques. I am not sure that my grasp of the theory behind EDM is solid enough to accurately apply it to complex systems or to explore new conceptual areas, and I think that writing such a page (much like teaching a concept to someone else) will help me identify and resolve gaps in my understanding.</li>
+<li>Solidify my understanding of the different ways that EDM can incorporate spatial data. I plan to re-read some of the key spatial EDM papers to review the theory and the methods they used, as during my initial read I mostly focused on the introduction, results, and discussion/conclusions. I primarily want to feel more confident in my ability to determine which approach(es) would be most suitable for a given data set.</li>
+</ol></li>
+<li>Begin looking at the scallop data</li>
+</ol>
+</section>
 <section id="references" class="level1">
 
 
@@ -236,6 +216,9 @@ div.csl-indent {
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-pousse_juvenile_2023" class="csl-entry" role="doc-biblioentry">
+Pousse, Emilien, Matthew E. Poach, Dylan H. Redman, George Sennefelder, William Hubbard, Kristin Osborne, Daphne Munroe, et al. 2023. <span>“Juvenile Atlantic Sea Scallop, Placopecten Magellanicus, Energetic Response to Increased Carbon Dioxide and Temperature Changes.”</span> <em><span>PLOS</span> Climate</em> 2 (2): e0000142. <a href="https://doi.org/10.1371/journal.pclm.0000142">https://doi.org/10.1371/journal.pclm.0000142</a>.
+</div>
 <div id="ref-sugihara_detecting_2012" class="csl-entry" role="doc-biblioentry">
 Sugihara, George, Robert May, Hao Ye, Chih-hao Hsieh, Ethan Deyle, Michael Fogarty, and Stephan Munch. 2012. <span>“Detecting Causality in Complex Ecosystems.”</span> <em>Science</em> 338 (6106): 496–500. <a href="https://doi.org/10.1126/science.1227079">https://doi.org/10.1126/science.1227079</a>.
 </div>
