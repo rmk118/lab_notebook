@@ -1,8 +1,8 @@
 ---
 title: 'June 7'
 date: '2023-06-07'
-categories: ['Intro']
-description: 'This is my second post. I include a brief summary of some of the articles I read today.'
+categories: ['Intro', 'Events']
+description: 'Highlights from the 16th Annual Student-Organized Bioinformatics Symposium.'
 execute: 
   message: false
   warning: false
@@ -10,6 +10,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# EDM Background2
-
-EDM Papers
+Today was spent at the Student Organized Bioinformatics Symposium. Some of my favorite parts of the symposium included:
+- Speaker A
+- Poster B
+- Lightning Talk C

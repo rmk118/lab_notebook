@@ -7,12 +7,24 @@ execute:
 
 website:
   title: "Ruby's Lab Notebook - Summer 2023"
-  navbar:
-    right:
-      - text: Project Updates
-        href: blog.qmd 
-      - icon: github
-        href: https://github.com/rmk118 
+  # navbar:
+    # right:
+    #   - text: Project Updates
+    #     href: blog.qmd 
+    #   - icon: github
+    #     href: https://github.com/rmk118/lab_notebook
+    
+  sidebar:
+    style: "docked"
+    search: false
+    contents:
+     - section: "About"
+       contents:
+          - index.qmd
+     - section: "Project Updates"
+       contents:
+         - posts/Jun7/Jun7.Rmd
+         - posts/Jun6/Jun6.qmd
 
 format:
   html:

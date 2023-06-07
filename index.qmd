@@ -4,12 +4,15 @@ image: https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-
 about:
   template: trestles
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com/rmk_118
+    # - icon: twitter
+    #   text: Twitter
+    #   href: https://twitter.com/rmk_118
     - icon: github
-      text: Github
+      text: GitHub
       href: https://github.com/rmk118
+    - icon: link-45deg
+      text: The BRITE REU
+      href: https://sites.bu.edu/britereu/ 
 
 ---
 
