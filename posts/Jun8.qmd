@@ -1,0 +1,19 @@
+---
+title: 'June 8'
+date: '2023-06-08'
+categories: ['Intro']
+description: 'My activities for the day.'
+
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+# BRITE REU trainings & workshops
+This morning we had our first programming workshop as part of the BRITE REU program. We then had an ethics training.
+
+
+# Reading papers
+I spent much of today reading the papers that Dr. Deyle provided related to EDM and quantitative fisheries.

@@ -2,7 +2,7 @@
 title: 'Intro to EDM'
 date: '2023-07-06'
 categories: ['Resources']
-description: 'An overview of Empirical Dynamic Modeling (EDM) as I understand it.'
+description: 'An overview of Empirical Dynamic Modeling (EDM) as I understand it. The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.'
 execute: 
   message: false
   warning: false
@@ -12,3 +12,8 @@ editor_options:
 
 # Basic idea
 Empirical Dynamic Modeling (EDM) is...
+
+
+
+# Spatial EDM
+Spatial data can be incorporated into EDM in a variety of ways.

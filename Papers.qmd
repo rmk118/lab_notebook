@@ -2,7 +2,7 @@
 title: 'Relevant Papers'
 date: '2023-07-06'
 categories: ['Resources']
-description: 'Scientific literature that is clearly or potentially related to my project.'
+description: 'Non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.'
 execute: 
   message: false
   warning: false
@@ -10,5 +10,12 @@ editor_options:
   chunk_output_type: console
 ---
 
-# EDM
-Set 1
+# Food webs
+Jason Link...
+
+
+# Ecosystem-based fisheries management
+Jason Link...
+
+# Atlantic sea scallops
+Dvora Hart...
