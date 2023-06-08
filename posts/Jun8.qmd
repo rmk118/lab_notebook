@@ -13,8 +13,7 @@ editor_options:
 # BRITE REU trainings & workshops
 This morning we had our first programming workshop as part of the BRITE REU program, led by Michael Silverstein. We learned how to access the SSC and set up interactive sessions in Jupyter Notebook and RStudio.
 
-We then had an ethics training.
+We then had an ethics training alongside students from other REU programs at Boston University. I have had many similar ethics trainings before and am always cognizant of the need to avoid scientific misconduct, but it was interesting to hear the speaker describe several high-profile misconduct cases with which I was unfamiliar (like [Mark Spector](https://www.thecrimson.com/article/1981/10/3/cornell-researcher-quits-over-false-cancer/)).
 
-
-# Reading papers
-I spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM and quantitative fisheries.
+# EDM
+I spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM. I also read more about the basics of dynamical systems theory, which underpins EDM (and indeed, much of modern science). I started working on an Intro to EDM page for this site and found that attempting to articulate the concepts in my own words was tremendously helpful in solidifying my understanding of the concepts.
