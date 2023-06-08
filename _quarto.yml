@@ -23,7 +23,7 @@ website:
      #      - index.qmd
      - section: "Project Updates"
        contents:
-         - posts/Jun7/Jun7.Rmd
+         - posts/Jun7/Jun7.qmd
          - posts/Jun6/Jun6.qmd
 
 format:

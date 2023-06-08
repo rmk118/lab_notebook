@@ -25,7 +25,14 @@
     "href": "posts/Jun7/Jun7.html",
     "title": "June 7",
     "section": "",
-    "text": "EDM Background2\nEDM Papers"
+    "text": "Today was spent at the 16th Annual BU Bioinformatics Student-Organized Symposium. I found the entire symposium very interesting and filled up five pages of my notebook with concepts, techniques, and papers mentioned in the presentations that I wanted to save to look up on my own later. Here are some examples of things I recorded that were novel to me or that particularly caught my interest:\n\nThe phyllosphere\nFlux Balance Analysis\nMacArthur’s consumer-resource model\nGenomic epidemiology\n\nMy favorite part of the symposium was Dr. Alan Pacheco’s presentation on “Mapping Interaction Networks in Plant Microbiomes”, although I also enjoyed PhD candidate Helen Scott’s lightning talk on “Charting Carbon Use Efficiency in Ocean Microbiomes”.\nCool papers mentioned or cited at the conference include:\n\nMicrobiology of the phyllosphere (Lindow and Brandl, 2003)\nMapping phyllosphere microbiota interactions in planta to establish genotype-phenotype relationships (Schäfer et al., 2022)\nA protocol for generating a high-quality genome-scale metabolic reconstruction (Thiele and Palsson, 2010)\nWhat is flux balance analysis? (Orth et al., 2010)\nFast automated reconstruction of genome-scale metabolic models for microbial species and communities (Machado et al., 2018)"
+  },
+  {
+    "objectID": "Papers.html",
+    "href": "Papers.html",
+    "title": "Relevant Papers",
+    "section": "",
+    "text": "EDM\nSet 1"
   },
   {
     "objectID": "drafts/dummy.html",
@@ -42,9 +49,16 @@
     "text": "Welcome! Here I will document my work as an intern in Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible.\nI strongly believe in the importance of open, transparent, and accessible data science, and I hope that I can help support efforts to promote these principles within fisheries science and quantitiative marine ecology."
   },
   {
+    "objectID": "EDM.html",
+    "href": "EDM.html",
+    "title": "Intro to EDM",
+    "section": "",
+    "text": "Basic idea\nEmpirical Dynamic Modeling (EDM) is…"
+  },
+  {
     "objectID": "blog.html",
     "href": "blog.html",
-    "title": "Daily Project Updates",
+    "title": "All Posts",
     "section": "",
     "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\nJune 7\n\n\n\nIntro\n\n\nEvents\n\n\n\nHighlights from the 16th Annual Student-Organized Bioinformatics Symposium.\n\n\n\nJun 7, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 6\n\n\n\nIntro\n\n\n\nMy first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R…\n\n\n\nJun 6, 2023\n\n\n\n\n\n\n\n\nNo matching items"
   }
