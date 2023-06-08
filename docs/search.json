@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "posts/Jun8.html",
+    "href": "posts/Jun8.html",
+    "title": "June 8",
+    "section": "",
+    "text": "BRITE REU trainings & workshops\nThis morning we had our first programming workshop as part of the BRITE REU program.\nWe then had an ethics training.\n\n\nReading papers\nI spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM and quantitative fisheries."
+  },
+  {
     "objectID": "posts/Jun6/Jun6.html",
     "href": "posts/Jun6/Jun6.html",
     "title": "June 6",
@@ -32,7 +39,7 @@
     "href": "Papers.html",
     "title": "Relevant Papers",
     "section": "",
-    "text": "EDM\nSet 1"
+    "text": "Food webs\n\n\n\nAuthor, year\nTitle\nNotes\n\n\n\n\nLink, 2022\nDoes food web theory work for marine ecosystems?\n\n\n\nHeymans et al., 2016\nBest practice in Ecopath with Ecosim food-web models for ecosystem-based management\n\n\n\n\n\n\n\n\n\n\n\nAtlantic sea scallops\n\n\n\nAuthor, year\nTitle\nNotes\n\n\n\n\nTruesdell et al., 2016\nEffects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: an application to the US Atlantic sea scallop fishery\n\n\n\nHart, 2003\nYield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop"
   },
   {
     "objectID": "drafts/dummy.html",
@@ -53,13 +60,13 @@
     "href": "EDM.html",
     "title": "Intro to EDM",
     "section": "",
-    "text": "Basic idea\nEmpirical Dynamic Modeling (EDM) is…"
+    "text": "Basic idea\nEmpirical Dynamic Modeling (EDM) is…\n\n\nSpatial EDM\nSpatial data can be incorporated into EDM in a variety of ways."
   },
   {
     "objectID": "blog.html",
     "href": "blog.html",
     "title": "All Posts",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\nJune 7\n\n\n\nIntro\n\n\nEvents\n\n\n\nHighlights from the 16th Annual Student-Organized Bioinformatics Symposium.\n\n\n\nJun 7, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 6\n\n\n\nIntro\n\n\n\nMy first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R…\n\n\n\nJun 6, 2023\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\nJune 8\n\n\n\nIntro\n\n\n\nMy activities for the day.\n\n\n\nJun 8, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 7\n\n\n\nIntro\n\n\nEvents\n\n\n\nHighlights from the 16th Annual Student-Organized Bioinformatics Symposium.\n\n\n\nJun 7, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 6\n\n\n\nIntro\n\n\n\nMy first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R…\n\n\n\nJun 6, 2023\n\n\n\n\n\n\n\n\nNo matching items"
   }
 ]
