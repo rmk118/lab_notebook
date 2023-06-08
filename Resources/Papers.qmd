@@ -1,6 +1,6 @@
 ---
 title: 'Relevant Papers'
-date: '2023-06-08'
+date-modified: '2023-06-08'
 categories: ['Resources']
 description: 'A list of non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.'
 execute: 
@@ -8,7 +8,16 @@ execute:
   warning: false
 editor_options: 
   chunk_output_type: console
+bibliography: ../references.bib
 ---
+# Quantitative Lenses folder from Dr. Deyle
+| Author, year | Title | Notes |
+|--------------|-------|-------|
+|              |       |       |
+|              |       |       |
+|              |       |       |
+
+
 
 # Food webs
 | Author, year | Title | Notes |
