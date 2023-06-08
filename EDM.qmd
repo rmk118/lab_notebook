@@ -10,8 +10,19 @@ editor_options:
   chunk_output_type: console
 ---
 
+# Dynamical systems
+A dynamical system is a system whose state is uniquely specified by a set of variables (state variables) and whose behavior is described by predefined rules. The dynamical system evolves over time in the state space, which is the set of all possible values of the state variables. If a state space is continuous (i.e., the state variables are not restricted to discrete values) and finite-dimensional, the number of state variables defines the dimension of the dynamical system.
+
+In a discrete dynamical system, we can represent the change in a state variable $x$ over time as a difference equation, also called a recurrence equation: $x_t = F(x_{t-1}, t)$
+
+For a deterministic dynamical system, the change in the state variable is represented as a differential equation:
+
+
+We can represent states as vectors corresponding to locations on 
+
 # Basic idea
-Empirical Dynamic Modeling (EDM) is...
+Ecological interactions in natural systems are often (nonlinear, or state-dependent), meaning the 
+mpirical Dynamic Modeling (EDM) is...
 
 
 

@@ -4,7 +4,7 @@
     "href": "posts/Jun8.html",
     "title": "June 8",
     "section": "",
-    "text": "BRITE REU trainings & workshops\nThis morning we had our first programming workshop as part of the BRITE REU program.\nWe then had an ethics training.\n\n\nReading papers\nI spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM and quantitative fisheries."
+    "text": "BRITE REU trainings & workshops\nThis morning we had our first programming workshop as part of the BRITE REU program, led by Michael Silverstein. We learned how to access the SSC and set up interactive sessions in Jupyter Notebook and RStudio.\nWe then had an ethics training.\n\n\nReading papers\nI spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM and quantitative fisheries."
   },
   {
     "objectID": "posts/Jun6/Jun6.html",
@@ -60,7 +60,7 @@
     "href": "EDM.html",
     "title": "Intro to EDM",
     "section": "",
-    "text": "Basic idea\nEmpirical Dynamic Modeling (EDM) is…\n\n\nSpatial EDM\nSpatial data can be incorporated into EDM in a variety of ways."
+    "text": "Dynamical systems\nA dynamical system is a system whose state is uniquely specified by a set of variables (state variables) and whose behavior is described by predefined rules. The dynamical system evolves over time in the state space, which is the set of all possible values of the state variables. If a state space is continuous (i.e., the state variables are not restricted to discrete values) and finite-dimensional, the number of state variables defines the dimension of the dynamical system.\nIn a discrete dynamical system, we can represent the change in a state variable \\(x\\) over time as a difference equation, also called a recurrence equation: \\(x_t = F(x_{t-1}, t)\\)\nFor a deterministic dynamical system, the\nWe can represent states as vectors corresponding to locations on\n\n\nBasic idea\nEcological interactions in natural systems are often (nonlinear, or state-dependent), meaning the mpirical Dynamic Modeling (EDM) is…\n\n\nSpatial EDM\nSpatial data can be incorporated into EDM in a variety of ways."
   },
   {
     "objectID": "blog.html",

@@ -21,7 +21,7 @@ website:
     - section: "Resources"
       contents:
        - Papers.qmd
-     #      - EDM.qmd
+       - EDM.qmd
     - section: "Project Updates"
       contents:
          # - posts/Jun8.qmd
