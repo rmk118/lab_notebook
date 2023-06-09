@@ -11,7 +11,7 @@ editor_options:
 ---
 
 ## Python Practice
-This morning ...
+This morning I worked through the [Introduction to Python](https://programming-workshops.readthedocs.io/en/latest/workshops/03_python/index.html) section of the BRITE Python programming workshop. 
 
 ## UROP BBQ
 At noon we had the Summer Kick-Off BBQ sponsored by the BU Undergraduate Research Opportunities Program (UROP). I had the chance to talk with some students from BU who are doing chemistry research over the summer. It was interesting to hear about their research, especially in areas (related to inorganic chemistry) that I am less familiar with.
