@@ -25,6 +25,8 @@ Empirical dynamic modeling (EDM) uses time series data to analyze and forecast n
 
 Motion on the attractor manifold can be projected onto a coordinate axis, forming a time series. On the other hand, we can use time series data to reconstruct the dynamics of the system in multidimensional state space, called attractor reconstruction [@chang2017]. In the real world, we often lack the necessary data (e.g., time series for cod, phytoplankton, and zooplankton) to reconstruct the dynamics of a system, and we likely do not even know all of the variables that dictate the state of the system. Using Takens' theorem, we can use time-delay embedding to reconstruct a "shadow manifold" that preserves the essential dynamics of the original system.
 
+[Introduction to Empirical Dynamic Modeling](https://youtu.be/fevurdpiRYg) (YouTube video) [Constructing Empirical Dynamic Models: Takens'Theorem](https://youtu.be/QQwtrWBwxQg) (YouTube video)
+
 ## Simplex Projection
 
 Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, $E$, of a system. This is important for future EDM techniques and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include @ye2015, @chang2017, @sugihara1990, and the [vignette](https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf) for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:
@@ -44,14 +46,35 @@ S-map analysis can be used to distinguish nonlinear dynamical systems from linea
 
 Helpful explanations of how S-mapping works can be found in the Methods sections of [@deyle2016] and [@deyle2018], as well as in [@chang2017].
 
-> S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, $w(d) = e^{(−θ d/\bar{d})}$. Here, $d$ is the distance between the predictee and each library point, and $\bar{d}$ is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to linear autoregressive model. In contrast, if θ > 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ > 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. [@chang2017]
+> S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, $w(d) = e^{(−θ d/\bar{d})}$. Here, $d$ is the distance between the predictee and each library point, and $\bar{d}$ is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to linear autoregressive model. In contrast, if θ \> 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ \> 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. [@chang2017]
 
 ## Convergent Cross-Mapping (CCM)
 
-Convergent cross-mapping...
+[State Space Reconstruction: Convergent Cross Mapping](https://youtu.be/NrFdIz-D2yM) (YouTube video)
+
+Convergent cross-mapping is...
+
+Here is a collection of papers that have used CCM to identify causality in complex ecosystems:
+
+| Author, year  | Title                                                            | Notes                               |
+|----------------|------------------------------------|--------------------|
+| @sugihara2012 | Detecting Causality in Complex Ecosystems                        | The must-read paper describing CCM! |
+| @deyle2018    | Ecosystem-based forecasts of recruitment in two menhaden species |                                     |
+|               |                                                                  |                                     |
+|               |                                                                  |                                     |
 
 # Spatial EDM
 
 There are several different approaches to incorporating spatial dynamics into EDM.
+
+Here is a collection of papers that have analyzed the spatio-temporal dynamics of a natural system using EDM:
+
+| Author and year   | Title                                                                        | Notes |
+|-------------------|------------------------------------------------------------------------------|-------|
+| @mcnamara2019     | Insights into coral reef benthic dynamics from nonlinear spatial forecasting |       |
+| @brito-millán2019 | Influence of aggregation on benthic coral reef spatio-temporal dynamics      |       |
+| @johnson2021      | Leveraging spatial information to forecast nonlinear ecological dynamics     |       |
+| @deyle2013        | Predicting climate effects on Pacific sardine                                |       |
+|                   |                                                                              |       |
 
 # References
