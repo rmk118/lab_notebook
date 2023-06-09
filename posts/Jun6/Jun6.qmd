@@ -1,7 +1,7 @@
 ---
 title: 'June 6'
 date: '2023-06-06'
-categories: ['Intro']
+categories: ['Reading','Week 1']
 description: 'My first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R Markdown, and Quarto.'
 
 execute: 

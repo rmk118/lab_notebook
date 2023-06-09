@@ -1,0 +1,23 @@
+---
+title: 'June 9'
+date: '2023-06-09'
+categories: ['Week 1', 'Events']
+description: 'My activities for the day.'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Python Practice
+This morning ...
+
+## UROP BBQ
+At noon we had the Summer Kick-Off BBQ sponsored by the BU Undergraduate Research Opportunities Program (UROP). I had the chance to talk with some students from BU who are doing chemistry research over the summer. It was interesting to hear about their research, especially in areas (related to inorganic chemistry) that I am less familiar with.
+
+## EDM
+In the afternoon ...
+
+## Meeting with Dr. Deyle
+In the afternoon ...

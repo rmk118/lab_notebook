@@ -1,7 +1,7 @@
 ---
 title: 'June 7'
 date: '2023-06-07'
-categories: ['Intro', 'Events']
+categories: ['Week 1', 'Events']
 description: 'Highlights from the 16th Annual Student-Organized Bioinformatics Symposium.'
 execute: 
   message: false

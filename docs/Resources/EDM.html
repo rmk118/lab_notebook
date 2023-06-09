@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="An overview of Empirical Dynamic Modeling (EDM) as I understand it. The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.">
+<meta name="description" content="An overview of Empirical Dynamic Modeling (EDM). The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.">
 
 <title>Ruby’s Lab Notebook - Summer 2023 - Intro to EDM</title>
 <style>
@@ -186,7 +186,7 @@ div.csl-indent {
 
 <div>
   <div class="description">
-    An overview of Empirical Dynamic Modeling (EDM) as I understand it. The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.
+    An overview of Empirical Dynamic Modeling (EDM). The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.
   </div>
 </div>
 
@@ -219,7 +219,7 @@ div.csl-indent {
 <p>Motion on the attractor manifold can be projected onto a coordinate axis, forming a time series. On the other hand, we can use time series data to reconstruct the dynamics of the system in multidimensional state space, called attractor reconstruction <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>. In the real world, we often lack the necessary data (e.g., time series for cod, phytoplankton, and zooplankton) to reconstruct the dynamics of a system, and we likely do not even know all of the variables that dictate the state of the system. Using Takens’ theorem, we can use time-delay embedding to reconstruct a “shadow manifold” that preserves the essential dynamics of the original system.</p>
 <section id="simplex-projection" class="level2">
 <h2 class="anchored" data-anchor-id="simplex-projection">Simplex Projection</h2>
-<p>Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, E, of a system. This is important for future EDM procedures and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include <span class="citation" data-cites="chang2017">Chang, Ushio, and Hsieh (<a href="#ref-chang2017" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="sugihara1990">Sugihara and May (<a href="#ref-sugihara1990" role="doc-biblioref">1990</a>)</span>, and the <a href="https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf">vignette</a> for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:</p>
+<p>Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, <span class="math inline">\(E\)</span>, of a system. This is important for future EDM techniques and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include <span class="citation" data-cites="chang2017">Chang, Ushio, and Hsieh (<a href="#ref-chang2017" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="sugihara1990">Sugihara and May (<a href="#ref-sugihara1990" role="doc-biblioref">1990</a>)</span>, and the <a href="https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf">vignette</a> for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:</p>
 <ol type="1">
 <li>Choose an embedding dimension, <span class="math inline">\(E\)</span></li>
 <li>Use the <span class="math inline">\(E+1\)</span> nearest neighbors of the target point in <span class="math inline">\(E\)</span>-dimensional space to enclose the predictee in a minimal polygon (simplex)</li>
@@ -243,8 +243,6 @@ div.csl-indent {
 </section>
 <section id="references" class="level1">
 
-<!-- # Spatial EDM -->
-<!-- Spatial data can be incorporated into EDM in a variety of ways. -->
 
 
 

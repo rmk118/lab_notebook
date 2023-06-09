@@ -2,7 +2,7 @@
 title: 'Intro to EDM'
 date-modified: '2023-06-08'
 categories: ['Resources']
-description: 'An overview of Empirical Dynamic Modeling (EDM) as I understand it. The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.'
+description: 'An overview of Empirical Dynamic Modeling (EDM). The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.'
 execute: 
   message: false
   warning: false
@@ -27,7 +27,7 @@ Motion on the attractor manifold can be projected onto a coordinate axis, formin
 
 ## Simplex Projection
 
-Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, E, of a system. This is important for future EDM procedures and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include @chang2017, @sugihara1990, and the [vignette](https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf) for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:
+Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, $E$, of a system. This is important for future EDM techniques and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include @chang2017, @sugihara1990, and the [vignette](https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf) for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:
 
 1.  Choose an embedding dimension, $E$
 2.  Use the $E+1$ nearest neighbors of the target point in $E$-dimensional space to enclose the predictee in a minimal polygon (simplex)
@@ -48,7 +48,3 @@ Convergent cross-mapping...
 There are several different approaches to incorporating spatial dynamics into EDM.
 
 # References
-
-<!-- # Spatial EDM -->
-
-<!-- Spatial data can be incorporated into EDM in a variety of ways. -->
