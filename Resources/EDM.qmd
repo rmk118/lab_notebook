@@ -38,7 +38,10 @@ Simplex projection is a non-parametric analysis in state space used to determine
 4.  Evaluate the predictive skill of the simplex projection, such as by computing the correlation coefficient $\rho$ between the forecasted and observed results.
 5.  Repeat the process with different values of $E$ to determine which $E$ results in the highest predictive skill, indicating the optimal embedding dimension
 
-\*\* $E$ is *not* necessarily the same as the true dimension of the system, $D$, or the number of variables being analyzed (e.g., number of species in a trophic web), but it is bounded such that $E<2D+1$ \*\*
+\*\*NOTES \*\*
+
+* $E$ is *not* necessarily the same as the true dimension of the system, $D$, or the number of variables being analyzed (e.g., number of species in a trophic web), but it is bounded such that $E<2D+1$
+* It is sometimes helpful to take the first differences in a target variable to distinguish meaningful prediction ability arising from the system dynamics from the statistical prediction resulting from autocorrelation. For example, Deyle et al., @deyle2018 used $ΔLPUE(t) = LPUE(t + 1) − LPUE(t)$ rather than simply $LPUE(t)$.
 
 ## S-Map Analysis
 
@@ -48,19 +51,21 @@ Helpful explanations of how S-mapping works can be found in the Methods sections
 
 > S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, $w(d) = e^{(−θ d/\bar{d})}$. Here, $d$ is the distance between the predictee and each library point, and $\bar{d}$ is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to linear autoregressive model. In contrast, if θ \> 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ \> 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. [@chang2017]
 
+We can quantify the state-dependency of the system by taking $Δ\rho=\rho_\theta-\rho_{(\theta=0)}$. The statistical significance of S-map results can be analyzed by generating a randomized version of the time series that maintains the fundamental statistical properties of the real data set (like autocorrelation), but is otherwise completely random. Performing S-map analysis on a large sample of such randomly-generated series will generate a null distribution of the S-map predictability $\rho$ and $Δ\rho$. Thus, we can find the probability of obtaining the $\rho$ and $Δ\rho$ values from the real data if the underlying nonlinear dynamics were not present.
+
 ## Convergent Cross-Mapping (CCM)
 
 [State Space Reconstruction: Convergent Cross Mapping](https://youtu.be/NrFdIz-D2yM) (YouTube video)
 
-Convergent cross-mapping is...
+CCM can detect causal linkages between time series and distinguish such causality from correlation arising from a shared environmental driver [@sugihara2012]. If two (or more) variables, $X$ and $Y$ are from the same dynamical system, information about one variable...
 
 Here is a collection of papers that have used CCM to identify causality in complex ecosystems:
 
 | Author, year  | Title                                                            | Notes                               |
-|----------------|------------------------------------|--------------------|
+|-------------------|----------------------------------|--------------------|
 | @sugihara2012 | Detecting Causality in Complex Ecosystems                        | The must-read paper describing CCM! |
 | @deyle2018    | Ecosystem-based forecasts of recruitment in two menhaden species |                                     |
-|               |                                                                  |                                     |
+| @deyle2013    | Predicting climate effects on Pacific sardine                    |                                     |
 |               |                                                                  |                                     |
 
 # Spatial EDM
@@ -70,7 +75,7 @@ There are several different approaches to incorporating spatial dynamics into ED
 Here is a collection of papers that have analyzed the spatio-temporal dynamics of a natural system using EDM:
 
 | Author and year   | Title                                                                        | Notes |
-|-------------------|------------------------------------------------------------------------------|-------|
+|------------------|-------------------------------------|------------------|
 | @mcnamara2019     | Insights into coral reef benthic dynamics from nonlinear spatial forecasting |       |
 | @brito-millán2019 | Influence of aggregation on benthic coral reef spatio-temporal dynamics      |       |
 | @johnson2021      | Leveraging spatial information to forecast nonlinear ecological dynamics     |       |

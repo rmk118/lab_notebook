@@ -16,8 +16,5 @@ This morning I worked through the [Introduction to Python](https://programming-w
 ## UROP BBQ
 At noon we had the Summer Kick-Off BBQ sponsored by the BU Undergraduate Research Opportunities Program (UROP). I had the chance to talk with some students from BU who are doing chemistry research over the summer. It was interesting to hear about their research, especially in areas (related to inorganic chemistry) that I am less familiar with.
 
-## EDM
-In the afternoon ...
-
-## Meeting with Dr. Deyle
-In the afternoon ...
+## EDM & Meeting
+In the afternoon I continued to work on the Intro to EDM page. I finished the simplex projection and S-map sections and started on the CCM section. I also had a productive Zoom meeting with Dr. Deyle where we discussed my progress thus far and directions for future work. We focused somewhat on the potential spatial aspect of the project, and he provided examples of spatial EDM papers as well as a list of R packages that are useful for spatial analysis.
