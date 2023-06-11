@@ -7,13 +7,6 @@ execute:
 
 website:
   title: "Ruby's Lab Notebook - Summer 2023"
-  # navbar:
-    # right:
-    #   - text: Project Updates
-    #     href: blog.qmd 
-    #   - icon: github
-    #     href: https://github.com/rmk118/lab_notebook
-    
   sidebar:
     style: "docked"
     search: false
@@ -35,5 +28,9 @@ format:
     css: styles.css
 
 toc: true
+toc-depth: 3
+# Enable banner style title blocks
+title-block-banner: false
 
+page-layout: article
 

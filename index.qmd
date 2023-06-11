@@ -1,16 +1,25 @@
 ---
 title: "Ruby's Summer 2023 Lab Notebook"
-image: https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo
-about:
-  template: trestles
-  links:
-    - icon: github
-      text: GitHub
-      href: https://github.com/rmk118
-    - icon: link-45deg
-      text: The BRITE REU
-      href: https://sites.bu.edu/britereu/ 
+# image: https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo
+# about:
+#   template: trestles
+#   links:
+#     - icon: github
+#       text: GitHub
+#       href: https://github.com/rmk118
+#     - icon: link-45deg
+#       text: The BRITE REU
+#       href: https://sites.bu.edu/britereu/ 
 ---
-Welcome! Here I will document my work as an intern in Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible.
 
+<!-- ![](https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo){width="30%"} Welcome! Here I will document my work as an intern in Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible. -->
+
+<!-- I strongly believe in the importance of open, transparent, and accessible data science, and I hope that I can help support efforts to promote these principles within fisheries science and quantitiative marine ecology. -->
+
+::: {layout="[1,2]"}
+![](https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo)
+
+Welcome! Here I will document my work as an intern in Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible.
 I strongly believe in the importance of open, transparent, and accessible data science, and I hope that I can help support efforts to promote these principles within fisheries science and quantitiative marine ecology.
+:::
+
