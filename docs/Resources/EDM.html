@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.361">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -18,14 +18,15 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -39,8 +40,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -75,10 +75,12 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
@@ -88,19 +90,21 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Intro to EDM</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Resources/Papers.html">Resources</a></li><li class="breadcrumb-item"><a href="../Resources/EDM.html">Intro to EDM</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="../">Ruby’s Lab Notebook - Summer 2023</a> 
@@ -110,45 +114,58 @@ div.csl-indent {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Resources</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Resources</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link">Relevant Papers</a>
+  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Relevant Papers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Resources/EDM.html" class="sidebar-item-text sidebar-link active">Intro to EDM</a>
+  <a href="../Resources/EDM.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Intro to EDM</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Project Updates</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Project Updates</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun8.html" class="sidebar-item-text sidebar-link">June 8</a>
+  <a href="../posts/Jun9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">June 9</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun7/Jun7.html" class="sidebar-item-text sidebar-link">June 7</a>
+  <a href="../posts/Jun8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">June 8</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun6/Jun6.html" class="sidebar-item-text sidebar-link">June 6</a>
+  <a href="../posts/Jun7/Jun7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">June 7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../posts/Jun6/Jun6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">June 6</span></a>
   </div>
 </li>
       </ul>
@@ -156,6 +173,7 @@ div.csl-indent {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -169,6 +187,7 @@ div.csl-indent {
   <li><a href="#convergent-cross-mapping-ccm" id="toc-convergent-cross-mapping-ccm" class="nav-link" data-scroll-target="#convergent-cross-mapping-ccm">Convergent Cross-Mapping (CCM)</a></li>
   </ul></li>
   <li><a href="#spatial-edm" id="toc-spatial-edm" class="nav-link" data-scroll-target="#spatial-edm">Spatial EDM</a></li>
+  <li><a href="#other-recent-edm-papers" id="toc-other-recent-edm-papers" class="nav-link" data-scroll-target="#other-recent-edm-papers">Other recent EDM papers</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -178,7 +197,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Intro to EDM</h1>
+<h1 class="title">Intro to EDM</h1>
   <div class="quarto-categories">
     <div class="quarto-category">Resources</div>
   </div>
@@ -217,10 +236,11 @@ div.csl-indent {
 <p>In EDM, the state of a dynamical system is a specific location in a multivariate coordinate space, or state space, whose coordinate axes are causally coupled ecosystem variables such as species abundance, temperature, resources, etc. The state of the system changes in time according to the rules/equations that describe the system dynamics, and this in turn traces out a trajectory. The collection of these time-series trajectories forms a geometric object called an attractor manifold, which describes empirically how variables relate to each other in time. <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle et al. 2016</a>)</span></p>
 </blockquote>
 <p>Motion on the attractor manifold can be projected onto a coordinate axis, forming a time series. On the other hand, we can use time series data to reconstruct the dynamics of the system in multidimensional state space, called attractor reconstruction <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>. In the real world, we often lack the necessary data (e.g., time series for cod, phytoplankton, and zooplankton) to reconstruct the dynamics of a system, and we likely do not even know all of the variables that dictate the state of the system. Using Takens’ theorem, we can use time-delay embedding to reconstruct a “shadow manifold” that preserves the essential dynamics of the original system.</p>
-<p><a href="https://youtu.be/fevurdpiRYg">Introduction to Empirical Dynamic Modeling</a> (YouTube video) <a href="https://youtu.be/QQwtrWBwxQg">Constructing Empirical Dynamic Models: Takens’Theorem</a> (YouTube video)</p>
+<p><a href="https://youtu.be/fevurdpiRYg">Introduction to Empirical Dynamic Modeling</a> (YouTube video)</p>
+<p><a href="https://youtu.be/QQwtrWBwxQg">Constructing Empirical Dynamic Models: Takens’Theorem</a> (YouTube video)</p>
 <section id="simplex-projection" class="level2">
 <h2 class="anchored" data-anchor-id="simplex-projection">Simplex Projection</h2>
-<p>Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, <span class="math inline">\(E\)</span>, of a system. This is important for future EDM techniques and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include <span class="citation" data-cites="ye2015">Ye et al. (<a href="#ref-ye2015" role="doc-biblioref">2015</a>)</span>, <span class="citation" data-cites="chang2017">Chang, Ushio, and Hsieh (<a href="#ref-chang2017" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="sugihara1990">Sugihara and May (<a href="#ref-sugihara1990" role="doc-biblioref">1990</a>)</span>, and the <a href="https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf">vignette</a> for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:</p>
+<p>Simplex projection is a non-parametric analysis in state space used to determine the optimal embedding dimension, <span class="math inline">\(E\)</span>, of a system. This is important for future EDM techniques and can offer insight into the dimensionality (and complexity) of a given system. Papers that provide helpful and more technically rigorous descriptions of simplex projection include <span class="citation" data-cites="ye2015">Ye, Beamish, et al. (<a href="#ref-ye2015" role="doc-biblioref">2015</a>)</span>, <span class="citation" data-cites="chang2017">Chang, Ushio, and Hsieh (<a href="#ref-chang2017" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="sugihara1990">Sugihara and May (<a href="#ref-sugihara1990" role="doc-biblioref">1990</a>)</span>, and the <a href="https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf">vignette</a> for the R package rEDM, which also describes how to perform the analysis in R. Roughly, simplex projection is done as follows:</p>
 <ol type="1">
 <li>Choose an embedding dimension, <span class="math inline">\(E\)</span></li>
 <li>Use the <span class="math inline">\(E+1\)</span> nearest neighbors of the target point in <span class="math inline">\(E\)</span>-dimensional space to enclose the predictee in a minimal polygon (simplex)</li>
@@ -231,7 +251,11 @@ div.csl-indent {
 <li>Evaluate the predictive skill of the simplex projection, such as by computing the correlation coefficient <span class="math inline">\(\rho\)</span> between the forecasted and observed results.</li>
 <li>Repeat the process with different values of <span class="math inline">\(E\)</span> to determine which <span class="math inline">\(E\)</span> results in the highest predictive skill, indicating the optimal embedding dimension</li>
 </ol>
-<p>** <span class="math inline">\(E\)</span> is <em>not</em> necessarily the same as the true dimension of the system, <span class="math inline">\(D\)</span>, or the number of variables being analyzed (e.g., number of species in a trophic web), but it is bounded such that <span class="math inline">\(E&lt;2D+1\)</span> **</p>
+<p>**NOTES **</p>
+<ul>
+<li><span class="math inline">\(E\)</span> is <em>not</em> necessarily the same as the true dimension of the system, <span class="math inline">\(D\)</span>, or the number of variables being analyzed (e.g., number of species in a trophic web), but it is bounded such that <span class="math inline">\(E&lt;2D+1\)</span></li>
+<li>It is sometimes helpful to take the first differences in a target variable to distinguish meaningful prediction ability arising from the system dynamics from the statistical prediction resulting from autocorrelation. For example, <span class="citation" data-cites="deyle2018">E. Deyle et al. (<a href="#ref-deyle2018" role="doc-biblioref">2018</a>)</span> used <span class="math inline">\(ΔLPUE(t) = LPUE(t + 1) − LPUE(t)\)</span> rather than simply <span class="math inline">\(LPUE(t)\)</span>.</li>
+</ul>
 </section>
 <section id="s-map-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="s-map-analysis">S-Map Analysis</h2>
@@ -240,17 +264,19 @@ div.csl-indent {
 <blockquote class="blockquote">
 <p>S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, <span class="math inline">\(w(d) = e^{(−θ d/\bar{d})}\)</span>. Here, <span class="math inline">\(d\)</span> is the distance between the predictee and each library point, and <span class="math inline">\(\bar{d}\)</span> is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to linear autoregressive model. In contrast, if θ &gt; 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ &gt; 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span></p>
 </blockquote>
+<p>We can quantify the state-dependency of the system by taking <span class="math inline">\(Δ\rho=\rho_\theta-\rho_{(\theta=0)}\)</span>. The statistical significance of S-map results can be analyzed by generating a randomized version of the time series that maintains the fundamental statistical properties of the real data set (like autocorrelation), but is otherwise completely random. Performing S-map analysis on a large sample of such randomly-generated series will generate a null distribution of the S-map predictability <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span>. Thus, we can find the probability of obtaining the <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span> values from the real data if the underlying nonlinear dynamics were not present.</p>
 </section>
 <section id="convergent-cross-mapping-ccm" class="level2">
 <h2 class="anchored" data-anchor-id="convergent-cross-mapping-ccm">Convergent Cross-Mapping (CCM)</h2>
 <p><a href="https://youtu.be/NrFdIz-D2yM">State Space Reconstruction: Convergent Cross Mapping</a> (YouTube video)</p>
-<p>Convergent cross-mapping is…</p>
-<p>Here is a collection of papers that have used CCM to identify causality in complex ecosystems:</p>
+<p>CCM can detect causal linkages between time series and distinguish such causality from correlation arising from a shared environmental driver. <span class="citation" data-cites="sugihara2012">(<a href="#ref-sugihara2012" role="doc-biblioref">Sugihara et al. 2012</a>)</span> provides a comprehensive description of how CCM works, with general explanations also available in <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>, <span class="citation" data-cites="ye2015a">(<a href="#ref-ye2015a" role="doc-biblioref">Ye, Deyle, et al. 2015</a>)</span>,<span class="citation" data-cites="deyle2013">(<a href="#ref-deyle2013" role="doc-biblioref">E. R. Deyle et al. 2013</a>)</span>, and <span class="citation" data-cites="deyle2018">(<a href="#ref-deyle2018" role="doc-biblioref">E. Deyle et al. 2018</a>)</span>, among others.</p>
+<p>In essence, CCM measures the extent to which the historical record of <span class="math inline">\(Y\)</span>’s values (the shadow manifold <span class="math inline">\(M_Y\)</span> built from <span class="math inline">\(Y\)</span> and the appropriate number of time lags) can be used to predict states of <span class="math inline">\(X\)</span>. If <span class="math inline">\(X\)</span> causes <span class="math inline">\(Y\)</span>, information about the state of <span class="math inline">\(X\)</span> can be recovered from <span class="math inline">\(M_Y\)</span> and having a more detailed <span class="math inline">\(M_Y\)</span> (bigger library size = a denser manifold) increases the prediction skill of <span class="math inline">\(X\)</span>. Therefore, significant convergence when using <span class="math inline">\(M_Y\)</span> to predict <span class="math inline">\(X\)</span> (i.e., <span class="math inline">\(Y\)</span> crossmap <span class="math inline">\(X\)</span>) indicates causality in the reverse direction, <span class="math inline">\(X\Rightarrow Y\)</span>. For a stochastic forcing variable <span class="math inline">\(X\)</span>, the current state of <span class="math inline">\(Y\)</span> cannot be inferred from values of <span class="math inline">\(X\)</span>, so a manifold reconstructed from lags of <span class="math inline">\(X\)</span> will not reliably estimate <span class="math inline">\(Y\)</span>; i.e., <span class="math inline">\(X\)</span> crossmap <span class="math inline">\(Y\)</span> will fail to converge.</p>
+<p>Here is a collection of papers that have used CCM to identify causality in complex ecosystems. (Note that papers incorporating spatial data into CCM are in the following section.)</p>
 <table class="table">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 50%">
-<col style="width: 27%">
+<col style="width: 23%">
+<col style="width: 47%">
+<col style="width: 28%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -271,13 +297,18 @@ div.csl-indent {
 <td></td>
 </tr>
 <tr class="odd">
-<td></td>
-<td></td>
+<td><span class="citation" data-cites="deyle2013">E. R. Deyle et al. (<a href="#ref-deyle2013" role="doc-biblioref">2013</a>)</span></td>
+<td>Predicting climate effects on Pacific sardine</td>
 <td></td>
 </tr>
 <tr class="even">
+<td><span class="citation" data-cites="ye2015a">Ye, Deyle, et al. (<a href="#ref-ye2015a" role="doc-biblioref">2015</a>)</span></td>
+<td>Distinguishing time-delayed causal interactions using convergent cross mapping</td>
 <td></td>
-<td></td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="mcgowan2017">McGowan et al. (<a href="#ref-mcgowan2017" role="doc-biblioref">2017</a>)</span></td>
+<td>Predicting coastal algal blooms in southern California</td>
 <td></td>
 </tr>
 </tbody>
@@ -290,13 +321,13 @@ div.csl-indent {
 <p>Here is a collection of papers that have analyzed the spatio-temporal dynamics of a natural system using EDM:</p>
 <table class="table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 75%">
-<col style="width: 6%">
+<col style="width: 23%">
+<col style="width: 49%">
+<col style="width: 26%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Author and year</th>
+<th>Author, year</th>
 <th>Title</th>
 <th>Notes</th>
 </tr>
@@ -318,13 +349,37 @@ div.csl-indent {
 <td></td>
 </tr>
 <tr class="even">
-<td><span class="citation" data-cites="deyle2013">E. R. Deyle et al. (<a href="#ref-deyle2013" role="doc-biblioref">2013</a>)</span></td>
-<td>Predicting climate effects on Pacific sardine</td>
+<td><span class="citation" data-cites="clark2015">Clark et al. (<a href="#ref-clark2015" role="doc-biblioref">2015</a>)</span></td>
+<td>Spatial convergent cross mapping to detect causal relationships from short time series</td>
 <td></td>
 </tr>
+</tbody>
+</table>
+</section>
+<section id="other-recent-edm-papers" class="level1">
+<h1>Other recent EDM papers</h1>
+<table class="table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 50%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Author, year</th>
+<th>Title</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
+<td><span class="citation" data-cites="li2021">Li et al. (<a href="#ref-li2021" role="doc-biblioref">2021</a>)</span></td>
+<td>Beyond linearity, stability, and equilibrium: The edm package for empirical dynamic modeling and convergent cross-mapping in Stata</td>
 <td></td>
-<td></td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="munch2023">Munch, Rogers, and Sugihara (<a href="#ref-munch2023" role="doc-biblioref">2023</a>)</span></td>
+<td>Recent developments in empirical dynamic modelling</td>
 <td></td>
 </tr>
 </tbody>
@@ -337,45 +392,60 @@ div.csl-indent {
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-brito-millán2019" class="csl-entry" role="doc-biblioentry">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-brito-millán2019" class="csl-entry" role="listitem">
 Brito-Millán, Marlene, B. T. Werner, Stuart A. Sandin, and Dylan E. McNamara. 2019. <span>“Influence of Aggregation on Benthic Coral Reef Spatio-Temporal Dynamics.”</span> <em>Royal Society Open Science</em> 6 (2): 181703. <a href="https://doi.org/10.1098/rsos.181703">https://doi.org/10.1098/rsos.181703</a>.
 </div>
-<div id="ref-casini2009" class="csl-entry" role="doc-biblioentry">
+<div id="ref-casini2009" class="csl-entry" role="listitem">
 Casini, Michele, Joakim Hjelm, Juan-Carlos Molinero, Johan Lövgren, Massimiliano Cardinale, Valerio Bartolino, Andrea Belgrano, and Georgs Kornilovs. 2009. <span>“Trophic Cascades Promote Threshold-Like Shifts in Pelagic Marine Ecosystems.”</span> <em>Proceedings of the National Academy of Sciences</em> 106 (1): 197–202. <a href="https://doi.org/10.1073/pnas.0806649105">https://doi.org/10.1073/pnas.0806649105</a>.
 </div>
-<div id="ref-chang2017" class="csl-entry" role="doc-biblioentry">
+<div id="ref-chang2017" class="csl-entry" role="listitem">
 Chang, Chun-Wei, Masayuki Ushio, and Chih-hao Hsieh. 2017. <span>“Empirical Dynamic Modeling for Beginners.”</span> <em>Ecological Research</em> 32 (6): 785–96. <a href="https://doi.org/10.1007/s11284-017-1469-9">https://doi.org/10.1007/s11284-017-1469-9</a>.
 </div>
-<div id="ref-deyle2013" class="csl-entry" role="doc-biblioentry">
+<div id="ref-clark2015" class="csl-entry" role="listitem">
+Clark, Adam Thomas, Hao Ye, Forest Isbell, Ethan R. Deyle, Jane Cowles, G. David Tilman, and George Sugihara. 2015. <span>“Spatial Convergent Cross Mapping to Detect Causal Relationships from Short Time Series.”</span> <em>Ecology</em> 96 (5): 1174–81. <a href="https://doi.org/10.1890/14-1479.1">https://doi.org/10.1890/14-1479.1</a>.
+</div>
+<div id="ref-deyle2013" class="csl-entry" role="listitem">
 Deyle, Ethan R., Michael Fogarty, Chih-hao Hsieh, Les Kaufman, Alec D. MacCall, Stephan B. Munch, Charles T. Perretti, Hao Ye, and George Sugihara. 2013. <span>“Predicting Climate Effects on Pacific Sardine.”</span> <em>Proceedings of the National Academy of Sciences</em> 110 (16): 6430–35. <a href="https://doi.org/10.1073/pnas.1215506110">https://doi.org/10.1073/pnas.1215506110</a>.
 </div>
-<div id="ref-deyle2016" class="csl-entry" role="doc-biblioentry">
+<div id="ref-deyle2016" class="csl-entry" role="listitem">
 Deyle, Ethan R., Robert M. May, Stephan B. Munch, and George Sugihara. 2016. <span>“Tracking and Forecasting Ecosystem Interactions in Real Time.”</span> <em>Proceedings of the Royal Society B: Biological Sciences</em> 283 (1822): 20152258. <a href="https://doi.org/10.1098/rspb.2015.2258">https://doi.org/10.1098/rspb.2015.2258</a>.
 </div>
-<div id="ref-deyle2018" class="csl-entry" role="doc-biblioentry">
+<div id="ref-deyle2018" class="csl-entry" role="listitem">
 Deyle, Ethan, Amy M Schueller, Hao Ye, Gerald M Pao, and George Sugihara. 2018. <span>“Ecosystem-Based Forecasts of Recruitment in Two Menhaden Species.”</span> <em>Fish and Fisheries</em> 19 (5): 769–81. <a href="https://doi.org/10.1111/faf.12287">https://doi.org/10.1111/faf.12287</a>.
 </div>
-<div id="ref-johnson2021" class="csl-entry" role="doc-biblioentry">
+<div id="ref-johnson2021" class="csl-entry" role="listitem">
 Johnson, Bethany, Marcella Gomez, and Stephan B. Munch. 2021. <span>“Leveraging Spatial Information to Forecast Nonlinear Ecological Dynamics.”</span> <em>Methods in Ecology and Evolution</em> 12 (2): 266–79. <a href="https://doi.org/10.1111/2041-210X.13511">https://doi.org/10.1111/2041-210X.13511</a>.
 </div>
-<div id="ref-mcnamara2019" class="csl-entry" role="doc-biblioentry">
+<div id="ref-li2021" class="csl-entry" role="listitem">
+Li, Jinjing, Michael J. Zyphur, George Sugihara, and Patrick J. Laub. 2021. <span>“Beyond Linearity, Stability, and Equilibrium: The Edm Package for Empirical Dynamic Modeling and Convergent Cross-Mapping in Stata.”</span> <em>The Stata Journal</em> 21 (1): 220–58. <a href="https://doi.org/10.1177/1536867X211000030">https://doi.org/10.1177/1536867X211000030</a>.
+</div>
+<div id="ref-mcgowan2017" class="csl-entry" role="listitem">
+McGowan, John A., Ethan R. Deyle, Hao Ye, Melissa L. Carter, Charles T. Perretti, Kerri D. Seger, Alain de Verneil, and George Sugihara. 2017. <span>“Predicting Coastal Algal Blooms in Southern California.”</span> <em>Ecology</em> 98 (5): 1419–33. <a href="https://doi.org/10.1002/ecy.1804">https://doi.org/10.1002/ecy.1804</a>.
+</div>
+<div id="ref-mcnamara2019" class="csl-entry" role="listitem">
 McNamara, Dylan E., Nick Cortale, Clinton Edwards, Yoan Eynaud, and Stuart A. Sandin. 2019. <span>“Insights into Coral Reef Benthic Dynamics from Nonlinear Spatial Forecasting.”</span> <em>Journal of The Royal Society Interface</em> 16 (153): 20190047. <a href="https://doi.org/10.1098/rsif.2019.0047">https://doi.org/10.1098/rsif.2019.0047</a>.
 </div>
-<div id="ref-sayama2015" class="csl-entry" role="doc-biblioentry">
+<div id="ref-munch2023" class="csl-entry" role="listitem">
+Munch, Stephan B., Tanya L. Rogers, and George Sugihara. 2023. <span>“Recent Developments in Empirical Dynamic Modelling.”</span> <em>Methods in Ecology and Evolution</em> 14 (3): 732–45. <a href="https://doi.org/10.1111/2041-210X.13983">https://doi.org/10.1111/2041-210X.13983</a>.
+</div>
+<div id="ref-sayama2015" class="csl-entry" role="listitem">
 Sayama, Hiroki. 2015. <em>Introduction to the modeling and analysis of complex systems</em>. Open SUNY textbooks. Albany: SUNY Geneseo. <a href="https://math.libretexts.org/Bookshelves/Scientific_Computing_Simulations_and_Modeling/Book%3A_Introduction_to_the_Modeling_and_Analysis_of_Complex_Systems_(Sayama)">https://math.libretexts.org/Bookshelves/Scientific_Computing_Simulations_and_Modeling/Book%3A_Introduction_to_the_Modeling_and_Analysis_of_Complex_Systems_(Sayama)</a>.
 </div>
-<div id="ref-sugihara1994" class="csl-entry" role="doc-biblioentry">
+<div id="ref-sugihara1994" class="csl-entry" role="listitem">
 Sugihara, George. 1994. <span>“Nonlinear Forecasting for the Classification of Natural Time Series.”</span> <em>Philosophical Transactions of the Royal Society of London. Series A: Physical and Engineering Sciences</em> 348 (1688): 477–95. <a href="https://doi.org/10.1098/rsta.1994.0106">https://doi.org/10.1098/rsta.1994.0106</a>.
 </div>
-<div id="ref-sugihara1990" class="csl-entry" role="doc-biblioentry">
+<div id="ref-sugihara1990" class="csl-entry" role="listitem">
 Sugihara, George, and Robert M. May. 1990. <span>“Nonlinear Forecasting as a Way of Distinguishing Chaos from Measurement Error in Time Series.”</span> <em>Nature</em> 344 (6268): 734–41. <a href="https://doi.org/10.1038/344734a0">https://doi.org/10.1038/344734a0</a>.
 </div>
-<div id="ref-sugihara2012" class="csl-entry" role="doc-biblioentry">
+<div id="ref-sugihara2012" class="csl-entry" role="listitem">
 Sugihara, George, Robert May, Hao Ye, Chih-hao Hsieh, Ethan Deyle, Michael Fogarty, and Stephan Munch. 2012. <span>“Detecting Causality in Complex Ecosystems.”</span> <em>Science</em> 338 (6106): 496–500. <a href="https://doi.org/10.1126/science.1227079">https://doi.org/10.1126/science.1227079</a>.
 </div>
-<div id="ref-ye2015" class="csl-entry" role="doc-biblioentry">
+<div id="ref-ye2015" class="csl-entry" role="listitem">
 Ye, Hao, Richard J. Beamish, Sarah M. Glaser, Sue C. H. Grant, Chih-hao Hsieh, Laura J. Richards, Jon T. Schnute, and George Sugihara. 2015. <span>“Equation-Free Mechanistic Ecosystem Forecasting Using Empirical Dynamic Modeling.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (13). <a href="https://doi.org/10.1073/pnas.1417063112">https://doi.org/10.1073/pnas.1417063112</a>.
+</div>
+<div id="ref-ye2015a" class="csl-entry" role="listitem">
+Ye, Hao, Ethan R. Deyle, Luis J. Gilarranz, and George Sugihara. 2015. <span>“Distinguishing Time-Delayed Causal Interactions Using Convergent Cross Mapping.”</span> <em>Scientific Reports</em> 5 (1). <a href="https://doi.org/10.1038/srep14750">https://doi.org/10.1038/srep14750</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -405,9 +475,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -472,6 +556,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {

@@ -1,6 +1,6 @@
 ---
 title: 'Relevant Papers'
-date-modified: '2023-06-08'
+date-modified: '2023-06-10'
 categories: ['Resources']
 description: 'A list of non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.'
 execute: 
@@ -14,35 +14,21 @@ bibliography: ../references.bib
 # Quantitative Fisheries (from Dr. Deyle)
 
 | Author, year   | Title                                                                                                                                        | Notes |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------------------|-------|
+|---------------|--------------------------------------------|-------------------|
 | @overholtz2009 | A simulation model to explore the response of the Gulf of Maine food web to large-scale environmental and ecological changes                 |       |
 | @link2009      | Response of balanced network models to large-scale perturbation: Implications for evaluating the role of small pelagics in the Gulf of Maine |       |
 | @ross2021      | Projecting regions of North Atlantic right whale, *Eubalaena glacialis*, habitat suitability in the Gulfof Maine for the year 2050           |       |
 
 # Food webs & ecosystem-based management
 
-| Author, year                                                             | Title                                                                                                 | Notes |
-|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|-------|
-| [Link, 2022](https://www.int-res.com/articles/meps2002/230/m230p001.pdf) | Does food web theory work for marine ecosystems?                                                      |       |
-| @tam2017                                                                 | Towards ecosystem-based management: identifying operational food-web indicators for marine ecosystems |       |
-|                                                                          |                                                                                                       |       |
-|                                                                          |                                                                                                       |       |
+| Author, year | Title                                                                                                 | Notes |
+|---------------|------------------------------------------|------------------------|
+| @link2002    | Does food web theory work for marine ecosystems?                                                      |       |
+| @tam2017     | Towards ecosystem-based management: identifying operational food-web indicators for marine ecosystems |       |
 
 # Atlantic sea scallops
 
-| Author, year                                                                                                                                                                                               | Title                                                                                                                                            | Notes |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [Truesdell et al., 2016](https://academic.oup.com/icesjms/article/73/4/1062/2457902)                                                                                                                       | Effects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: an application to the US Atlantic sea scallop fishery |       |
-| [Hart, 2003](https://www.researchgate.net/publication/279700466_Yield-_and_biomass-per-recruit_analysis_for_rotational_fisheries_with_an_application_to_the_Atlantic_sea_scallop_Placopecten_magellanicus) | Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop                                |       |
-
-<!-- # Recruitment -->
-
-<!-- | Author, year | Title | Notes | -->
-
-<!-- |--------------|-------|-------| -->
-
-<!-- |      Link        |       |       | -->
-
-<!-- |              |       |       | -->
-
-<!-- |              |       |       | -->
+| Author, year   | Title                                                                                                                                            | Notes |
+|---------------|-------------------------------|-------------------------|
+| @truesdell2016 | Effects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: an application to the US Atlantic sea scallop fishery |       |
+| @hart2003      | Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop                                |       |
