@@ -35,7 +35,7 @@ bibliography: ../references.bib
 
 # Other 
 
-| Author, year | Title                                                              | Notes                                                                                                                                           |
+| Author, year | Title                                                                                  | Notes                                                                                                                                                                                    |
 |-----------------|-------------------------------|------------------------|
-| @maunder2004 | Standardizing catch and effort data: a review of recent approaches | Good background on CPUE. Includes intro to catch data standardization, dealing with zeros and interactions, and selecting explanatory variables |
-|              |                                                                    |                                                                                                                                                 |
+| @maunder2004 | Standardizing catch and effort data: a review of recent approaches                     | Good background on CPUE. Includes intro to catch data standardization, dealing with zeros and interactions, and selecting explanatory variables                                          |
+| @hsieh2008a  | Spatial analysis shows that fishing enhances the climatic sensitivity of marine fishes | Analyzed spatial area of occupancy and index of spatial heterogeneity, and changes in distribution from cold to warm period. Used linear regression and a variety of nonparametric tests |
