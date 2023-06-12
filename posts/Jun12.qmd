@@ -11,12 +11,14 @@ editor_options:
 ---
 
 ### Reading EDM papers
-This morning...
+This morning I read many EDM papers and updated the Intro to EDM page with brief notes/summaries of many of them. I also did some reading on the different kinds of error (process vs. observational), stochastic processes, and white and red noise.
 
 ### Python Practice
-This afternoon...
+Michael sent us an email today with additional material to review before Wednesday's Python programming workshop. I went through the information he sent and practiced working with Jupyter notebook in the SCC so I will be ready for the workshop.
 
 ## Data exploration
+
+I started some preliminary data exploration/cleaning, although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data.
 
 Load packages
 ```{r}
@@ -45,20 +47,36 @@ scallops <- svcat %>%
            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
 
 scallops <- scallops %>% 
-  mutate(name = as.factor(SCIENTIFIC_NAME),
+  mutate(name = SCIENTIFIC_NAME,
          cruise6 = as.factor(CRUISE6),
          cruise = as.factor(CRUISE),
          sex = as.factor(CATCHSEX),
+         stratum = as.factor(STRATUM),
          .keep = "unused")
 
 summary(scallops)
 ```
 
 ```{r echo=FALSE}
-rm(svcat)
+#rm(svcat)
 ```
 
 ```{r}
+scallops <- scallops %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
 
+summarise_all(scallops,n_distinct)
+
+#All have sex = 0, means unknown sex
+#SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species
+
+#Remove unnecessary variables
+scallops <- scallops %>% 
+  select(-c("sex", "STATUS_CODE", "SVSPP"))
+
+#ggplot(scallops, aes(x = cruise)) + geom_bar()
+#ggplot(scallops, aes(x = cruise6)) + geom_bar()
+#ggplot(scallops, aes(x = stratum)) + geom_bar()
+  
 ```
 
