@@ -28,7 +28,7 @@ library(dplyr)
 Looking at 22564_UNION_FSCS_SVCAT (one out of five .csv files in the folder shared by Dr. Deyle)
 ```{r}
 #read data
-svcat <- read.csv("data/22564_UNION_FSCS_SVCAT.csv")
+svcat <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv")
 
 #view the first six rows of data
 head(svcat)
@@ -43,9 +43,22 @@ glimpse(svcat)
 scallops <- svcat %>% 
   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+scallops <- scallops %>% 
+  mutate(name = as.factor(SCIENTIFIC_NAME),
+         cruise6 = as.factor(CRUISE6),
+         cruise = as.factor(CRUISE),
+         sex = as.factor(CATCHSEX),
+         .keep = "unused")
+
+summary(scallops)
 ```
 
 ```{r echo=FALSE}
 rm(svcat)
+```
+
+```{r}
+
 ```
 

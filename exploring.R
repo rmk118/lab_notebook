@@ -27,3 +27,11 @@ summary(svcat)
 scallops <- svcat %>% 
   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+rm(svcat)
+
+scallops <- scallops %>% 
+  mutate(id = as.factor(ID),
+         name = as.factor(SCIENTIFIC_NAME),
+         cruise6 = as.factor(CRUISE6),
+         cruise = as.factor(CRUISE),
+         .keep = "unused")

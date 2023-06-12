@@ -257,24 +257,153 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="python-practice">Python Practice</h3>
 <p>This afternoon…</p>
 </section>
-<section id="data-exploration" class="level1">
-<h1>Data exploration</h1>
+<section id="data-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="data-exploration">Data exploration</h2>
+<p>Load packages</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># dat_all&lt;- read.csv("22564_UNION_FSCS_SVLEN.csv")</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># head(dat_all)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(dat_all) #530652 observations of 13 vars</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># glimpse(dat_all)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># name&lt;-as.factor(dat_all$SCIENTIFIC_NAME)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(name)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># data &lt;- dat_all %&gt;%</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | </span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Looking at 22564_UNION_FSCS_SVCAT (one out of five .csv files in the folder shared by Dr.&nbsp;Deyle)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>svcat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#view the first six rows of data</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(svcat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CRUISE6 CRUISE STRATUM TOW STATION STATUS_CODE                 ID SVSPP
+1  197703    177   06370   1       1          10 197703063700010001   401
+2  197703    177   06370   2       2          10 197703063700020002   401
+3  197703    177   06370   3       3          10 197703063700030003   401
+4  197703    177   06380   1       4          10 197703063800010004   401
+5  197703    177   06370   4       5          10 197703063700040005   401
+6  197703    177   06370   5       6          10 197703063700050006   401
+  CATCHSEX EXPCATCHNUM EXPCATCHWT                        SCIENTIFIC_NAME
+1        0           4        0.3 Placopecten magellanicus (sea scallop)
+2        0           3        0.1 Placopecten magellanicus (sea scallop)
+3        0           2        0.3 Placopecten magellanicus (sea scallop)
+4        0           4        0.9 Placopecten magellanicus (sea scallop)
+5        0          12        1.7 Placopecten magellanicus (sea scallop)
+6        0          22        4.6 Placopecten magellanicus (sea scallop)
+  CATCH_COMMENT
+1              
+2              
+3              
+4              
+5              
+6              </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#different overviews of the data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(svcat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   CRUISE6             CRUISE            STRATUM               TOW         
+ Length:94632       Length:94632       Length:94632       Min.   :  1.000  
+ Class :character   Class :character   Class :character   1st Qu.:  3.000  
+ Mode  :character   Mode  :character   Mode  :character   Median :  6.000  
+                                                          Mean   :  8.977  
+                                                          3rd Qu.: 11.000  
+                                                          Max.   :147.000  
+                                                          NA's   :11       
+    STATION       STATUS_CODE      ID                SVSPP      
+ Min.   :  1.0   Min.   :10   Length:94632       Min.   :  1.0  
+ 1st Qu.: 93.0   1st Qu.:10   Class :character   1st Qu.:102.0  
+ Median :197.0   Median :10   Mode  :character   Median :193.0  
+ Mean   :227.2   Mean   :10                      Mean   :221.3  
+ 3rd Qu.:351.0   3rd Qu.:10                      3rd Qu.:400.0  
+ Max.   :699.0   Max.   :10                      Max.   :998.0  
+ NA's   :11      NA's   :11                      NA's   :11     
+    CATCHSEX        EXPCATCHNUM         EXPCATCHWT       SCIENTIFIC_NAME   
+ Min.   :0.00000   Min.   :     0.0   Min.   :   0.000   Length:94632      
+ 1st Qu.:0.00000   1st Qu.:     1.0   1st Qu.:   0.040   Class :character  
+ Median :0.00000   Median :     4.0   Median :   0.400   Mode  :character  
+ Mean   :0.02798   Mean   :   269.8   Mean   :   8.112                     
+ 3rd Qu.:0.00000   3rd Qu.:    23.0   3rd Qu.:   1.980                     
+ Max.   :2.00000   Max.   :170310.0   Max.   :2070.000                     
+ NA's   :11        NA's   :69         NA's   :5623                         
+ CATCH_COMMENT     
+ Length:94632      
+ Class :character  
+ Mode  :character  
+                   
+                   
+                   
+                   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(svcat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 94,632
+Columns: 13
+$ CRUISE6         &lt;chr&gt; "197703", "197703", "197703", "197703", "197703", "197…
+$ CRUISE          &lt;chr&gt; "177", "177", "177", "177", "177", "177", "177", "177"…
+$ STRATUM         &lt;chr&gt; "06370", "06370", "06370", "06380", "06370", "06370", …
+$ TOW             &lt;int&gt; 1, 2, 3, 1, 4, 5, 1, 1, 2, 2, 1, 1, 2, 3, 4, 4, 1, 1, …
+$ STATION         &lt;int&gt; 1, 2, 3, 4, 5, 6, 8, 13, 14, 14, 15, 15, 16, 17, 18, 1…
+$ STATUS_CODE     &lt;int&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10…
+$ ID              &lt;chr&gt; "197703063700010001", "197703063700020002", "197703063…
+$ SVSPP           &lt;int&gt; 401, 401, 401, 401, 401, 401, 401, 401, 400, 401, 400,…
+$ CATCHSEX        &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ EXPCATCHNUM     &lt;int&gt; 4, 3, 2, 4, 12, 22, 1, 2, 7, 1897, 1, 22, 2, 45, 7, 20…
+$ EXPCATCHWT      &lt;dbl&gt; 0.3, 0.1, 0.3, 0.9, 1.7, 4.6, 0.1, 0.3, 0.0, 154.4, 0.…
+$ SCIENTIFIC_NAME &lt;chr&gt; "Placopecten magellanicus (sea scallop)", "Placopecten…
+$ CATCH_COMMENT   &lt;chr&gt; " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filter to only species of interest - takes it from 94632 obs to 21425 vars</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> svcat <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="sc">|</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop clapper)"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">as.factor</span>(SCIENTIFIC_NAME),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(scallops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   STRATUM               TOW             STATION       STATUS_CODE
+ Length:21425       Min.   :  1.000   Min.   :  1.0   Min.   :10  
+ Class :character   1st Qu.:  3.000   1st Qu.: 99.0   1st Qu.:10  
+ Mode  :character   Median :  6.000   Median :206.0   Median :10  
+                    Mean   :  8.902   Mean   :233.6   Mean   :10  
+                    3rd Qu.: 11.000   3rd Qu.:359.0   3rd Qu.:10  
+                    Max.   :147.000   Max.   :696.0   Max.   :10  
+                                                                  
+      ID                SVSPP          CATCHSEX  EXPCATCHNUM     
+ Length:21425       Min.   :400.0   Min.   :0   Min.   :    0.0  
+ Class :character   1st Qu.:400.0   1st Qu.:0   1st Qu.:    4.0  
+ Mode  :character   Median :401.0   Median :0   Median :   27.0  
+                    Mean   :400.7   Mean   :0   Mean   :  305.3  
+                    3rd Qu.:401.0   3rd Qu.:0   3rd Qu.:  158.0  
+                    Max.   :401.0   Max.   :0   Max.   :63589.0  
+                                                NA's   :4        
+   EXPCATCHWT       CATCH_COMMENT     
+ Min.   :   0.000   Length:21425      
+ 1st Qu.:   0.000   Class :character  
+ Median :   0.236   Mode  :character  
+ Mean   :  28.406                     
+ 3rd Qu.:   9.860                     
+ Max.   :1549.180                     
+ NA's   :2643                         
+                                             name          cruise6     
+ Placopecten magellanicus (sea scallop clapper): 5899   200405 :  828  
+ Placopecten magellanicus (sea scallop)        :15526   200707 :  805  
+                                                        200608 :  765  
+                                                        200508 :  748  
+                                                        200207 :  685  
+                                                        200305 :  681  
+                                                        (Other):16913  
+     cruise     
+ 200405 :  828  
+ 200707 :  805  
+ 200608 :  765  
+ 200508 :  748  
+ 200207 :  685  
+ 200305 :  681  
+ (Other):16913  </code></pre>
+</div>
 </div>
 
 
