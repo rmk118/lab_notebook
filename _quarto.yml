@@ -17,6 +17,7 @@ website:
        - Resources/EDM.qmd
     - section: "Project Updates"
       contents:
+        - posts/Jun12.qmd
         - posts/Jun9.qmd
         - posts/Jun8.qmd
         - posts/Jun7/Jun7.qmd

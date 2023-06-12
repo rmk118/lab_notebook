@@ -1,0 +1,14 @@
+{
+  "hash": "96a644c6eaae76f9fd15dc183c89c785",
+  "result": {
+    "markdown": "---\ntitle: 'June 12'\ndate: '2023-06-12'\ncategories: ['Week 2', 'Data exploration', 'Reading']\ndescription: 'My activities for the day.'\nexecute: \n  message: false\n  warning: false\neditor_options: \n  chunk_output_type: console\n---\n\n\n### Reading EDM papers\nThis morning...\n\n### Python Practice\nThis afternoon...\n\n# Data exploration\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(ggplot2)\nlibrary(dplyr)\n\n# dat_all<- read.csv(\"22564_UNION_FSCS_SVLEN.csv\")\n# head(dat_all)\n# summary(dat_all) #530652 observations of 13 vars\n# \n# glimpse(dat_all)\n# \n# name<-as.factor(dat_all$SCIENTIFIC_NAME)\n# summary(name)\n# \n# data <- dat_all %>%\n#   filter(SCIENTIFIC_NAME == \"Placopecten magellanicus (sea scallop)\" | \n#            SCIENTIFIC_NAME == \"Placopecten magellanicus (sea scallop clapper)\")\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

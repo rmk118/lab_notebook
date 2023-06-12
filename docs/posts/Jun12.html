@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ruby Krasnow">
-<meta name="dcterms.date" content="2023-06-09">
+<meta name="dcterms.date" content="2023-06-12">
 <meta name="description" content="My activities for the day.">
 
-<title>Ruby’s Lab Notebook - Summer 2023 - June 9</title>
+<title>Ruby’s Lab Notebook - Summer 2023 - June 12</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -76,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Jun12.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Jun9.html">June 9</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Jun12.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Jun12.html">June 12</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -127,13 +161,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun12.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Jun12.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">June 12</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun9.html" class="sidebar-item-text sidebar-link active">
+  <a href="../posts/Jun9.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">June 9</span></a>
   </div>
 </li>
@@ -167,9 +201,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#python-practice" id="toc-python-practice" class="nav-link active" data-scroll-target="#python-practice">Python Practice</a></li>
-  <li><a href="#urop-bbq" id="toc-urop-bbq" class="nav-link" data-scroll-target="#urop-bbq">UROP BBQ</a></li>
-  <li><a href="#edm-meeting" id="toc-edm-meeting" class="nav-link" data-scroll-target="#edm-meeting">EDM &amp; Meeting</a></li>
+  <li><a href="#reading-edm-papers" id="toc-reading-edm-papers" class="nav-link active" data-scroll-target="#reading-edm-papers">Reading EDM papers</a></li>
+  <li><a href="#python-practice" id="toc-python-practice" class="nav-link" data-scroll-target="#python-practice">Python Practice</a></li>
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">Data exploration</a></li>
   </ul>
 </nav>
     </div>
@@ -178,10 +212,10 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">June 9</h1>
+<h1 class="title">June 12</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Week 1</div>
-    <div class="quarto-category">Events</div>
+    <div class="quarto-category">Week 2</div>
+    <div class="quarto-category">Data exploration</div>
     <div class="quarto-category">Reading</div>
   </div>
   </div>
@@ -205,7 +239,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 9, 2023</p>
+      <p class="date">June 12, 2023</p>
     </div>
   </div>
   
@@ -215,17 +249,33 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="python-practice" class="level2">
-<h2 class="anchored" data-anchor-id="python-practice">Python Practice</h2>
-<p>This morning I worked through the <a href="https://programming-workshops.readthedocs.io/en/latest/workshops/03_python/index.html">Introduction to Python</a> section of the BRITE Python programming workshop.</p>
+<section id="reading-edm-papers" class="level3">
+<h3 class="anchored" data-anchor-id="reading-edm-papers">Reading EDM papers</h3>
+<p>This morning…</p>
 </section>
-<section id="urop-bbq" class="level2">
-<h2 class="anchored" data-anchor-id="urop-bbq">UROP BBQ</h2>
-<p>At noon we had the Summer Kick-Off BBQ sponsored by the BU Undergraduate Research Opportunities Program (UROP). I had the chance to talk with some students from BU who are doing chemistry research over the summer. It was interesting to hear about their research, especially in areas (related to inorganic chemistry) that I am less familiar with.</p>
+<section id="python-practice" class="level3">
+<h3 class="anchored" data-anchor-id="python-practice">Python Practice</h3>
+<p>This afternoon…</p>
 </section>
-<section id="edm-meeting" class="level2">
-<h2 class="anchored" data-anchor-id="edm-meeting">EDM &amp; Meeting</h2>
-<p>In the afternoon I continued to work on the Intro to EDM page. I finished the simplex projection and S-map sections and started on the CCM section. I also had a productive Zoom meeting with Dr.&nbsp;Deyle where we discussed my progress thus far and directions for future work. We focused somewhat on the potential spatial aspect of the project, and he provided examples of spatial EDM papers as well as a list of R packages that are useful for spatial analysis.</p>
+<section id="data-exploration" class="level1">
+<h1>Data exploration</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># dat_all&lt;- read.csv("22564_UNION_FSCS_SVLEN.csv")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># head(dat_all)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(dat_all) #530652 observations of 13 vars</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># glimpse(dat_all)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># name&lt;-as.factor(dat_all$SCIENTIFIC_NAME)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(name)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># data &lt;- dat_all %&gt;%</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | </span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 </section>
