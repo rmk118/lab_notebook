@@ -39,7 +39,7 @@ glimpse(svcat)
 ```
 
 ```{r}
-#filter to only species of interest - takes it from 94632 obs to 21425 vars
+#filter to only species of interest - reduces it from 94632 observations to 21425
 scallops <- svcat %>% 
   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
