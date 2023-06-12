@@ -187,7 +187,7 @@ div.csl-indent {
   <li><a href="#convergent-cross-mapping-ccm" id="toc-convergent-cross-mapping-ccm" class="nav-link" data-scroll-target="#convergent-cross-mapping-ccm">Convergent Cross-Mapping (CCM)</a></li>
   </ul></li>
   <li><a href="#spatial-edm" id="toc-spatial-edm" class="nav-link" data-scroll-target="#spatial-edm">Spatial EDM</a></li>
-  <li><a href="#other-recent-edm-papers" id="toc-other-recent-edm-papers" class="nav-link" data-scroll-target="#other-recent-edm-papers">Other recent EDM papers</a></li>
+  <li><a href="#other-edm-papers" id="toc-other-edm-papers" class="nav-link" data-scroll-target="#other-edm-papers">Other EDM papers</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -217,7 +217,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 10, 2023</p>
+      <p class="date-modified">June 11, 2023</p>
     </div>
   </div>
     
@@ -231,9 +231,9 @@ div.csl-indent {
 <p>A dynamical system is a system whose state is uniquely specified by a set of variables (state variables) and whose behavior is described by predefined rules <span class="citation" data-cites="sayama2015">(<a href="#ref-sayama2015" role="doc-biblioref">Sayama 2015</a>)</span>. The dynamical system evolves over time in the state space, which is the set of all possible values of the state variables. If a state space is continuous (i.e., the state variables are not restricted to discrete values) and finite-dimensional, the number of state variables defines the dimension of the dynamical system.</p>
 <p>If a dynamical system is deterministic, future states of the system can be predicted from the past behavior of the system, even if the trajectories appear chaotic <span class="citation" data-cites="sugihara1990">(<a href="#ref-sugihara1990" role="doc-biblioref">Sugihara and May 1990</a>)</span>. In a nonlinear system, interactions between variables are state-dependent: for example, the correlation between fish and zooplankton populations in the Baltic Sea changes sign depending on planktivore abundance, with two different ecosystem configurations (top-down vs.&nbsp;bottom-up forcing) on either side of a planktivore threshold <span class="citation" data-cites="casini2009">(<a href="#ref-casini2009" role="doc-biblioref">Casini et al. 2009</a>)</span>.</p>
 <!-- The logistic equation $$ \frac{dN}{dt}=rN(1-\frac{N}{K}) $$ is nonlinear because the change in population of species N is not proportional to the current abundance of N: if N is half of the carrying capacity K, the population of N will be growing much faster than if N is very close to K. -->
-<p>Empirical dynamic modeling (EDM) uses time series data to analyze and forecast nonlinear systems, which are extremely common in the natural world <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle et al. 2016</a>)</span>. Ecologists classically model species interactions using a community matrix, a matrix of the partial derivatives (the Jacobian) of the system evaluated at equilibrium. The sign and magnitude of the coefficients in the matrix represent the direction and intensity, respectively, of the impact of a change in population of one species on the population of another. However, as with the Baltic Sea fish example, having a single matrix of coefficients does not suffice to describe a complex nonlinear system because the interaction between species can vary with the state of the ecosystem <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle et al. 2016</a>)</span>. Methods based on linear regression to analyze nonlinear ecological systems, while extremely valuable, have many weaknesses, including the inability to distinguish interactions between species from the effect of a shared driving variable like temperature (see the <a href="https://en.wikipedia.org/wiki/Moran%27s_theorem">Moran Effect</a>).</p>
+<p>Empirical dynamic modeling (EDM) uses time series data to analyze and forecast nonlinear systems, which are extremely common in the natural world <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle, May, et al. 2016</a>)</span>. Ecologists classically model species interactions using a community matrix, a matrix of the partial derivatives (the Jacobian) of the system evaluated at equilibrium. The sign and magnitude of the coefficients in the matrix represent the direction and intensity, respectively, of the impact of a change in population of one species on the population of another. However, as with the Baltic Sea fish example, having a single matrix of coefficients does not suffice to describe a complex nonlinear system because the interaction between species can vary with the state of the ecosystem <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle, May, et al. 2016</a>)</span>. Methods based on linear regression to analyze nonlinear ecological systems, while extremely valuable, have many weaknesses, including the inability to distinguish interactions between species from the effect of a shared driving variable like temperature (see the <a href="https://en.wikipedia.org/wiki/Moran%27s_theorem">Moran Effect</a>).</p>
 <blockquote class="blockquote">
-<p>In EDM, the state of a dynamical system is a specific location in a multivariate coordinate space, or state space, whose coordinate axes are causally coupled ecosystem variables such as species abundance, temperature, resources, etc. The state of the system changes in time according to the rules/equations that describe the system dynamics, and this in turn traces out a trajectory. The collection of these time-series trajectories forms a geometric object called an attractor manifold, which describes empirically how variables relate to each other in time. <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle et al. 2016</a>)</span></p>
+<p>In EDM, the state of a dynamical system is a specific location in a multivariate coordinate space, or state space, whose coordinate axes are causally coupled ecosystem variables such as species abundance, temperature, resources, etc. The state of the system changes in time according to the rules/equations that describe the system dynamics, and this in turn traces out a trajectory. The collection of these time-series trajectories forms a geometric object called an attractor manifold, which describes empirically how variables relate to each other in time. <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle, May, et al. 2016</a>)</span></p>
 </blockquote>
 <p>Motion on the attractor manifold can be projected onto a coordinate axis, forming a time series. On the other hand, we can use time series data to reconstruct the dynamics of the system in multidimensional state space, called attractor reconstruction <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>. In the real world, we often lack the necessary data (e.g., time series for cod, phytoplankton, and zooplankton) to reconstruct the dynamics of a system, and we likely do not even know all of the variables that dictate the state of the system. Using Takens’ theorem, we can use time-delay embedding to reconstruct a “shadow manifold” that preserves the essential dynamics of the original system.</p>
 <p><a href="https://youtu.be/fevurdpiRYg">Introduction to Empirical Dynamic Modeling</a> (YouTube video)</p>
@@ -260,11 +260,11 @@ div.csl-indent {
 <section id="s-map-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="s-map-analysis">S-Map Analysis</h2>
 <p>S-map analysis can be used to distinguish nonlinear dynamical systems from linear stochastic systems and identify the degree of state-dependency of a system <span class="citation" data-cites="sugihara1994">(<a href="#ref-sugihara1994" role="doc-biblioref">Sugihara 1994</a>)</span>.S-mapping is a forecasting method that uses locally weighted multivariate linear regressions calculated as the system moves along its attractor. Rather than using only nearby points, S-maps uses the entire library of points on the attractor, where points are given an exponentially decaying weight based on their distance from the target point.</p>
-<p>Helpful explanations of how S-mapping works can be found in the Methods sections of <span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle et al. 2016</a>)</span> and <span class="citation" data-cites="deyle2018">(<a href="#ref-deyle2018" role="doc-biblioref">E. Deyle et al. 2018</a>)</span>, as well as in <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>.</p>
+<p>Helpful explanations of how S-mapping works can be found in the Methods sections of <span class="citation" data-cites="glaser2011">(<a href="#ref-glaser2011" role="doc-biblioref">Glaser et al. 2011</a>)</span>,<span class="citation" data-cites="deyle2016">(<a href="#ref-deyle2016" role="doc-biblioref">E. R. Deyle, May, et al. 2016</a>)</span> and <span class="citation" data-cites="deyle2018">(<a href="#ref-deyle2018" role="doc-biblioref">E. Deyle et al. 2018</a>)</span>, as well as in <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span>.</p>
 <blockquote class="blockquote">
-<p>S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, <span class="math inline">\(w(d) = e^{(−θ d/\bar{d})}\)</span>. Here, <span class="math inline">\(d\)</span> is the distance between the predictee and each library point, and <span class="math inline">\(\bar{d}\)</span> is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to linear autoregressive model. In contrast, if θ &gt; 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ &gt; 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span></p>
+<p>S-map analysis is a locally weighted linear regression performed under the state space associated with a weighting function in the form of an exponential decay kernel, <span class="math inline">\(w(d) = e^{(−θ d/\bar{d})}\)</span>. Here, <span class="math inline">\(d\)</span> is the distance between the predictee and each library point, and <span class="math inline">\(\bar{d}\)</span> is the mean distance of all paired library points. The parameter θ controls the degree of state dependency. If θ = 0, all library points have the same weight regardless of the local state of the predictee; mathematically, this model reduces to a linear autoregressive model. In contrast, if θ &gt; 0, the forecast given by the S-map depends on the local state of the predictee, and thus produces locally different fittings. Therefore, by comparing the performance of equivalent linear (θ = 0) and nonlinear (θ &gt; 0) S-map models, one can distinguish nonlinear dynamical systems from linear stochastic systems. <span class="citation" data-cites="chang2017">(<a href="#ref-chang2017" role="doc-biblioref">Chang, Ushio, and Hsieh 2017</a>)</span></p>
 </blockquote>
-<p>We can quantify the state-dependency of the system by taking <span class="math inline">\(Δ\rho=\rho_\theta-\rho_{(\theta=0)}\)</span>. The statistical significance of S-map results can be analyzed by generating a randomized version of the time series that maintains the fundamental statistical properties of the real data set (like autocorrelation), but is otherwise completely random. Performing S-map analysis on a large sample of such randomly-generated series will generate a null distribution of the S-map predictability <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span>. Thus, we can find the probability of obtaining the <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span> values from the real data if the underlying nonlinear dynamics were not present.</p>
+<p>We can quantify the state-dependency of the system by finding the improvement in prediction skill of the nonlinear model compared to a linear model, <span class="math inline">\(Δ\rho=\rho_\theta-\rho_{(\theta=0)}\)</span>. The statistical significance of S-map results can be analyzed by generating a randomized version of the time series that maintains the fundamental statistical properties of the real data set (like autocorrelation), but is otherwise completely random. Performing S-map analysis on a large sample of such randomly-generated series will generate a null distribution of the S-map predictability <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span>. Thus, we can find the probability of obtaining the <span class="math inline">\(\rho\)</span> and <span class="math inline">\(Δ\rho\)</span> values from the real data if the underlying nonlinear dynamics were not present.</p>
 </section>
 <section id="convergent-cross-mapping-ccm" class="level2">
 <h2 class="anchored" data-anchor-id="convergent-cross-mapping-ccm">Convergent Cross-Mapping (CCM)</h2>
@@ -274,9 +274,9 @@ div.csl-indent {
 <p>Here is a collection of papers that have used CCM to identify causality in complex ecosystems. (Note that papers incorporating spatial data into CCM are in the following section.)</p>
 <table class="table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 47%">
-<col style="width: 28%">
+<col style="width: 22%">
+<col style="width: 29%">
+<col style="width: 48%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -289,7 +289,27 @@ div.csl-indent {
 <tr class="odd">
 <td><span class="citation" data-cites="sugihara2012">Sugihara et al. (<a href="#ref-sugihara2012" role="doc-biblioref">2012</a>)</span></td>
 <td>Detecting Causality in Complex Ecosystems</td>
-<td>The must-read paper describing CCM!</td>
+<td>The must-read paper describing CCM! Describes different possibilities: bidirectional causality via functional coupling, unidirectional causality, and more complex models. Supplementary material is also helpful, esp.&nbsp;Box S1 (pg. 37). Examples included: (1) Bidirectional coupling b/w Didinium (predator) and Paramecium (prey), and (2) Anchovy, sardine, and SST: species aren’t coupled to each other, but weakly forced by same envi. driver</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="deyle2013">E. R. Deyle et al. (<a href="#ref-deyle2013" role="doc-biblioref">2013</a>)</span></td>
+<td>Predicting climate effects on Pacific sardine</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="ye2015a">Ye, Deyle, et al. (<a href="#ref-ye2015a" role="doc-biblioref">2015</a>)</span></td>
+<td>Distinguishing time-delayed causal interactions using convergent cross mapping</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="mcgowan2017">McGowan et al. (<a href="#ref-mcgowan2017" role="doc-biblioref">2017</a>)</span></td>
+<td>Predicting coastal algal blooms in southern California</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="chang2017">Chang, Ushio, and Hsieh (<a href="#ref-chang2017" role="doc-biblioref">2017</a>)</span></td>
+<td>Empirical dynamic modeling for beginners</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><span class="citation" data-cites="deyle2018">E. Deyle et al. (<a href="#ref-deyle2018" role="doc-biblioref">2018</a>)</span></td>
@@ -297,18 +317,8 @@ div.csl-indent {
 <td></td>
 </tr>
 <tr class="odd">
-<td><span class="citation" data-cites="deyle2013">E. R. Deyle et al. (<a href="#ref-deyle2013" role="doc-biblioref">2013</a>)</span></td>
-<td>Predicting climate effects on Pacific sardine</td>
 <td></td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="ye2015a">Ye, Deyle, et al. (<a href="#ref-ye2015a" role="doc-biblioref">2015</a>)</span></td>
-<td>Distinguishing time-delayed causal interactions using convergent cross mapping</td>
 <td></td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="mcgowan2017">McGowan et al. (<a href="#ref-mcgowan2017" role="doc-biblioref">2017</a>)</span></td>
-<td>Predicting coastal algal blooms in southern California</td>
 <td></td>
 </tr>
 </tbody>
@@ -322,8 +332,8 @@ div.csl-indent {
 <table class="table">
 <colgroup>
 <col style="width: 23%">
-<col style="width: 49%">
-<col style="width: 26%">
+<col style="width: 23%">
+<col style="width: 53%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -334,35 +344,50 @@ div.csl-indent {
 </thead>
 <tbody>
 <tr class="odd">
+<td><span class="citation" data-cites="hsieh2008">Hsieh, Anderson, and Sugihara (<a href="#ref-hsieh2008" role="doc-biblioref">2008</a>)</span></td>
+<td>Extending Nonlinear Analysis to Short Ecological Time Series</td>
+<td>Combines ecologically similar multispecies time series into one long (composite) time series. Offers 3 tests to ensure accurate results and tests method with 23 Pacific coastal fish species</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="glaser2011">Glaser et al. (<a href="#ref-glaser2011" role="doc-biblioref">2011</a>)</span></td>
+<td>Detecting and forecasting complex nonlinear dynamics in spatially structured catch-per-unit-effort time series for North Pacific albacore</td>
+<td>Uses spatially disaggregated data to increase info density, create composite time series, produce annual CPUE forecast at 2 different spatial scales. Figs. 4, 5 are a cool way of explaining simplex projection and S-maps. Standardizing CPUE removed signature of nonlinearity. Use of target-composite to forecast individual cells produced better forecasts than single cell analysis.</td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="clark2015">Clark et al. (<a href="#ref-clark2015" role="doc-biblioref">2015</a>)</span></td>
+<td>Spatial convergent cross mapping to detect causal relationships from short time series</td>
+<td></td>
+</tr>
+<tr class="even">
 <td><span class="citation" data-cites="mcnamara2019">McNamara et al. (<a href="#ref-mcnamara2019" role="doc-biblioref">2019</a>)</span></td>
 <td>Insights into coral reef benthic dynamics from nonlinear spatial forecasting</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span class="citation" data-cites="brito-millán2019">Brito-Millán et al. (<a href="#ref-brito-millán2019" role="doc-biblioref">2019</a>)</span></td>
 <td>Influence of aggregation on benthic coral reef spatio-temporal dynamics</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="citation" data-cites="johnson2021">Johnson, Gomez, and Munch (<a href="#ref-johnson2021" role="doc-biblioref">2021</a>)</span></td>
 <td>Leveraging spatial information to forecast nonlinear ecological dynamics</td>
 <td></td>
 </tr>
-<tr class="even">
-<td><span class="citation" data-cites="clark2015">Clark et al. (<a href="#ref-clark2015" role="doc-biblioref">2015</a>)</span></td>
-<td>Spatial convergent cross mapping to detect causal relationships from short time series</td>
+<tr class="odd">
+<td></td>
+<td></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="other-recent-edm-papers" class="level1">
-<h1>Other recent EDM papers</h1>
+<section id="other-edm-papers" class="level1">
+<h1>Other EDM papers</h1>
 <table class="table">
 <colgroup>
-<col style="width: 21%">
-<col style="width: 50%">
-<col style="width: 27%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 54%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -372,6 +397,36 @@ div.csl-indent {
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td><span class="citation" data-cites="dixon1999">Dixon, Milicich, and Sugihara (<a href="#ref-dixon1999" role="doc-biblioref">1999</a>)</span></td>
+<td>Episodic Fluctuations in Larval Supply</td>
+<td>Concluded variation in recruitment arises from nonlinear response of larval reef fish to key physical forcing variables. Used S-maps to show predictability of egg production and recruitment didn’t improve with increasing nonlinearity, but larval supply did. Modeled larval supply based on 3 biological drivers, concluded fluctuations result from both deterministic (lunar) and stochastic (wind stress) variables</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="hsieh2005">Hsieh et al. (<a href="#ref-hsieh2005" role="doc-biblioref">2005</a>)</span></td>
+<td>Distinguishing random environmental fluctuations from ecological catastrophes for the North Pacific Ocean</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="royer2006">Royer and Fromentin (<a href="#ref-royer2006" role="doc-biblioref">2006</a>)</span></td>
+<td>Recurrent and density-dependent patterns in long-term fluctuations of Atlantic bluefin tuna trap catches</td>
+<td>Helpful explanation of generating surrogates with white or red noise as a null hypotheses to test for determinism. Uses recurrence analysis rather than EDM: similar (uses lagged coordinate embedding) but uses fitting instead of prediction/forecasting and provides qual. rather than quant. info about nonlinearity</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="anderson2008">Anderson et al. (<a href="#ref-anderson2008" role="doc-biblioref">2008</a>)</span></td>
+<td>Why fishing magnifies fluctuations in fish abundance</td>
+<td>Tests three different hypothesis about relationship b/w fishing and stock variability, uses S-maps to find that age-truncated pops have increasingly unstable pop dynamics bc of changing demographic parameters, not bc of variable fishing pressure or more closely tracking environmental variation</td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="tsonis2015">Tsonis et al. (<a href="#ref-tsonis2015" role="doc-biblioref">2015</a>)</span></td>
+<td>Dynamical evidence for causality between galactic cosmic rays and interannual variation in global temperature</td>
+<td>Also see <span class="citation" data-cites="ye2015b">Ye, Sugihara, et al. (<a href="#ref-ye2015b" role="doc-biblioref">2015</a>)</span></td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="deyle2016a">E. R. Deyle, Maher, et al. (<a href="#ref-deyle2016a" role="doc-biblioref">2016</a>)</span></td>
+<td>Global environmental drivers of influenza</td>
+<td></td>
+</tr>
 <tr class="odd">
 <td><span class="citation" data-cites="li2021">Li et al. (<a href="#ref-li2021" role="doc-biblioref">2021</a>)</span></td>
 <td>Beyond linearity, stability, and equilibrium: The edm package for empirical dynamic modeling and convergent cross-mapping in Stata</td>
@@ -393,6 +448,9 @@ div.csl-indent {
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-anderson2008" class="csl-entry" role="listitem">
+Anderson, Christian N. K., Chih-hao Hsieh, Stuart A. Sandin, Roger Hewitt, Anne Hollowed, John Beddington, Robert M. May, and George Sugihara. 2008. <span>“Why Fishing Magnifies Fluctuations in Fish Abundance.”</span> <em>Nature</em> 452 (7189): 835–39. <a href="https://doi.org/10.1038/nature06851">https://doi.org/10.1038/nature06851</a>.
+</div>
 <div id="ref-brito-millán2019" class="csl-entry" role="listitem">
 Brito-Millán, Marlene, B. T. Werner, Stuart A. Sandin, and Dylan E. McNamara. 2019. <span>“Influence of Aggregation on Benthic Coral Reef Spatio-Temporal Dynamics.”</span> <em>Royal Society Open Science</em> 6 (2): 181703. <a href="https://doi.org/10.1098/rsos.181703">https://doi.org/10.1098/rsos.181703</a>.
 </div>
@@ -408,11 +466,26 @@ Clark, Adam Thomas, Hao Ye, Forest Isbell, Ethan R. Deyle, Jane Cowles, G. David
 <div id="ref-deyle2013" class="csl-entry" role="listitem">
 Deyle, Ethan R., Michael Fogarty, Chih-hao Hsieh, Les Kaufman, Alec D. MacCall, Stephan B. Munch, Charles T. Perretti, Hao Ye, and George Sugihara. 2013. <span>“Predicting Climate Effects on Pacific Sardine.”</span> <em>Proceedings of the National Academy of Sciences</em> 110 (16): 6430–35. <a href="https://doi.org/10.1073/pnas.1215506110">https://doi.org/10.1073/pnas.1215506110</a>.
 </div>
+<div id="ref-deyle2016a" class="csl-entry" role="listitem">
+Deyle, Ethan R., M. Cyrus Maher, Ryan D. Hernandez, Sanjay Basu, and George Sugihara. 2016. <span>“Global Environmental Drivers of Influenza.”</span> <em>Proceedings of the National Academy of Sciences</em> 113 (46): 13081–86. <a href="https://doi.org/10.1073/pnas.1607747113">https://doi.org/10.1073/pnas.1607747113</a>.
+</div>
 <div id="ref-deyle2016" class="csl-entry" role="listitem">
 Deyle, Ethan R., Robert M. May, Stephan B. Munch, and George Sugihara. 2016. <span>“Tracking and Forecasting Ecosystem Interactions in Real Time.”</span> <em>Proceedings of the Royal Society B: Biological Sciences</em> 283 (1822): 20152258. <a href="https://doi.org/10.1098/rspb.2015.2258">https://doi.org/10.1098/rspb.2015.2258</a>.
 </div>
 <div id="ref-deyle2018" class="csl-entry" role="listitem">
 Deyle, Ethan, Amy M Schueller, Hao Ye, Gerald M Pao, and George Sugihara. 2018. <span>“Ecosystem-Based Forecasts of Recruitment in Two Menhaden Species.”</span> <em>Fish and Fisheries</em> 19 (5): 769–81. <a href="https://doi.org/10.1111/faf.12287">https://doi.org/10.1111/faf.12287</a>.
+</div>
+<div id="ref-dixon1999" class="csl-entry" role="listitem">
+Dixon, Paul A., Maria J. Milicich, and George Sugihara. 1999. <span>“Episodic Fluctuations in Larval Supply.”</span> <em>Science</em> 283 (5407): 1528–30. <a href="https://doi.org/10.1126/science.283.5407.1528">https://doi.org/10.1126/science.283.5407.1528</a>.
+</div>
+<div id="ref-glaser2011" class="csl-entry" role="listitem">
+Glaser, Sarah M., Hao Ye, Mark Maunder, Alec MacCall, Michael Fogarty, and George Sugihara. 2011. <span>“Detecting and Forecasting Complex Nonlinear Dynamics in Spatially Structured Catch-Per-Unit-Effort Time Series for North Pacific Albacore (Thunnus Alalunga).”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 68 (3): 400–412. <a href="https://doi.org/10.1139/F10-160">https://doi.org/10.1139/F10-160</a>.
+</div>
+<div id="ref-hsieh2008" class="csl-entry" role="listitem">
+Hsieh, Chih-hao, Christian Anderson, and George Sugihara. 2008. <span>“Extending Nonlinear Analysis to Short Ecological Time Series.”</span> <em>The American Naturalist</em> 171 (1): 71–80. <a href="https://doi.org/10.1086/524202">https://doi.org/10.1086/524202</a>.
+</div>
+<div id="ref-hsieh2005" class="csl-entry" role="listitem">
+Hsieh, Chih-hao, Sarah M. Glaser, Andrew J. Lucas, and George Sugihara. 2005. <span>“Distinguishing Random Environmental Fluctuations from Ecological Catastrophes for the North Pacific Ocean.”</span> <em>Nature</em> 435 (7040): 336–40. <a href="https://doi.org/10.1038/nature03553">https://doi.org/10.1038/nature03553</a>.
 </div>
 <div id="ref-johnson2021" class="csl-entry" role="listitem">
 Johnson, Bethany, Marcella Gomez, and Stephan B. Munch. 2021. <span>“Leveraging Spatial Information to Forecast Nonlinear Ecological Dynamics.”</span> <em>Methods in Ecology and Evolution</em> 12 (2): 266–79. <a href="https://doi.org/10.1111/2041-210X.13511">https://doi.org/10.1111/2041-210X.13511</a>.
@@ -429,6 +502,9 @@ McNamara, Dylan E., Nick Cortale, Clinton Edwards, Yoan Eynaud, and Stuart A. Sa
 <div id="ref-munch2023" class="csl-entry" role="listitem">
 Munch, Stephan B., Tanya L. Rogers, and George Sugihara. 2023. <span>“Recent Developments in Empirical Dynamic Modelling.”</span> <em>Methods in Ecology and Evolution</em> 14 (3): 732–45. <a href="https://doi.org/10.1111/2041-210X.13983">https://doi.org/10.1111/2041-210X.13983</a>.
 </div>
+<div id="ref-royer2006" class="csl-entry" role="listitem">
+Royer, F., and J. M. Fromentin. 2006. <span>“Recurrent and Density-Dependent Patterns in Long-Term Fluctuations of Atlantic Bluefin Tuna Trap Catches.”</span> <em>Marine Ecology Progress Series</em> 319 (August): 237–49. <a href="https://doi.org/10.3354/meps319237">https://doi.org/10.3354/meps319237</a>.
+</div>
 <div id="ref-sayama2015" class="csl-entry" role="listitem">
 Sayama, Hiroki. 2015. <em>Introduction to the modeling and analysis of complex systems</em>. Open SUNY textbooks. Albany: SUNY Geneseo. <a href="https://math.libretexts.org/Bookshelves/Scientific_Computing_Simulations_and_Modeling/Book%3A_Introduction_to_the_Modeling_and_Analysis_of_Complex_Systems_(Sayama)">https://math.libretexts.org/Bookshelves/Scientific_Computing_Simulations_and_Modeling/Book%3A_Introduction_to_the_Modeling_and_Analysis_of_Complex_Systems_(Sayama)</a>.
 </div>
@@ -441,11 +517,17 @@ Sugihara, George, and Robert M. May. 1990. <span>“Nonlinear Forecasting as a W
 <div id="ref-sugihara2012" class="csl-entry" role="listitem">
 Sugihara, George, Robert May, Hao Ye, Chih-hao Hsieh, Ethan Deyle, Michael Fogarty, and Stephan Munch. 2012. <span>“Detecting Causality in Complex Ecosystems.”</span> <em>Science</em> 338 (6106): 496–500. <a href="https://doi.org/10.1126/science.1227079">https://doi.org/10.1126/science.1227079</a>.
 </div>
+<div id="ref-tsonis2015" class="csl-entry" role="listitem">
+Tsonis, Anastasios A., Ethan R. Deyle, Robert M. May, George Sugihara, Kyle Swanson, Joshua D. Verbeten, and Geli Wang. 2015. <span>“Dynamical Evidence for Causality Between Galactic Cosmic Rays and Interannual Variation in Global Temperature.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (11): 3253–56. <a href="https://doi.org/10.1073/pnas.1420291112">https://doi.org/10.1073/pnas.1420291112</a>.
+</div>
 <div id="ref-ye2015" class="csl-entry" role="listitem">
 Ye, Hao, Richard J. Beamish, Sarah M. Glaser, Sue C. H. Grant, Chih-hao Hsieh, Laura J. Richards, Jon T. Schnute, and George Sugihara. 2015. <span>“Equation-Free Mechanistic Ecosystem Forecasting Using Empirical Dynamic Modeling.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (13). <a href="https://doi.org/10.1073/pnas.1417063112">https://doi.org/10.1073/pnas.1417063112</a>.
 </div>
 <div id="ref-ye2015a" class="csl-entry" role="listitem">
 Ye, Hao, Ethan R. Deyle, Luis J. Gilarranz, and George Sugihara. 2015. <span>“Distinguishing Time-Delayed Causal Interactions Using Convergent Cross Mapping.”</span> <em>Scientific Reports</em> 5 (1). <a href="https://doi.org/10.1038/srep14750">https://doi.org/10.1038/srep14750</a>.
+</div>
+<div id="ref-ye2015b" class="csl-entry" role="listitem">
+Ye, Hao, George Sugihara, Ethan R. Deyle, Robert M. May, Kyle Swanson, and Anastasios A. Tsonis. 2015. <span>“Reply to Luo Et Al.: Robustness of Causal Effects of Galactic Cosmic Rays on Interannual Variation in Global Temperature.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (34). <a href="https://doi.org/10.1073/pnas.1511080112">https://doi.org/10.1073/pnas.1511080112</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

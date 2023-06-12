@@ -32,3 +32,10 @@ bibliography: ../references.bib
 |---------------|-------------------------------|-------------------------|
 | @truesdell2016 | Effects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: an application to the US Atlantic sea scallop fishery |       |
 | @hart2003      | Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop                                |       |
+
+# Other 
+
+| Author, year | Title                                                              | Notes                                                                                                                                           |
+|-----------------|-------------------------------|------------------------|
+| @maunder2004 | Standardizing catch and effort data: a review of recent approaches | Good background on CPUE. Includes intro to catch data standardization, dealing with zeros and interactions, and selecting explanatory variables |
+|              |                                                                    |                                                                                                                                                 |
