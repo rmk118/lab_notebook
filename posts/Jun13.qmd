@@ -1,0 +1,61 @@
+---
+title: 'June 13'
+date: '2023-06-13'
+categories: ['Week 2', 'Data exploration', 'Reading']
+description: 'My activities for the day.'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Reading EDM papers
+This morning...
+
+## Data exploration
+
+I started some preliminary data exploration/cleaning, although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data.
+
+Load packages
+```{r}
+library(ggplot2)
+library(dplyr)
+
+```
+
+Set-up: from yesterday (June 12)
+```{r}
+#read data
+svcat <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv")
+
+#filter to only species of interest - reduces it from 94632 observations to 21425
+scallops <- svcat %>% 
+  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+#turn categorical variables into factors
+scallops <- scallops %>% 
+  mutate(name = SCIENTIFIC_NAME,
+         cruise6 = as.factor(CRUISE6),
+         cruise = as.factor(CRUISE),
+         sex = as.factor(CATCHSEX),
+         stratum = as.factor(STRATUM),
+         .keep = "unused")
+
+rm(svcat)
+
+#shorten for clarity
+scallops <- scallops %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+
+#Remove unnecessary/redundant variables: all entries are listed as unknown sex, all have the same status code, and SVSPP corresponds with name
+scallops <- scallops %>% 
+  select(-c("sex", "STATUS_CODE", "SVSPP"))
+```
+
+
+```{r}
+
+```
+
