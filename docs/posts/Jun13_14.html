@@ -297,8 +297,7 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="data-exploration">Data exploration</h2>
 <p>Load packages</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Set-up (from June 12)</p>
 <div class="cell">
@@ -321,11 +320,46 @@ div.csl-indent {
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>))</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove unnecessary/redundant variables: all entries are listed as unknown sex, all have the same status code, and SVSPP corresponds with name</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove unnecessary/redundant variables: all entries are listed as unknown sex (sex=0), </span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># all have the same status code (10), and SVSPP corresponds with name (401 = scallop, </span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 400 = clappers)</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, I needed to turn the data into an actual time series:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the season and year associated with each cruise</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES.csv"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#select the relevant variables</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> cruises <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cruise6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#combine with the existing dataframe</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallops, cruises, <span class="at">by=</span><span class="st">"cruise6"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21,425 × 12
+     TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name  cruise6 cruise stratum
+   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; &lt;fct&gt;   &lt;fct&gt;  &lt;fct&gt;  
+ 1     1       1 197703063…       4     0.3 " "     scal… 197703  177    06370  
+ 2     2       2 197703063…       3     0.1 " "     scal… 197703  177    06370  
+ 3     3       3 197703063…       2     0.3 " "     scal… 197703  177    06370  
+ 4     1       4 197703063…       4     0.9 " "     scal… 197703  177    06380  
+ 5     4       5 197703063…      12     1.7 " "     scal… 197703  177    06370  
+ 6     5       6 197703063…      22     4.6 " "     scal… 197703  177    06370  
+ 7     1       8 197703064…       1     0.1 " "     scal… 197703  177    06420  
+ 8     1      13 197703065…       2     0.3 " "     scal… 197703  177    06500  
+ 9     2      14 197703065…       7     0   " "     clap… 197703  177    06500  
+10     2      14 197703065…    1897   154.  " "     scal… 197703  177    06500  
+# … with 21,415 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
+#   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
+</div>
 </div>
 
 

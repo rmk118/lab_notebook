@@ -36,8 +36,7 @@ The other route that I am exploring would be something related to creating an sE
 Load packages
 
 ```{r}
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 
 ```
 
@@ -63,13 +62,30 @@ scallops <- scallops %>%
 
 #shorten for clarity
 scallops <- scallops %>% 
-  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
 
-#Remove unnecessary/redundant variables: all entries are listed as unknown sex, all have the same status code, and SVSPP corresponds with name
+#Remove unnecessary/redundant variables: all entries are listed as unknown sex (sex=0), 
+# all have the same status code (10), and SVSPP corresponds with name (401 = scallop, 
+# 400 = clappers)
 scallops <- scallops %>% 
   select(-c("sex", "STATUS_CODE", "SVSPP"))
 ```
 
+First, I needed to turn the data into an actual time series:
+
 ```{r}
+#read the file that has the season and year associated with each cruise
+cruises <- read.csv("~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES.csv")
+
+#select the relevant variables
+cruises <- cruises %>% 
+  select(c("CRUISE6","SEASON","YEAR")) %>% 
+  mutate(cruise6 = as.factor(CRUISE6), .keep="unused")
+
+#combine with the existing dataframe
+scallops <- left_join(scallops, cruises, by="cruise6")
+
+as_tibble(scallops)
 
 ```

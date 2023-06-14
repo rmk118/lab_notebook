@@ -1,25 +1,36 @@
 #Exploratory data analysis
-#June 13, 2023
+#June 14, 2023
 
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 
-# dat_all<- read.csv("22564_UNION_FSCS_SVLEN.csv")
-# head(dat_all)
-# summary(dat_all) #530652 observations of 13 vars
+# dat_len<- read.csv("22564_UNION_FSCS_SVLEN.csv")
+# head(dat_len)
+# summary(dat_len) #530652 observations of 13 vars
 # 
-# glimpse(dat_all)
+# glimpse(dat_len)
 # 
-# name<-as.factor(dat_all$SCIENTIFIC_NAME)
-# summary(name)
-# 
-# data <- dat_all %>%
+# data <- dat_len %>%
 #   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
 #            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")
 
-# cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
 # svbio <- read.csv("data/22564_UNION_FSCS_SVBIO.csv", quote = "")
 # svsta <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
+
+# Predators ---------------------------------------------------------------
+
+# species <- svcat %>% 
+#   group_by(SCIENTIFIC_NAME) %>% 
+#   summarise(avg = mean(EXPCATCHWT))
+#   
+# species
+# trues <- species %>%  filter(!is.na(species$avg)==TRUE)
+# 
+# # preds <- svcat %>% 
+# #   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+# #            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+
+# Data wrangling ----------------------------------------------------------
 
 svcat <- read.csv("data/22564_UNION_FSCS_SVCAT.csv")
 head(svcat)
@@ -55,24 +66,14 @@ scallops <- scallops %>%
 ggplot(scallops, aes(x = cruise6)) + geom_bar()
 #ggplot(scallops, aes(x = stratum)) + geom_bar()
 
+
+# Creating a time series ----------------------------------------------------
+
 cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
 cruises <- cruises %>% 
   select(c("CRUISE6","SEASON","YEAR")) %>% 
   mutate(cruise6 = as.factor(CRUISE6), .keep="unused")
 
-
 scallops <- left_join(scallops, cruises, by="cruise6")
 
 
-species <- svcat %>% 
-  group_by(SCIENTIFIC_NAME) %>% 
-  summarise(avg = mean(EXPCATCHWT))
-  
-
-species
-
-trues <- species %>%  filter(!is.na(species$avg)==TRUE)
-
-# preds <- svcat %>% 
-#   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-#            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
