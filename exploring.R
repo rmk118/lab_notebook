@@ -2,6 +2,7 @@
 #June 14, 2023
 
 library(tidyverse)
+library(lubridate)
 
 # dat_len<- read.csv("22564_UNION_FSCS_SVLEN.csv")
 # head(dat_len)
@@ -14,7 +15,6 @@ library(tidyverse)
 #            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")
 
 # svbio <- read.csv("data/22564_UNION_FSCS_SVBIO.csv", quote = "")
-# svsta <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
 
 # Predators ---------------------------------------------------------------
 
@@ -42,10 +42,10 @@ scallops <- svcat %>%
 
 scallops <- scallops %>% 
   mutate(name = SCIENTIFIC_NAME,
-         cruise6 = as.factor(CRUISE6),
-         cruise = as.factor(CRUISE),
-         sex = as.factor(CATCHSEX),
-         stratum = as.factor(STRATUM),
+         CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         CATCHSEX = as.factor(CATCHSEX),
+         STRATUM = as.factor(STRATUM),
          .keep = "unused")
 
 summary(scallops)
@@ -60,10 +60,10 @@ summarise_all(scallops,n_distinct)
 
 #Remove unnecessary variables
 scallops <- scallops %>% 
-  select(-c("sex", "STATUS_CODE", "SVSPP"))
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
 
 #ggplot(scallops, aes(x = cruise)) + geom_bar()
-ggplot(scallops, aes(x = cruise6)) + geom_bar()
+#ggplot(scallops, aes(x = cruise6)) + geom_bar()
 #ggplot(scallops, aes(x = stratum)) + geom_bar()
 
 
@@ -72,8 +72,20 @@ ggplot(scallops, aes(x = cruise6)) + geom_bar()
 cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
 cruises <- cruises %>% 
   select(c("CRUISE6","SEASON","YEAR")) %>% 
-  mutate(cruise6 = as.factor(CRUISE6), .keep="unused")
+  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
 
-scallops <- left_join(scallops, cruises, by="cruise6")
+scallops <- left_join(scallops, cruises, by="CRUISE6")
+
+
+# Fixing lack of data -----------------------------------------------------
+
+df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
+
+df_stations_wrangled <- df_stations %>%
+  # filter(EST_YEAR %in% unlist(target_chunks)) %>%
+  mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
+  select(STATION,STRATUM,DATE) %>%
+  mutate(DATE=year(DATE)) %>%
+  distinct()
 
 
