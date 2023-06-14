@@ -27,7 +27,7 @@ summary(svcat)
 scallops <- svcat %>% 
   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
-rm(svcat)
+
 
 scallops <- scallops %>% 
   mutate(name = SCIENTIFIC_NAME,
@@ -62,3 +62,17 @@ cruises <- cruises %>%
 
 
 scallops <- left_join(scallops, cruises, by="cruise6")
+
+
+species <- svcat %>% 
+  group_by(SCIENTIFIC_NAME) %>% 
+  summarise(avg = mean(EXPCATCHWT))
+  
+
+species
+
+trues <- species %>%  filter(!is.na(species$avg)==TRUE)
+
+# preds <- svcat %>% 
+#   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+#            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")

@@ -6,9 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A list of non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.">
+<meta name="author" content="Ruby Krasnow">
+<meta name="dcterms.date" content="2023-06-14">
+<meta name="description" content="Making progress!">
 
-<title>Ruby’s Lab Notebook - Summer 2023 - Relevant Papers</title>
+<title>Ruby’s Lab Notebook - Summer 2023 - June 13 &amp; 14</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -93,7 +129,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Resources/Papers.html">Resources</a></li><li class="breadcrumb-item"><a href="../Resources/Papers.html">Relevant Papers</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Jun13_14.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Jun13_14.html">June 13 &amp; 14</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -121,7 +157,7 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link active">
+  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Relevant Papers</span></a>
   </div>
 </li>
@@ -144,7 +180,7 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../posts/Jun13_14.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Jun13_14.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">June 13 &amp; 14</span></a>
   </div>
 </li>
@@ -190,10 +226,8 @@ div.csl-indent {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#quantitative-fisheries-from-dr.-deyle" id="toc-quantitative-fisheries-from-dr.-deyle" class="nav-link active" data-scroll-target="#quantitative-fisheries-from-dr.-deyle">Quantitative Fisheries (from Dr.&nbsp;Deyle)</a></li>
-  <li><a href="#food-webs-ecosystem-based-management" id="toc-food-webs-ecosystem-based-management" class="nav-link" data-scroll-target="#food-webs-ecosystem-based-management">Food webs &amp; ecosystem-based management</a></li>
-  <li><a href="#atlantic-sea-scallops" id="toc-atlantic-sea-scallops" class="nav-link" data-scroll-target="#atlantic-sea-scallops">Atlantic sea scallops</a></li>
-  <li><a href="#other" id="toc-other" class="nav-link" data-scroll-target="#other">Other</a></li>
+  <li><a href="#reading-papers" id="toc-reading-papers" class="nav-link active" data-scroll-target="#reading-papers">Reading papers</a></li>
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">Data exploration</a></li>
   </ul>
 </nav>
     </div>
@@ -202,204 +236,97 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Relevant Papers</h1>
+<h1 class="title">June 13 &amp; 14</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Resources</div>
+    <div class="quarto-category">Week 2</div>
+    <div class="quarto-category">Data exploration</div>
+    <div class="quarto-category">Reading</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A list of non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.
+    Making progress!
   </div>
 </div>
 
 
 <div class="quarto-title-meta">
 
-    
-  
     <div>
-    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 12, 2023</p>
+             <p>Ruby Krasnow </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 14, 2023</p>
     </div>
   </div>
+  
     
   </div>
   
 
 </header>
 
-<section id="quantitative-fisheries-from-dr.-deyle" class="level1">
-<h1>Quantitative Fisheries (from Dr.&nbsp;Deyle)</h1>
-<table class="table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 74%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author, year</th>
-<th>Title</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="citation" data-cites="overholtz2009">Overholtz and Link (<a href="#ref-overholtz2009" role="doc-biblioref">2009</a>)</span></td>
-<td>A simulation model to explore the response of the Gulf of Maine food web to large-scale environmental and ecological changes</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="link2009">Jason Link et al. (<a href="#ref-link2009" role="doc-biblioref">2009</a>)</span></td>
-<td>Response of balanced network models to large-scale perturbation: Implications for evaluating the role of small pelagics in the Gulf of Maine</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="ross2021">Ross et al. (<a href="#ref-ross2021" role="doc-biblioref">2021</a>)</span></td>
-<td>Projecting regions of North Atlantic right whale, <em>Eubalaena glacialis</em>, habitat suitability in the Gulfof Maine for the year 2050</td>
-</tr>
-</tbody>
-</table>
+<section id="reading-papers" class="level3">
+<h3 class="anchored" data-anchor-id="reading-papers">Reading papers</h3>
+<p>I identified many recent papers that have specifically applied EDM to fisheries, several of which include comprehensive and well-annotated R scripts. I also explored the literature related to Atlantic sea scallops to see which questions have already been thoroughly examined and where I could potentially use EDM (or spatial EDM, sEDM) to fill in gaps in our scientific knowledge or confirm or refute the findings of alternative modeling approaches.</p>
+<p>Regardless of which of these topics I focus on, my first step will be to wrangle the dredge survey data to produce scallop time series that can be easily grouped by size, age class, and location. Getting the scallop data into a workable format will allow for an initial exploration of stock-recruitment dynamics, which could potentially be the entire focus of my project. Understanding scallop recruitment and yield-per-recruit, especially within the spatial context of a rotationally-managed fishery— is a fundamental part of accurate modeling and remains an important area of research <span class="citation" data-cites="hart2003 stokesbury2012 bethoney2016">(<a href="#ref-hart2003" role="doc-biblioref">D. Hart 2003</a>; <a href="#ref-stokesbury2012" role="doc-biblioref">Stokesbury 2012</a>; <a href="#ref-bethoney2016" role="doc-biblioref">Bethoney, Asci, and Stokesbury 2016</a>)</span>.</p>
+<section id="predation" class="level4">
+<h4 class="anchored" data-anchor-id="predation">Predation</h4>
+<p>I was first interested in the use of EDM to explore the impact of predation on Atlantic sea scallops, in a similar manner to how <span class="citation" data-cites="liu2022">Liu and Gaines (<a href="#ref-liu2022" role="doc-biblioref">2022</a>)</span> analyzed the interactions between kelp and sea urchins in a Southern California kelp forest. I find predator-prey relationships and interspecies interactions in general to be a fascinating area of ecology. Research on the effects of sea star and crab predation on scallop recruitment in the Mid-Atlantic Bight revealed significant complexity in ecosystem, as unknown environmental variables and significant spatial and temporal variability made it difficult to identify causative relationships <span class="citation" data-cites="hart2006 shank2012">(<a href="#ref-hart2006" role="doc-biblioref">D. R. Hart 2006</a>; <a href="#ref-shank2012" role="doc-biblioref">Shank, Hart, and Friedland 2012</a>)</span>. EDM could potentially be very useful in more conclusively determining causality in this system. However, the time series data for scallop predators appears relatively limited (much shorter than the overall dredge survey), potentially limiting the use of EDM. I will continue to look for predator data that could facilitate an EDM analysis of this interesting system.</p>
+<blockquote class="blockquote">
+<p>“Nonetheless, due to the lack of quantitative analyses, the causal connection between predation pressure and sea scallop size structure interannual variability remains unknown” <span class="citation" data-cites="zang2023">(<a href="#ref-zang2023" role="doc-biblioref">Zang et al. 2023</a>)</span></p>
+</blockquote>
 </section>
-<section id="food-webs-ecosystem-based-management" class="level1">
-<h1>Food webs &amp; ecosystem-based management</h1>
-<table class="table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 75%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author, year</th>
-<th>Title</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="citation" data-cites="link2002">J. Link (<a href="#ref-link2002" role="doc-biblioref">2002</a>)</span></td>
-<td>Does food web theory work for marine ecosystems?</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="tam2017">Tam et al. (<a href="#ref-tam2017" role="doc-biblioref">2017</a>)</span></td>
-<td>Towards ecosystem-based management: identifying operational food-web indicators for marine ecosystems</td>
-</tr>
-</tbody>
-</table>
+<section id="natural-mortality" class="level4">
+<h4 class="anchored" data-anchor-id="natural-mortality">Natural mortality</h4>
+<p>Estimating natural mortality (M) is an issue of ongoing concern in fisheries management worldwide <span class="citation" data-cites="hamel2023 kenchington2014">(e.g., <a href="#ref-hamel2023" role="doc-biblioref">Hamel et al. 2023</a>; <a href="#ref-kenchington2014" role="doc-biblioref">Kenchington 2014</a>)</span>. <span class="citation" data-cites="hart2022">D. R. Hart and Chang (<a href="#ref-hart2022" role="doc-biblioref">2022</a>)</span> recently improved the performance of size-based scallop stock assessment models by estimating temporally variable natural mortality, rather than the historical approach of using a fixed value of M (e.g., M=0.16 for closed areas of Georges Bank). However, the likely density-dependence, spatial and temporal variability, and potential confounding of natural mortality with fishing mortality present challenges when attempting to use traditional modeling approaches to uncover the dynamics of the system <span class="citation" data-cites="hart2022">(<a href="#ref-hart2022" role="doc-biblioref">D. R. Hart and Chang 2022</a>)</span>. Additionally, the stock assessment framework underlying previous examinations of scallop natural mortality may be obscuring the true nonlinear dynamics of the system, as stock assessment models often overestimate stability and underestimate predictability, with potentially significant implications for fisheries management <span class="citation" data-cites="storch2017">(<a href="#ref-storch2017" role="doc-biblioref">Storch et al. 2017</a>)</span>.</p>
 </section>
-<section id="atlantic-sea-scallops" class="level1">
-<h1>Atlantic sea scallops</h1>
-<table class="table">
-<colgroup>
-<col style="width: 26%">
-<col style="width: 73%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author, year</th>
-<th>Title</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="citation" data-cites="bethoney2016">Bethoney, Asci, and Stokesbury (<a href="#ref-bethoney2016" role="doc-biblioref">2016</a>)</span></td>
-<td>Implications of extremely high recruitment events into the US sea scallop fishery</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="cooley2015">Cooley et al. (<a href="#ref-cooley2015" role="doc-biblioref">2015</a>)</span></td>
-<td>An Integrated Assessment Model for Helping the United States Sea Scallop (Placopecten magellanicus) Fishery Plan Ahead for Ocean Acidification and Warming</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="hart2003">D. Hart (<a href="#ref-hart2003" role="doc-biblioref">2003</a>)</span></td>
-<td>Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="hart2006">D. R. Hart (<a href="#ref-hart2006" role="doc-biblioref">2006</a>)</span></td>
-<td>Effects of sea stars and crabs on sea scallop Placopecten magellanicus recruitment in the Mid-Atlantic Bight (USA)</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="hart2022">D. R. Hart and Chang (<a href="#ref-hart2022" role="doc-biblioref">2022</a>)</span></td>
-<td>Estimating natural mortality for Atlantic Sea scallops (Placopecten magellenicus) using a size-based stock assessment model</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="hart2013">D. R. Hart, Jacobson, and Tang (<a href="#ref-hart2013" role="doc-biblioref">2013</a>)</span></td>
-<td>To split or not to split: Assessment of Georges Bank sea scallops in the presence of marine protected areas</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="pousse2023">Pousse et al. (<a href="#ref-pousse2023" role="doc-biblioref">2023</a>)</span></td>
-<td>Juvenile Atlantic sea scallop, Placopecten magellanicus, energetic response to increased carbon dioxide and temperature changes</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="rheuban2018">Rheuban et al. (<a href="#ref-rheuban2018" role="doc-biblioref">2018</a>)</span></td>
-<td>Projected impacts of future climate change, ocean acidification, and management on the US Atlantic sea scallop (Placopecten magellanicus) fishery</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="shank2012">Shank, Hart, and Friedland (<a href="#ref-shank2012" role="doc-biblioref">2012</a>)</span></td>
-<td>Post-settlement predation by sea stars and crabs on the sea scallop in the Mid-Atlantic Bight</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="stokesbury2012">Stokesbury (<a href="#ref-stokesbury2012" role="doc-biblioref">2012</a>)</span></td>
-<td>Stock Definition and Recruitment: Implications for the U.S. Sea Scallop (Placopecten magellanicus) Fishery from 2003 to 2011</td>
-</tr>
-<tr class="odd">
-<td><span class="citation" data-cites="truesdell2016">Truesdell, Hart, and Chen (<a href="#ref-truesdell2016" role="doc-biblioref">2016</a>)</span></td>
-<td>Effects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: an application to the US Atlantic sea scallop fishery</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="zang2023">Zang et al. (<a href="#ref-zang2023" role="doc-biblioref">2023</a>)</span></td>
-<td>Effects of warming and fishing on Atlantic sea scallop (Placopecten magellanicus) size structure in the Mid-Atlantic rotationally closed areas</td>
-</tr>
-</tbody>
-</table>
+<section id="comprehensive-model" class="level4">
+<h4 class="anchored" data-anchor-id="comprehensive-model">Comprehensive model</h4>
+<p>The other route that I am exploring would be something related to creating an sEDM analog to the model(s) used by <span class="citation" data-cites="zang2023">Zang et al. (<a href="#ref-zang2023" role="doc-biblioref">2023</a>)</span>, <span class="citation" data-cites="cooley2015">Cooley et al. (<a href="#ref-cooley2015" role="doc-biblioref">2015</a>)</span>, or <span class="citation" data-cites="rheuban2018">Rheuban et al. (<a href="#ref-rheuban2018" role="doc-biblioref">2018</a>)</span>. Input data would likely be size data from the dredge surveys, temperature and ocean carbonate chemistry (could use FVCOM), and food availability (primary production/phytoplankton). These models have been extremely valuable to understand how rising temperatures, ocean acidification, and fishing pressure impact scallop populations, bringing us closer to true ecosystem-based management for one of North America’s most economically valuable fisheries. However, they rely on population dynamic models based on the von Bertalanffy growth function and growth matrices, with specific growth, weight, and mortality parameters. As our knowledge of scallop physiology and life history continues to expand, it is becoming more clear that the processes relevant to the creation of these models can be highly state-dependent, so using sEDM instead of a model relying on fixed parameters could potentially yield improved forecasts of scallop abundance. For example, the first experiment on scallop response to increased CO<sub>2</sub> and temperature showed that the independent effects of CO<sub>2</sub> and temperature change once a CO<sub>2</sub> threshold is reached <span class="citation" data-cites="pousse2023">(<a href="#ref-pousse2023" role="doc-biblioref">Pousse et al. 2023</a>)</span>. No studies have yet utilized this insight when predicting the impacts of climate change and ocean acidification on the scallop fishery; a project using EDM to explore these impacts would therefore be the first not to rely on a model that is inconsistent with recently-uncovered mechanistic relationships. However, creating and testing such a model would be a highly involved process and may not be feasible within the remainder of the summer.</p>
 </section>
-<section id="other" class="level1">
-<h1>Other</h1>
-<table class="table">
-<colgroup>
-<col style="width: 26%">
-<col style="width: 41%">
-<col style="width: 32%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author, year</th>
-<th>Title</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="citation" data-cites="maunder2004">Maunder and Punt (<a href="#ref-maunder2004" role="doc-biblioref">2004</a>)</span></td>
-<td>Standardizing catch and effort data: a review of recent approaches</td>
-<td>Good background on CPUE. Includes intro to catch data standardization, dealing with zeros and interactions, and selecting explanatory variables</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="hsieh2008a">Hsieh et al. (<a href="#ref-hsieh2008a" role="doc-biblioref">2008</a>)</span></td>
-<td>Spatial analysis shows that fishing enhances the climatic sensitivity of marine fishes</td>
-<td>Analyzed spatial area of occupancy and index of spatial heterogeneity, and changes in distribution from cold to warm period. Used linear regression and a variety of nonparametric tests</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<colgroup>
-<col style="width: 26%">
-<col style="width: 73%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Author, year</th>
-<th>Title</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="citation" data-cites="hamel2023">Hamel et al. (<a href="#ref-hamel2023" role="doc-biblioref">2023</a>)</span></td>
-<td>Natural mortality: Theory, estimation and application in fishery stock assessment models</td>
-</tr>
-<tr class="even">
-<td><span class="citation" data-cites="kenchington2014">Kenchington (<a href="#ref-kenchington2014" role="doc-biblioref">2014</a>)</span></td>
-<td>Natural mortality estimators for information-limited fisheries</td>
-</tr>
-</tbody>
-</table>
+</section>
+<section id="data-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="data-exploration">Data exploration</h2>
+<p>Load packages</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Set-up (from June 12)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>svcat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#filter to only species of interest - reduces it from 94632 observations to 21425</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> svcat <span class="sc">%&gt;%</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="sc">|</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop clapper)"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#turn categorical variables into factors</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> SCIENTIFIC_NAME,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">stratum =</span> <span class="fu">as.factor</span>(STRATUM),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove unnecessary/redundant variables: all entries are listed as unknown sex, all have the same status code, and SVSPP corresponds with name</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 
@@ -421,29 +348,14 @@ Hart, Deborah R. 2006. <span>“Effects of Sea Stars and Crabs on Sea Scallop Pl
 <div id="ref-hart2022" class="csl-entry" role="listitem">
 Hart, Deborah R., and Jui-Han Chang. 2022. <span>“Estimating Natural Mortality for Atlantic Sea Scallops (Placopecten Magellenicus) Using a Size-Based Stock Assessment Model.”</span> <em>Fisheries Research</em> 254 (October): 106423. <a href="https://doi.org/10.1016/j.fishres.2022.106423">https://doi.org/10.1016/j.fishres.2022.106423</a>.
 </div>
-<div id="ref-hart2013" class="csl-entry" role="listitem">
-Hart, Deborah R., Larry D. Jacobson, and Jiashen Tang. 2013. <span>“To Split or Not to Split: Assessment of Georges Bank Sea Scallops in the Presence of Marine Protected Areas.”</span> <em>Fisheries Research</em>, Marine Protected Areas as a Fisheries Management Tool, 144 (July): 74–83. <a href="https://doi.org/10.1016/j.fishres.2012.11.004">https://doi.org/10.1016/j.fishres.2012.11.004</a>.
-</div>
 <div id="ref-hart2003" class="csl-entry" role="listitem">
 Hart, Dvora. 2003. <span>“Yield- and Biomass-Per-Recruit Analysis for Rotational Fisheries, with an Application to the Atlantic Sea Scallop (Placopecten Magellanicus).”</span> <em>Fishery Bulletin - National Oceanic and Atmospheric Administration</em> 101 (January): 44–57. <a href="https://www.researchgate.net/publication/279700466_Yield-_and_biomass-per-recruit_analysis_for_rotational_fisheries_with_an_application_to_the_Atlantic_sea_scallop_Placopecten_magellanicus">https://www.researchgate.net/publication/279700466_Yield-_and_biomass-per-recruit_analysis_for_rotational_fisheries_with_an_application_to_the_Atlantic_sea_scallop_Placopecten_magellanicus</a>.
-</div>
-<div id="ref-hsieh2008a" class="csl-entry" role="listitem">
-Hsieh, Chih-hao, Christian S Reiss, Roger P Hewitt, and George Sugihara. 2008. <span>“Spatial Analysis Shows That Fishing Enhances the Climatic Sensitivity of Marine Fishes.”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 65 (5): 947–61. <a href="https://doi.org/10.1139/f08-017">https://doi.org/10.1139/f08-017</a>.
 </div>
 <div id="ref-kenchington2014" class="csl-entry" role="listitem">
 Kenchington, Trevor J. 2014. <span>“Natural Mortality Estimators for Information-Limited Fisheries.”</span> <em>Fish and Fisheries</em> 15 (4): 533–62. <a href="https://doi.org/10.1111/faf.12027">https://doi.org/10.1111/faf.12027</a>.
 </div>
-<div id="ref-link2002" class="csl-entry" role="listitem">
-Link, J. 2002. <span>“Does Food Web Theory Work for Marine Ecosystems?”</span> <em>Marine Ecology Progress Series</em> 230: 1–9. <a href="https://doi.org/10.3354/meps230001">https://doi.org/10.3354/meps230001</a>.
-</div>
-<div id="ref-link2009" class="csl-entry" role="listitem">
-Link, Jason, Laurel Col, Vincent Guida, David Dow, John O’Reilly, Jack Green, William Overholtz, et al. 2009. <span>“Response of Balanced Network Models to Large-Scale Perturbation: Implications for Evaluating the Role of Small Pelagics in the Gulf of Maine.”</span> <em>Ecological Modelling</em> 220 (3): 351–69. <a href="https://doi.org/10.1016/j.ecolmodel.2008.10.009">https://doi.org/10.1016/j.ecolmodel.2008.10.009</a>.
-</div>
-<div id="ref-maunder2004" class="csl-entry" role="listitem">
-Maunder, Mark N., and André E. Punt. 2004. <span>“Standardizing Catch and Effort Data: A Review of Recent Approaches.”</span> <em>Fisheries Research</em>, Models in Fisheries Research: GLMs, GAMS and GLMMs, 70 (2): 141–59. <a href="https://doi.org/10.1016/j.fishres.2004.08.002">https://doi.org/10.1016/j.fishres.2004.08.002</a>.
-</div>
-<div id="ref-overholtz2009" class="csl-entry" role="listitem">
-Overholtz, William, and Jason Link. 2009. <span>“A Simulation Model to Explore the Response of the Gulf of Maine Food Web to Large-Scale Environmental and Ecological Changes.”</span> <em>Ecological Modelling</em> 220 (19): 2491–2502. <a href="https://doi.org/10.1016/j.ecolmodel.2009.06.034">https://doi.org/10.1016/j.ecolmodel.2009.06.034</a>.
+<div id="ref-liu2022" class="csl-entry" role="listitem">
+Liu, Owen R., and Steven D. Gaines. 2022. <span>“Environmental Context Dependency in Species Interactions.”</span> <em>Proceedings of the National Academy of Sciences</em> 119 (36): e2118539119. <a href="https://doi.org/10.1073/pnas.2118539119">https://doi.org/10.1073/pnas.2118539119</a>.
 </div>
 <div id="ref-pousse2023" class="csl-entry" role="listitem">
 Pousse, Emilien, Matthew E. Poach, Dylan H. Redman, George Sennefelder, William Hubbard, Kristin Osborne, Daphne Munroe, et al. 2023. <span>“Juvenile Atlantic Sea Scallop, Placopecten Magellanicus, Energetic Response to Increased Carbon Dioxide and Temperature Changes.”</span> <em>PLOS Climate</em> 2 (2): e0000142. <a href="https://doi.org/10.1371/journal.pclm.0000142">https://doi.org/10.1371/journal.pclm.0000142</a>.
@@ -451,20 +363,14 @@ Pousse, Emilien, Matthew E. Poach, Dylan H. Redman, George Sennefelder, William 
 <div id="ref-rheuban2018" class="csl-entry" role="listitem">
 Rheuban, Jennie E., Scott C. Doney, Sarah R. Cooley, and Deborah R. Hart. 2018. <span>“Projected Impacts of Future Climate Change, Ocean Acidification, and Management on the US Atlantic Sea Scallop (Placopecten Magellanicus) Fishery.”</span> <em>PLOS ONE</em> 13 (9): e0203536. <a href="https://doi.org/10.1371/journal.pone.0203536">https://doi.org/10.1371/journal.pone.0203536</a>.
 </div>
-<div id="ref-ross2021" class="csl-entry" role="listitem">
-Ross, Camille H., Daniel E. Pendleton, Benjamin Tupper, David Brickman, Monica A. Zani, Charles A. Mayo, and Nicholas R. Record. 2021. <span>“Projecting Regions of North Atlantic Right Whale, Eubalaena Glacialis, Habitat Suitability in the Gulf of Maine for the Year 2050.”</span> <em>Elementa: Science of the Anthropocene</em> 9 (1): 00058. <a href="https://doi.org/10.1525/elementa.2020.20.00058">https://doi.org/10.1525/elementa.2020.20.00058</a>.
-</div>
 <div id="ref-shank2012" class="csl-entry" role="listitem">
 Shank, Burton V., Deborah R. Hart, and Kevin D. Friedland. 2012. <span>“Post-Settlement Predation by Sea Stars and Crabs on the Sea Scallop in the Mid-Atlantic Bight.”</span> <em>Marine Ecology Progress Series</em> 468 (November): 161–77. <a href="https://doi.org/10.3354/meps09974">https://doi.org/10.3354/meps09974</a>.
 </div>
 <div id="ref-stokesbury2012" class="csl-entry" role="listitem">
 Stokesbury, Kevin D. E. 2012. <span>“Stock Definition and Recruitment: Implications for the u.s. Sea Scallop (Placopecten Magellanicus) Fishery from 2003 to 2011.”</span> <em>Reviews in Fisheries Science</em> 20 (3): 154–64. <a href="https://doi.org/10.1080/10641262.2012.695816">https://doi.org/10.1080/10641262.2012.695816</a>.
 </div>
-<div id="ref-tam2017" class="csl-entry" role="listitem">
-Tam, Jamie C., Jason S. Link, Axel G. Rossberg, Stuart I. Rogers, Philip S. Levin, Marie-Joëlle Rochet, Alida Bundy, et al. 2017. <span>“Towards Ecosystem-Based Management: Identifying Operational Food-Web Indicators for Marine Ecosystems.”</span> <em>ICES Journal of Marine Science</em> 74 (7): 2040–52. <a href="https://doi.org/10.1093/icesjms/fsw230">https://doi.org/10.1093/icesjms/fsw230</a>.
-</div>
-<div id="ref-truesdell2016" class="csl-entry" role="listitem">
-Truesdell, Samuel B., Deborah R. Hart, and Yong Chen. 2016. <span>“Effects of Spatial Heterogeneity in Growth and Fishing Effort on Yield-Per-Recruit Models: An Application to the US Atlantic Sea Scallop Fishery.”</span> <em>ICES Journal of Marine Science</em> 73 (4): 1062–73. <a href="https://doi.org/10.1093/icesjms/fsv238">https://doi.org/10.1093/icesjms/fsv238</a>.
+<div id="ref-storch2017" class="csl-entry" role="listitem">
+Storch, Laura S., Sarah M. Glaser, Hao Ye, and Andrew A. Rosenberg. 2017. <span>“Stock Assessment and End-to-End Ecosystem Models Alter Dynamics of Fisheries Data.”</span> <em>PLOS ONE</em> 12 (2): e0171644. <a href="https://doi.org/10.1371/journal.pone.0171644">https://doi.org/10.1371/journal.pone.0171644</a>.
 </div>
 <div id="ref-zang2023" class="csl-entry" role="listitem">
 Zang, Z, R Ji, D R Hart, D Jin, C Chen, Y Liu, and C S Davis. 2023. <span>“Effects of Warming and Fishing on Atlantic Sea Scallop (Placopecten Magellanicus) Size Structure in the Mid-Atlantic Rotationally Closed Areas.”</span> <em>ICES Journal of Marine Science</em>, April, fsad063. <a href="https://doi.org/10.1093/icesjms/fsad063">https://doi.org/10.1093/icesjms/fsad063</a>.
