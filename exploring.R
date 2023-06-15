@@ -51,14 +51,14 @@ scallops <- scallops %>%
 summary(scallops)
 
 scallops <- scallops %>% 
-  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
 
 summarise_all(scallops,n_distinct)
 
 #All have sex = 0, means unknown sex
 #SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species
-
-#Remove unnecessary variables
+#So we can remove unnecessary variables
 scallops <- scallops %>% 
   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
 
@@ -80,6 +80,7 @@ scallops <- left_join(scallops, cruises, by="CRUISE6")
 # Fixing lack of data -----------------------------------------------------
 
 df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
+df_strata <- read.csv("data/SVDBS_SVMSTRATA.csv")
 
 df_stations_wrangled <- df_stations %>%
   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
@@ -88,4 +89,7 @@ df_stations_wrangled <- df_stations %>%
   mutate(DATE=year(DATE)) %>%
   distinct()
 
-
+#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
+data.frame(table(df_stations_wrangled$STATION))
+data.frame(table(df_stations_wrangled$STRATUM))
+data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?

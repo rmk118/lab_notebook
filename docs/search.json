@@ -49,6 +49,69 @@
     "text": "EDM & Meeting\nIn the afternoon I continued to work on the Intro to EDM page. I finished the simplex projection and S-map sections and started on the CCM section. I also had a productive Zoom meeting with Dr. Deyle where we discussed my progress thus far and directions for future work. We focused somewhat on the potential spatial aspect of the project, and he provided examples of spatial EDM papers as well as a list of R packages that are useful for spatial analysis."
   },
   {
+    "objectID": "posts/Week1.html",
+    "href": "posts/Week1.html",
+    "title": "Week 1",
+    "section": "",
+    "text": "I spent much of today reading the papers that Dr. Deyle provided related to EDM and quantitative fisheries. The EDM papers included applications of the approach to specific case studies, as well as the mathematical background. For example, (Sugihara et al. 2012) is the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).\nI also familiarized myself with recent modeling studies related to the Atlantic sea scallop fishery. The economic value of the scallop fishery and the availability of high-quality time series data make scallops a good choice for meaningful applied data science. There have been various models created to estimate biomass (stock assessments), estimate natural mortality, and to develop an Integrated Assessment Model to inform fishery management under changing oceanographic conditions. However, these models depend on assumptions (especially about stock-recruitment relationships) that may not be justified. EDM could potentially provide new insights into the factors that impact scallop abundance without needing to make such assumption.\nThere are also many interesting spatial dynamics to consider, particularly related to the rotational management plans implemented by the New England Fishery Management Council. Another potential area of investigation relates to new research by Pousse et al., (2023) indicating that ocean acidification depresses the growth of juvenile Atlantic sea scallops. This research highlights the need for accurate forecasting of scallop populations under projected acidification conditions in order to ensure the continued prosperity of the fishery.\n\n\n\n\n\nUnfortunately, I had to spend several hours today wrangling with Git and GitHub in order to create the new repository for this notebook and successfully connect it to GitHub. The main issues were related to inconsistent authentication protocols (HTTPS vs. ssh) between my GitHub account, GitHub CLI, and local repo. Eventually, I resolved the issues and successfully link the local and remote directories and deploy this notebook as a GitHub pages site associated with the repository.\n\n\n\nIt has been several years since I last worked in Markdown, and I reviewed the basic syntax: headers, italics, bullet points, inserting links, etc. My previous experience using Markdown syntax was in R Markdown, but for this lab notebook I decided to learn Quarto. Quarto is an “open-source scientific and technical publishing system” that is used by academics to create static and dynamic documents, personal websites, CVs, books, and other media. Called the next generation of R Markdown, knowing how to use Quarto will be a valuable skill for this REU project as well as future research endeavors.\n\n\n\n\n\nFinish reading the all of the quantitative fisheries papers that Dr. Deyle provided\nCreate a blog page (blog = lab notebook website) to collect and organize my list of relevant papers\nEDM\n\nCreate an “Intro to EDM” blog page where I can summarize my understanding of EDM and associated analytical techniques. I am not sure that my grasp of the theory behind EDM is solid enough to accurately apply it to complex systems or to explore new conceptual areas, and I think that writing such a page (much like teaching a concept to someone else) will help me identify and resolve gaps in my understanding.\nSolidify my understanding of the different ways that EDM can incorporate spatial data. I plan to re-read some of the key spatial EDM papers to review the theory and the methods they used, as during my initial read I mostly focused on the introduction, results, and discussion/conclusions. I primarily want to feel more confident in my ability to determine which approach(es) would be most suitable for a given data set.\n\nBegin looking at the scallop data"
+  },
+  {
+    "objectID": "posts/Week1.html#papers",
+    "href": "posts/Week1.html#papers",
+    "title": "Week 1",
+    "section": "",
+    "text": "I spent much of today reading the papers that Dr. Deyle provided related to EDM and quantitative fisheries. The EDM papers included applications of the approach to specific case studies, as well as the mathematical background. For example, (Sugihara et al. 2012) is the foundational paper describing the use of EDM to detect causality through convergent cross-mapping (CCM).\nI also familiarized myself with recent modeling studies related to the Atlantic sea scallop fishery. The economic value of the scallop fishery and the availability of high-quality time series data make scallops a good choice for meaningful applied data science. There have been various models created to estimate biomass (stock assessments), estimate natural mortality, and to develop an Integrated Assessment Model to inform fishery management under changing oceanographic conditions. However, these models depend on assumptions (especially about stock-recruitment relationships) that may not be justified. EDM could potentially provide new insights into the factors that impact scallop abundance without needing to make such assumption.\nThere are also many interesting spatial dynamics to consider, particularly related to the rotational management plans implemented by the New England Fishery Management Council. Another potential area of investigation relates to new research by Pousse et al., (2023) indicating that ocean acidification depresses the growth of juvenile Atlantic sea scallops. This research highlights the need for accurate forecasting of scallop populations under projected acidification conditions in order to ensure the continued prosperity of the fishery."
+  },
+  {
+    "objectID": "posts/Week1.html#building-this-notebook",
+    "href": "posts/Week1.html#building-this-notebook",
+    "title": "Week 1",
+    "section": "",
+    "text": "Unfortunately, I had to spend several hours today wrangling with Git and GitHub in order to create the new repository for this notebook and successfully connect it to GitHub. The main issues were related to inconsistent authentication protocols (HTTPS vs. ssh) between my GitHub account, GitHub CLI, and local repo. Eventually, I resolved the issues and successfully link the local and remote directories and deploy this notebook as a GitHub pages site associated with the repository.\n\n\n\nIt has been several years since I last worked in Markdown, and I reviewed the basic syntax: headers, italics, bullet points, inserting links, etc. My previous experience using Markdown syntax was in R Markdown, but for this lab notebook I decided to learn Quarto. Quarto is an “open-source scientific and technical publishing system” that is used by academics to create static and dynamic documents, personal websites, CVs, books, and other media. Called the next generation of R Markdown, knowing how to use Quarto will be a valuable skill for this REU project as well as future research endeavors."
+  },
+  {
+    "objectID": "posts/Week1.html#goalsfuture-work",
+    "href": "posts/Week1.html#goalsfuture-work",
+    "title": "Week 1",
+    "section": "",
+    "text": "Finish reading the all of the quantitative fisheries papers that Dr. Deyle provided\nCreate a blog page (blog = lab notebook website) to collect and organize my list of relevant papers\nEDM\n\nCreate an “Intro to EDM” blog page where I can summarize my understanding of EDM and associated analytical techniques. I am not sure that my grasp of the theory behind EDM is solid enough to accurately apply it to complex systems or to explore new conceptual areas, and I think that writing such a page (much like teaching a concept to someone else) will help me identify and resolve gaps in my understanding.\nSolidify my understanding of the different ways that EDM can incorporate spatial data. I plan to re-read some of the key spatial EDM papers to review the theory and the methods they used, as during my initial read I mostly focused on the introduction, results, and discussion/conclusions. I primarily want to feel more confident in my ability to determine which approach(es) would be most suitable for a given data set.\n\nBegin looking at the scallop data"
+  },
+  {
+    "objectID": "posts/Week1.html#brite-reu-trainings-workshops",
+    "href": "posts/Week1.html#brite-reu-trainings-workshops",
+    "title": "Week 1",
+    "section": "BRITE REU trainings & workshops",
+    "text": "BRITE REU trainings & workshops\nThis morning we had our first programming workshop as part of the BRITE REU program, led by Michael Silverstein. We learned how to access the SSC and set up interactive sessions in Jupyter Notebook and RStudio.\nWe then had an ethics training alongside students from other REU programs at Boston University. I have had many similar ethics trainings before and am always cognizant of the need to avoid scientific misconduct, but it was interesting to hear the speaker describe several high-profile misconduct cases with which I was unfamiliar (like Mark Spector)."
+  },
+  {
+    "objectID": "posts/Week1.html#edm",
+    "href": "posts/Week1.html#edm",
+    "title": "Week 1",
+    "section": "EDM",
+    "text": "EDM\nI spent this afternoon reading and re-reading papers that Dr. Deyle provided related to EDM. I also read more about the basics of dynamical systems theory, which underpins EDM (and indeed, much of modern science). I started working on an Intro to EDM page for this site and found that attempting to articulate the concepts in my own words was tremendously helpful in solidifying my understanding of the concepts."
+  },
+  {
+    "objectID": "posts/Week1.html#python-practice",
+    "href": "posts/Week1.html#python-practice",
+    "title": "Week 1",
+    "section": "Python Practice",
+    "text": "Python Practice\nThis morning I worked through the Introduction to Python section of the BRITE Python programming workshop."
+  },
+  {
+    "objectID": "posts/Week1.html#urop-bbq",
+    "href": "posts/Week1.html#urop-bbq",
+    "title": "Week 1",
+    "section": "UROP BBQ",
+    "text": "UROP BBQ\nAt noon we had the Summer Kick-Off BBQ sponsored by the BU Undergraduate Research Opportunities Program (UROP). I had the chance to talk with some students from BU who are doing chemistry research over the summer. It was interesting to hear about their research, especially in areas (related to inorganic chemistry) that I am less familiar with."
+  },
+  {
+    "objectID": "posts/Week1.html#edm-meeting",
+    "href": "posts/Week1.html#edm-meeting",
+    "title": "Week 1",
+    "section": "EDM & Meeting",
+    "text": "EDM & Meeting\nIn the afternoon I continued to work on the Intro to EDM page. I finished the simplex projection and S-map sections and started on the CCM section. I also had a productive Zoom meeting with Dr. Deyle where we discussed my progress thus far and directions for future work. We focused somewhat on the potential spatial aspect of the project, and he provided examples of spatial EDM papers as well as a list of R packages that are useful for spatial analysis."
+  },
+  {
     "objectID": "posts/Jun13_14.html",
     "href": "posts/Jun13_14.html",
     "title": "June 13 & 14",
@@ -165,6 +228,6 @@
     "href": "blog.html",
     "title": "All Posts",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\nJune 13 & 14\n\n\n\nWeek 2\n\n\nData exploration\n\n\nReading\n\n\n\nMaking progress!\n\n\n\nJun 14, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 12\n\n\n\nWeek 2\n\n\nData exploration\n\n\nReading\n\n\n\nMy activities for the day.\n\n\n\nJun 12, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 9\n\n\n\nWeek 1\n\n\nEvents\n\n\nReading\n\n\n\nMy activities for the day.\n\n\n\nJun 9, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 8\n\n\n\nWeek 1\n\n\nWorkshop\n\n\n\nMy activities for the day.\n\n\n\nJun 8, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 7\n\n\n\nWeek 1\n\n\nEvents\n\n\n\nHighlights from the 16th Annual Student-Organized Bioinformatics Symposium.\n\n\n\nJun 7, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 6\n\n\n\nReading\n\n\nWeek 1\n\n\n\nMy first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R…\n\n\n\nJun 6, 2023\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n\n\n\nJune 13 & 14\n\n\n\nWeek 2\n\n\nData exploration\n\n\nReading\n\n\n\nMaking progress!\n\n\n\nJun 14, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 12\n\n\n\nWeek 2\n\n\nData exploration\n\n\nReading\n\n\n\nMy activities for the day.\n\n\n\nJun 12, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 9\n\n\n\nWeek 1\n\n\nEvents\n\n\nReading\n\n\n\nMy activities for the day.\n\n\n\nJun 9, 2023\n\n\n\n\n\n\n\n\n\n\n\nWeek 1\n\n\n\nWeek 1\n\n\nEvents\n\n\nReading\n\n\n\nMy first week on the job! Lots of getting organized, reading papers, and learning/refreshing my knowledge of Git, GitHub, R Markdown, Python, and Quarto. We also had our…\n\n\n\nJun 9, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 8\n\n\n\nWeek 1\n\n\nWorkshop\n\n\n\nMy activities for the day.\n\n\n\nJun 8, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 7\n\n\n\nWeek 1\n\n\nEvents\n\n\n\nHighlights from the 16th Annual Student-Organized Bioinformatics Symposium.\n\n\n\nJun 7, 2023\n\n\n\n\n\n\n\n\n\n\n\nJune 6\n\n\n\nReading\n\n\nWeek 1\n\n\n\nMy first day on the job! Here a brief summary of some of the articles I read today, where my project might be going, and a description of what I learned about Git, GitHub, R…\n\n\n\nJun 6, 2023\n\n\n\n\n\n\n\n\nNo matching items"
   }
 ]
