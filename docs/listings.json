@@ -2,13 +2,11 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/Week2R.html",
+      "/posts/Week2words.html",
       "/posts/Jun13_14.html",
       "/posts/Jun12.html",
-      "/posts/Jun9.html",
-      "/posts/Week1.html",
-      "/posts/Jun8.html",
-      "/posts/Jun7/Jun7.html",
-      "/posts/Jun6/Jun6.html"
+      "/posts/Week1.html"
     ]
   }
 ]

@@ -18,6 +18,8 @@ website:
     - section: "Project Updates"
       contents:
         - posts/Week1.qmd
+        - posts/Week2words.qmd
+        - posts/Week2R.qmd
 
 format:
   html:

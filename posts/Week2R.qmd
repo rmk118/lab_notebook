@@ -1,0 +1,142 @@
+---
+title: 'Week 2 in R'
+date: '2023-06-15'
+categories: ['Week 2', 'R']
+description: 'My activities for the week'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+Note: I continually refined my code, so some of the older or now-unnecessary code cells below are set to "eval = FALSE" so that the code will still be visible but will not be evaluated and disrupt the output of later cells.
+
+## Monday, June 12
+
+**All set to eval = FALSE**
+
+Load packages
+
+```{r, eval = FALSE}
+library(ggplot2)
+library(dplyr)
+
+```
+
+Looking at 22564_UNION_FSCS_SVCAT (one out of five .csv files in the folder shared by Dr. Deyle)
+
+```{r, eval = FALSE}
+#read data
+svcat <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv")
+
+#view the first six rows of data
+head(svcat)
+
+#different overviews of the data
+summary(svcat)
+glimpse(svcat)
+```
+
+```{r, eval = FALSE}
+#filter to only species of interest - reduces it from 94632 observations to 21425
+scallops <- svcat %>% 
+  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+scallops <- scallops %>% 
+  mutate(name = SCIENTIFIC_NAME,
+         cruise6 = as.factor(CRUISE6),
+         cruise = as.factor(CRUISE),
+         sex = as.factor(CATCHSEX),
+         stratum = as.factor(STRATUM),
+         .keep = "unused")
+
+summary(scallops)
+```
+
+```{r, eval = FALSE}
+scallops <- scallops %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+
+summarise_all(scallops,n_distinct)
+
+#All have sex = 0, means unknown sex
+#SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species
+
+#Remove unnecessary variables
+scallops <- scallops %>% 
+  select(-c("sex", "STATUS_CODE", "SVSPP"))
+
+#ggplot(scallops, aes(x = cruise)) + geom_bar()
+#ggplot(scallops, aes(x = cruise6)) + geom_bar()
+#ggplot(scallops, aes(x = stratum)) + geom_bar()
+  
+```
+
+# Tuesday and Wednesday (June 13 and 14)
+
+Load packages
+
+```{r}
+library(tidyverse) #rather than importing separately
+
+```
+
+Set-up (from June 12)
+
+```{r}
+#read data
+svcat <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv")
+
+#filter to only species of interest - reduces it from 94632 observations to 21425
+scallops <- svcat %>% 
+  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+#turn categorical variables into factors
+scallops <- scallops %>% 
+  mutate(name = SCIENTIFIC_NAME,
+         cruise6 = as.factor(CRUISE6),
+         cruise = as.factor(CRUISE),
+         sex = as.factor(CATCHSEX),
+         stratum = as.factor(STRATUM),
+         .keep = "unused")
+
+#shorten for clarity
+scallops <- scallops %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+
+#Remove unnecessary/redundant variables: all entries are listed as unknown sex (sex=0), 
+# all have the same status code (10), and SVSPP corresponds with name (401 = scallop, 
+# 400 = clappers)
+scallops <- scallops %>% 
+  select(-c("sex", "STATUS_CODE", "SVSPP"))
+```
+
+I worked on turning the data into an actual time series:
+
+```{r}
+#read the file that has the season and year associated with each cruise
+cruises <- read.csv("~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES.csv")
+
+#select the relevant variables
+cruises <- cruises %>% 
+  select(c("CRUISE6","SEASON","YEAR")) %>% 
+  mutate(cruise6 = as.factor(CRUISE6), .keep="unused")
+
+#combine with the existing dataframe
+scallops <- left_join(scallops, cruises, by="cruise6")
+
+as_tibble(scallops)
+
+```
+
+# Thursday (June 15)
+
+```{r, eval=FALSE}
+library(tidyverse)
+library(lubridate)
+
+```

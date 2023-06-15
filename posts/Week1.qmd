@@ -1,5 +1,5 @@
 ---
-title: 'Week 1'
+title: 'Week 1 in Words'
 date: '2023-06-09'
 categories: ['Week 1', 'Events', 'Reading']
 description: 'My first week on the job! Lots of getting organized, reading papers, and learning/refreshing my knowledge of Git, GitHub, R Markdown, Python, and Quarto. We also had our first programming workshop and attended the 16th Annual Student-Organized Bioinformatics Symposium.'

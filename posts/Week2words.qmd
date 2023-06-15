@@ -1,0 +1,57 @@
+---
+title: 'Week 2 in Words'
+date: '2023-06-15'
+categories: ['Week 2', 'Events', 'Reading', 'Data exploration']
+description: 'My activities for the week'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+# Monday, June 12
+
+**Reading EDM papers**
+
+This morning I read many EDM papers and updated the Intro to EDM page with brief notes/summaries of many of them. I also did some reading on the different kinds of error (process vs. observational), stochastic processes, and white and red noise.
+
+**Python Practice**
+
+Michael sent us an email today with additional material to review before Wednesday's Python programming workshop. I went through the information he sent and practiced working with Jupyter notebook in the SCC so I will be ready for the workshop.
+
+**Data exploration**
+
+I started some preliminary data exploration/cleaning, although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data. (See the "Week 2 in R" page).
+
+# Tuesday and Wednesday (June 13 and 14)
+
+## Reading papers and project planning
+
+I identified many recent papers that have specifically applied EDM to fisheries, several of which include comprehensive and well-annotated R scripts. I also explored the literature related to Atlantic sea scallops to see which questions have already been thoroughly examined and where I could potentially use EDM (or spatial EDM, sEDM) to fill in gaps in our scientific knowledge or confirm or refute the findings of alternative modeling approaches.
+
+Regardless of which of these topics I focus on, my first step will be to wrangle the dredge survey data to produce scallop time series that can be easily grouped by size, age class, and location. Getting the scallop data into a workable format will allow for an initial exploration of stock-recruitment dynamics, which could potentially be the entire focus of my project. Understanding scallop recruitment and yield-per-recruit, especially within the spatial context of a rotationally-managed fishery--- is a fundamental part of accurate modeling and remains an important area of research [@hart2003; @stokesbury2012; @bethoney2016].
+
+#### Predation
+
+I was first interested in the use of EDM to explore the impact of predation on Atlantic sea scallops, in a similar manner to how @liu2022 analyzed the interactions between kelp and sea urchins in a Southern California kelp forest. I find predator-prey relationships and interspecies interactions in general to be a fascinating area of ecology. Research on the effects of sea star and crab predation on scallop recruitment in the Mid-Atlantic Bight revealed significant complexity in ecosystem, as unknown environmental variables and significant spatial and temporal variability made it difficult to identify causative relationships [@hart2006; @shank2012]. EDM could potentially be very useful in more conclusively determining causality in this system. However, the time series data for scallop predators appears relatively limited (much shorter than the overall dredge survey), potentially limiting the use of EDM. I will continue to look for predator data that could facilitate an EDM analysis of this interesting system.
+
+> "Nonetheless, due to the lack of quantitative analyses, the causal connection between predation pressure and sea scallop size structure interannual variability remains unknown" [@zang2023]
+
+#### Natural mortality
+
+Estimating natural mortality (M) is an issue of ongoing concern in fisheries management worldwide [e.g., @hamel2023; @kenchington2014]. @hart2022 recently improved the performance of size-based scallop stock assessment models by estimating temporally variable natural mortality, rather than the historical approach of using a fixed value of M (e.g., M=0.16 for closed areas of Georges Bank). However, the likely density-dependence, spatial and temporal variability, and potential confounding of natural mortality with fishing mortality present challenges when attempting to use traditional modeling approaches to uncover the dynamics of the system [@hart2022]. Additionally, the stock assessment framework underlying previous examinations of scallop natural mortality may be obscuring the true nonlinear dynamics of the system, as stock assessment models often overestimate stability and underestimate predictability, with potentially significant implications for fisheries management [@storch2017].
+
+#### Comprehensive model
+
+The other route that I am exploring would be something related to creating an sEDM analog to the model(s) used by @zang2023, @cooley2015, or @rheuban2018. Input data would likely be size data from the dredge surveys, temperature and ocean carbonate chemistry (could use FVCOM), and food availability (primary production/phytoplankton). These models have been extremely valuable to understand how rising temperatures, ocean acidification, and fishing pressure impact scallop populations, bringing us closer to true ecosystem-based management for one of North America's most economically valuable fisheries. However, they rely on population dynamic models based on the von Bertalanffy growth function and growth matrices, with specific growth, weight, and mortality parameters. As our knowledge of scallop physiology and life history continues to expand, it is becoming more clear that the processes relevant to the creation of these models can be highly state-dependent, so using sEDM instead of a model relying on fixed parameters could potentially yield improved forecasts of scallop abundance. For example, the first experiment on scallop response to increased CO~2~ and temperature showed that the independent effects of CO~2~ and temperature change once a CO~2~ threshold is reached [@pousse2023]. No studies have yet utilized this insight when predicting the impacts of climate change and ocean acidification on the scallop fishery; a project using EDM to explore these impacts would therefore be the first not to rely on a model that is inconsistent with recently-uncovered mechanistic relationships. However, creating and testing such a model would be a highly involved process and may not be feasible within the remainder of the summer.
+
+## Programming workshop
+We also had our second programming session on Wednesday afternoon, where I spent several hours practicing basic Python syntax and then applying my new knowledge to a problem-based workshop where we wrote code to read and evaluate a FASTA file. For example, we used what we learned about loops and dictionaries to write functions to find the nucelotide and dinucleotide frequencies of a given sequence of DNA.
+
+# Thursday, June 15
+
+I first spent some time reorganizing this lab notebook so it would be easier to follow my work (e.g., putting all the code in one place).
+
+# References
