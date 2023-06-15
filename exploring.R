@@ -32,35 +32,35 @@ library(lubridate)
 
 # Data wrangling ----------------------------------------------------------
 
-svcat <- read.csv("data/22564_UNION_FSCS_SVCAT.csv")
-head(svcat)
-summary(svcat)
-scallops <- svcat %>% 
-  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
-           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
-
-
-scallops <- scallops %>% 
-  mutate(name = SCIENTIFIC_NAME,
-         CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         CATCHSEX = as.factor(CATCHSEX),
-         STRATUM = as.factor(STRATUM),
-         .keep = "unused")
-
-summary(scallops)
-
-scallops <- scallops %>% 
-  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
-                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
-
-summarise_all(scallops,n_distinct)
+# svcat <- read.csv("data/22564_UNION_FSCS_SVCAT.csv")
+# head(svcat)
+# summary(svcat)
+# scallops <- svcat %>% 
+#   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+#            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+# 
+# 
+# scallops <- scallops %>% 
+#   mutate(name = SCIENTIFIC_NAME,
+#          CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          CATCHSEX = as.factor(CATCHSEX),
+#          STRATUM = as.factor(STRATUM),
+#          .keep = "unused")
+# 
+# summary(scallops)
+# 
+# scallops <- scallops %>% 
+#   mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+#                        "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+# 
+# summarise_all(scallops,n_distinct)
 
 #All have sex = 0, means unknown sex
-#SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species
+#SVSPP is species, listed as either 401 (scallop) or 400 (clapper), redundant info to species
 #So we can remove unnecessary variables
-scallops <- scallops %>% 
-  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
+# scallops <- scallops %>% 
+#   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
 
 #ggplot(scallops, aes(x = cruise)) + geom_bar()
 #ggplot(scallops, aes(x = cruise6)) + geom_bar()
@@ -68,28 +68,84 @@ scallops <- scallops %>%
 
 
 # Creating a time series ----------------------------------------------------
-
-cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
-cruises <- cruises %>% 
-  select(c("CRUISE6","SEASON","YEAR")) %>% 
-  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
-
-scallops <- left_join(scallops, cruises, by="CRUISE6")
+# 
+# cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
+# cruises <- cruises %>% 
+#   select(c("CRUISE6","SEASON","YEAR")) %>% 
+#   mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
+# 
+# scallops <- left_join(scallops, cruises, by="CRUISE6")
 
 
 # Fixing lack of data -----------------------------------------------------
+# 
+# df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
+# df_strata <- read.csv("data/SVDBS_SVMSTRATA.csv")
+# 
+# df_stations_wrangled <- df_stations %>%
+#   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
+#   mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
+#   select(STATION,STRATUM,DATE) %>%
+#   mutate(DATE=year(DATE)) %>%
+#   distinct()
+# 
+# #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
+# data.frame(table(df_stations_wrangled$STATION))
+# data.frame(table(df_stations_wrangled$STRATUM))
+# data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
 
-df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
-df_strata <- read.csv("data/SVDBS_SVMSTRATA.csv")
+#ggplot(scallopsNew, aes(x = CRUISE)) + geom_bar()
+#ggplot(scallopsNew, aes(x = CRUISE6)) + geom_bar()
+#ggplot(scallopsNew, aes(x = STRATUM)) + geom_bar()
 
-df_stations_wrangled <- df_stations %>%
-  # filter(EST_YEAR %in% unlist(target_chunks)) %>%
-  mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
-  select(STATION,STRATUM,DATE) %>%
-  mutate(DATE=year(DATE)) %>%
-  distinct()
+# diffMonths <- df_stationsNew %>% 
+#   filter(EST_MONTH != GMT_MONTH)
+
+# Redoing everything with new data ----------------------------------------
+
+svcatNew <- read.csv("data/new22564_UNION_FSCS_SVCAT.csv") #there's more data: 96206 observations instead of 94632 (1574 more entries)
+head(svcatNew)
+summary(svcatNew)
+scallopsNew <- svcatNew %>% 
+  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+scallopsNew <- scallopsNew %>% 
+  mutate(name = SCIENTIFIC_NAME,
+         CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         CATCHSEX = as.factor(CATCHSEX),
+         STRATUM = as.factor(STRATUM),
+         .keep = "unused")
+
+scallopsNew <- scallopsNew %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
+
+scallopsNew <- scallopsNew %>% 
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
+
+# Creating a time series ----------------------------------------------------
+
+cruisesNew <- read.csv("data/new22564_SVDBS_CRUISES.csv")
+cruisesNew <- cruisesNew %>% 
+  select(c("CRUISE6","SEASON","YEAR")) %>% 
+  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
+
+scallopsNew <- left_join(scallopsNew, cruisesNew, by="CRUISE6")
+
+as_tibble(scallopsNew)
+
+# Fixing lack of data -----------------------------------------------------
+
+df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
+
+# df_stations_wrangledNew <- df_stationsNew %>%
+#   mutate(DATE = dmy(BEGIN_EST_TOWDATE)) %>%
+#   select(STATION,STRATUM,DATE) %>%
+#   mutate(DATE=year(DATE)) %>%
+#   distinct()
 
 #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-data.frame(table(df_stations_wrangled$STATION))
-data.frame(table(df_stations_wrangled$STRATUM))
-data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
+
+data.frame(table(scallopsNew$YEAR))

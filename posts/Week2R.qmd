@@ -61,8 +61,8 @@ scallops <- scallops %>%
 
 summarise_all(scallops,n_distinct)
 
-#All have sex = 0, means unknown sex
-#SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species
+#All have sex = 0, which means "Unsexed, unknown, or sex not observed"
+#SVSPP is species, listed as either 401 (scallop) or 400 (clapper), redundant info to species
 
 #Remove unnecessary variables
 scallops <- scallops %>% 
@@ -87,7 +87,7 @@ Set-up (from June 12)
 
 ```{r}
 #read data
-svcat <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv")
+svcat <- read.csv("~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVCAT.csv")
 
 #filter to only species of interest - reduces it from 94632 observations to 21425
 scallops <- svcat %>% 
@@ -97,10 +97,10 @@ scallops <- svcat %>%
 #turn categorical variables into factors
 scallops <- scallops %>% 
   mutate(name = SCIENTIFIC_NAME,
-         cruise6 = as.factor(CRUISE6),
-         cruise = as.factor(CRUISE),
-         sex = as.factor(CATCHSEX),
-         stratum = as.factor(STRATUM),
+         CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         CATCHSEX = as.factor(CATCHSEX),
+         STRATUM = as.factor(STRATUM),
          .keep = "unused")
 
 #shorten for clarity
@@ -112,22 +112,22 @@ scallops <- scallops %>%
 # all have the same status code (10), and SVSPP corresponds with name (401 = scallop, 
 # 400 = clappers)
 scallops <- scallops %>% 
-  select(-c("sex", "STATUS_CODE", "SVSPP"))
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
 ```
 
 I worked on turning the data into an actual time series:
 
 ```{r}
 #read the file that has the season and year associated with each cruise
-cruises <- read.csv("~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES.csv")
+cruises <- read.csv("~/Downloads/lab_notebook/data/Old/22564_SVDBS_CRUISES.csv")
 
 #select the relevant variables
 cruises <- cruises %>% 
   select(c("CRUISE6","SEASON","YEAR")) %>% 
-  mutate(cruise6 = as.factor(CRUISE6), .keep="unused")
+  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
 
 #combine with the existing dataframe
-scallops <- left_join(scallops, cruises, by="cruise6")
+scallops <- left_join(scallops, cruises, by="CRUISE6")
 
 as_tibble(scallops)
 
@@ -135,8 +135,94 @@ as_tibble(scallops)
 
 # Thursday (June 15)
 
+Load packages
+
 ```{r, eval=FALSE}
 library(tidyverse)
 library(lubridate)
 
 ```
+
+Dr. Deyle sent me some example code for wrangling lobster data from the NEFSC trawl surveys. I adapted the code for use with the scallop dredge surveys:
+
+```{r}
+#read the file that has the metadata associated with each stratum and station
+df_strata <- read.csv("data/Old/SVDBS_SVMSTRATA.csv")
+df_stations <- read.csv("data/Old/22564_UNION_FSCS_SVSTA.csv")
+
+#standardizing the date formats
+df_stations_wrangled <- df_stations %>%
+  mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
+  select(STATION,STRATUM,DATE) %>% #select relevant columns
+  mutate(DATE=year(DATE)) %>%
+  distinct() #remove duplicate rows
+
+```
+
+Then, I wanted to get a general idea of how many times each station and stratum were in the data (i.e., how many years that station or stratum was sampled).
+
+```{r}
+#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
+data.frame(table(df_stations_wrangled$STATION))
+data.frame(table(df_stations_wrangled$STRATUM))
+```
+
+This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., "took 20-30 meters" and "STARFISH NO STARS").
+
+
+I then checked to see how many entries were present for each year:
+```{r}
+data.frame(table(df_stations_wrangled$DATE))
+```
+
+Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. 
+At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn't include the SMAST and WHOI drop camera data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.
+
+Unfortunately, this prompted me to spend much of the afternoon searching for the HabCam data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.
+
+```{r}
+data.frame(table(scallops$YEAR))
+```
+
+However, searching for the HabCam data was not a complete waste of time. In my search, I had re-pulled the NOAA Scallop Survey data and found that this newer version had data through 2022, whereas the version that Dr. Deyle shared with me only extended to 2021. See the "Week 2 in Words" page for more about what I found in my search for the post-2006 scallop data.
+
+```{r}
+#re-run setup for new data
+svcatNew <- read.csv("~/Downloads/lab_notebook/data/new22564_UNION_FSCS_SVCAT.csv")
+
+scallopsNew <- svcatNew %>% 
+  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
+
+#turn categorical variables into factors
+scallopsNew <- scallopsNew %>% 
+  mutate(name = SCIENTIFIC_NAME,
+         CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         CATCHSEX = as.factor(CATCHSEX),
+         STRATUM = as.factor(STRATUM),
+         .keep = "unused")
+
+#shorten for clarity
+scallopsNew <- scallopsNew %>% 
+  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper")) %>% 
+ select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
+
+#read the file that has the season and year associated with each cruise
+cruisesNew <- read.csv("~/Downloads/lab_notebook/data/new22564_SVDBS_CRUISES.csv")
+
+#select the relevant variables
+cruisesNew <- cruisesNew %>% 
+  select(c("CRUISE6","SEASON","YEAR")) %>% 
+  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
+
+#combine with the existing dataframe
+scallopsNew <- left_join(scallopsNew, cruisesNew, by="CRUISE6")
+
+as_tibble(scallopsNew)
+
+data.frame(table(scallopsNew$YEAR))
+  
+```
+

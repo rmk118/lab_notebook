@@ -23,7 +23,7 @@ Michael sent us an email today with additional material to review before Wednesd
 
 **Data exploration**
 
-I started some preliminary data exploration/cleaning, although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data. (See the "Week 2 in R" page).
+I started some preliminary data exploration/cleaning (see the "Week 2 in R" page), although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data.
 
 # Tuesday and Wednesday (June 13 and 14)
 
@@ -53,5 +53,7 @@ We also had our second programming session on Wednesday afternoon, where I spent
 # Thursday, June 15
 
 I first spent some time reorganizing this lab notebook so it would be easier to follow my work (e.g., putting all the code in one place).
+
+Although I was extremely frustrated to learn I had spent hours searching for data I already had, I did find a wealth of information about the methodology and history of the sea scallop survey itself. I also discovered several other sources of sea scallop and benthic habitat data, which may be useful later in my project.
 
 # References
