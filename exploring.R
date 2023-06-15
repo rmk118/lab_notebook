@@ -115,7 +115,6 @@ scallopsNew <- scallopsNew %>%
          CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
          CATCHSEX = as.factor(CATCHSEX),
-         STRATUM = as.factor(STRATUM),
          .keep = "unused")
 
 scallopsNew <- scallopsNew %>% 
@@ -135,17 +134,28 @@ cruisesNew <- cruisesNew %>%
 scallopsNew <- left_join(scallopsNew, cruisesNew, by="CRUISE6")
 
 as_tibble(scallopsNew)
+str(scallopsNew)
+data.frame(table(scallopsNew$YEAR))
 
-# Fixing lack of data -----------------------------------------------------
+
+# Find strata with all 45 years of data -----------------------------------------------------
+
+#this gets rid of some weird strata in 1984 with letters, which don't seem to 
+# correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata
+scallopsNew <-  scallopsNew %>%
+  mutate(STRATUM = as.integer(STRATUM)) %>% 
+  filter(!is.na(STRATUM))
+
+#This will show you which ones were removed
+# scallopsTest <-  scallopsNew %>%
+#   mutate(strat = as.integer(STRATUM)) %>% 
+#   filter(is.na(strat))
 
 df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
 
-# df_stations_wrangledNew <- df_stationsNew %>%
-#   mutate(DATE = dmy(BEGIN_EST_TOWDATE)) %>%
-#   select(STATION,STRATUM,DATE) %>%
-#   mutate(DATE=year(DATE)) %>%
-#   distinct()
+#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
+data.frame(table(scallopsNew$STRATUM))
 
-#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-
-data.frame(table(scallopsNew$YEAR))
+#the key matching strata to location (latitude and longitude) starts from 1010
+scallopsNew <-  scallopsNew %>%
+  filter(STRATUM > 1000)

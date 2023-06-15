@@ -200,7 +200,7 @@ scallopsNew <- scallopsNew %>%
          CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
          CATCHSEX = as.factor(CATCHSEX),
-         STRATUM = as.factor(STRATUM),
+       #  STRATUM = as.factor(STRATUM), <-- this became unnecessary later
          .keep = "unused")
 
 #shorten for clarity
@@ -224,5 +224,31 @@ as_tibble(scallopsNew)
 
 data.frame(table(scallopsNew$YEAR))
   
+```
+
+I then started to pull data where there was all 45 years of data collection for a single stratum.
+
+```{r, warning=FALSE}
+
+#this gets rid of some weird strata in 1984 with letters, which don't seem to 
+# correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata
+scallopsTest <-  scallopsNew %>%
+  mutate(STRATUM = as.integer(STRATUM)) %>% 
+  filter(!is.na(STRATUM))
+
+#This will show you which ones were removed
+# scallopsTest <-  scallopsNew %>%
+#   mutate(strat = as.integer(STRATUM)) %>% 
+#   filter(is.na(strat))
+
+df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
+
+#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
+data.frame(table(scallopsNew$STRATUM))
+
+#the key matching strata to location (latitude and longitude) starts from 1010
+scallopsNew <-  scallopsNew %>%
+  filter(STRATUM > 1000)
+
 ```
 

@@ -109,7 +109,7 @@
     "href": "posts/Week2words.html",
     "title": "Week 2 in Words",
     "section": "",
-    "text": "Reading EDM papers\nThis morning I read many EDM papers and updated the Intro to EDM page with brief notes/summaries of many of them. I also did some reading on the different kinds of error (process vs. observational), stochastic processes, and white and red noise.\nPython Practice\nMichael sent us an email today with additional material to review before Wednesday’s Python programming workshop. I went through the information he sent and practiced working with Jupyter notebook in the SCC so I will be ready for the workshop.\nData exploration\nI started some preliminary data exploration/cleaning, although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data. (See the “Week 2 in R” page)."
+    "text": "Reading EDM papers\nThis morning I read many EDM papers and updated the Intro to EDM page with brief notes/summaries of many of them. I also did some reading on the different kinds of error (process vs. observational), stochastic processes, and white and red noise.\nPython Practice\nMichael sent us an email today with additional material to review before Wednesday’s Python programming workshop. I went through the information he sent and practiced working with Jupyter notebook in the SCC so I will be ready for the workshop.\nData exploration\nI started some preliminary data exploration/cleaning (see the “Week 2 in R” page), although I have many questions for Dr. Deyle about what certain columns mean and about the overall structure of the data."
   },
   {
     "objectID": "posts/Week2words.html#reading-papers-and-project-planning",
