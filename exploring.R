@@ -159,3 +159,7 @@ data.frame(table(scallopsNew$STRATUM))
 #the key matching strata to location (latitude and longitude) starts from 1010
 scallopsNew <-  scallopsNew %>%
   filter(STRATUM > 1000)
+
+scallopsTest <- scallopsNew %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))

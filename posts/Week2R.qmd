@@ -147,8 +147,8 @@ Dr. Deyle sent me some example code for wrangling lobster data from the NEFSC tr
 
 ```{r}
 #read the file that has the metadata associated with each stratum and station
-df_strata <- read.csv("data/Old/SVDBS_SVMSTRATA.csv")
-df_stations <- read.csv("data/Old/22564_UNION_FSCS_SVSTA.csv")
+df_strata <- read.csv("~/Downloads/lab_notebook/data/Old/SVDBS_SVMSTRATA.csv")
+df_stations <- read.csv("~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVSTA.csv")
 
 #standardizing the date formats
 df_stations_wrangled <- df_stations %>%
