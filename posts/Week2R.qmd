@@ -286,7 +286,12 @@ st_geometry(test)
 par(mar = c(0,0,1,0))
 plot(test[6])
 
-# 
+```
+
+
+
+```{r}
+
 # fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
 # st_layers("~/Downloads/Fish/Fish.gdb")
 # attr(fish, "sf_column")
