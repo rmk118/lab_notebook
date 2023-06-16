@@ -187,6 +187,7 @@ div.csl-indent {
   <li><a href="#programming-workshop" id="toc-programming-workshop" class="nav-link" data-scroll-target="#programming-workshop">Programming workshop</a></li>
   </ul></li>
   <li><a href="#thursday-june-15" id="toc-thursday-june-15" class="nav-link" data-scroll-target="#thursday-june-15">Thursday, June 15</a></li>
+  <li><a href="#friday-june-16" id="toc-friday-june-16" class="nav-link" data-scroll-target="#friday-june-16">Friday, June 16</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -273,7 +274,23 @@ div.csl-indent {
 <section id="thursday-june-15" class="level1">
 <h1>Thursday, June 15</h1>
 <p>I first spent some time reorganizing this lab notebook so it would be easier to follow my work (e.g., putting all the code in one place). I then started on some data exploration, the results of which I documented in “Week 2 in R”. I started with scallop biomass rather than length, mostly because of the much smaller file size. After finding a lack of data after 2006 in the stations file, I spent the early afternoon looking for the post-2006 scallop data. However, it turned out that the biomass file actually had scallop data for all years 1977-2021— it was only the stations file that was missing the recent years. I returned to working with the scallop biomass data, although the example code that Dr.&nbsp;Deyle provided from a lobster project relied on being able to match observations to listed stations, so I had be more innovative with my coding.</p>
-<p>While I was frustrated to learn I had spent so much time searching for data I already had, I did find a wealth of information about the methodology and history of the sea scallop survey itself. First, the scallop survey data I pulled from NOAA extended through 2022, a year beyond the version Dr.&nbsp;Deyle shared with me. I also discovered several other sources of sea scallop and benthic habitat data, which may be useful later in my project. In fact, I became highly immersed in the scallop literature, and found so much information that I started to create a separate page for this site titled “Scallop Resources”. I now have a relatively thorough understanding of the current landscape of Atlantic sea scallop research, and many exciting ideas for meaningful analyses I could perform once I get the data in a more workable format. Overall, I think today I made good progress towards being able to use real scallop data to test hypotheses and answer meaningful questions.</p>
+<p>While I was frustrated to learn I had spent so much time searching for data I already had, I did find a wealth of information about the methodology and history of the sea scallop survey itself. First, the scallop survey data I pulled from NOAA extended through 2022, a year beyond the version Dr.&nbsp;Deyle shared with me. I also discovered several other sources of sea scallop and benthic habitat data, which may be useful later in my project. In fact, I became highly immersed in the scallop literature, and found so much information that I started to create a separate page for this site titled “<a href="https://rmk118.github.io/lab_notebook/Resources/ScallopResources.html">Scallop Links</a>”. I now have a relatively thorough understanding of the current landscape of Atlantic sea scallop research, and many exciting ideas for meaningful analyses I could perform once I get the data in a more workable format. Overall, I think today I made good progress towards being able to use real scallop data to test hypotheses and answer meaningful questions.</p>
+</section>
+<section id="friday-june-16" class="level1">
+<h1>Friday, June 16</h1>
+<p><strong>Finding data:</strong> I searched for SMAST drop camera time series data. I found spatial data files (.gdb format) for the drop camera survey, but it was averaged across years. I also found scallop survey data (1960s through 2015!) in .gdb format that I hoped might also have predator (sea star and crab) information. I also went continued my search for the missing station data, since it would be harder to conduct a meaningful spatial analysis with only the relatively coarse strata. I ended up pulling the scallop survey data for a third time, and this time the station file was complete!</p>
+<p><strong>Working with data:</strong> I read about and implemented some GIS basics. I first started working with the data in open-source GIS software, but figured out that the R package <em>sf</em> could do everything I needed, so I switched to doing preliminary spatial analysis in R.</p>
+<p>I also created a <a href="https://rmk118.github.io/lab_notebook/Resources/ScallopResources.html">Scallop Links</a> page with many of the papers and resources I have found over the past week.</p>
+<p><strong>Plan for the future:</strong></p>
+<ul>
+<li>If I can get the SMAST drop camera data, my goal is to apply EDM to determine the causality of predator (sea star and crab) abundance on scallop abundance.</li>
+<li>If it is too challenging to obtain predation data, I will use the scallop survey length data and group the scallops into size/age classes, with the goal of either:
+<ul>
+<li>(A) Examining the relationship between scallop recruitment and stock biomass</li>
+<li>(B) Estimating natural mortality, an important parameter for stock assessment models, and exploring its potential density-dependence</li>
+</ul></li>
+</ul>
+<p>In any of the above cases, I will include environmental variables as additional inputs: temperature, food availability, and ocean currents that influence dispersal and population connectivity. I might start by restricting my analysis to only closed areas, but could later consider incorporating fishing pressure, selectivity, or mortality and compare the dynamics between open and closed areas.</p>
 </section>
 <section id="references" class="level1">
 

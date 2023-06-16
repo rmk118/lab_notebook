@@ -163,8 +163,8 @@ Then, I wanted to get a general idea of how many times each station and stratum 
 
 ```{r}
 #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-data.frame(table(df_stations_wrangled$STATION))
-data.frame(table(df_stations_wrangled$STRATUM))
+#data.frame(table(df_stations_wrangled$STATION))
+#data.frame(table(df_stations_wrangled$STRATUM))
 ```
 
 This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., "took 20-30 meters" and "STARFISH NO STARS").
@@ -175,15 +175,15 @@ I then checked to see how many entries were present for each year:
 data.frame(table(df_stations_wrangled$DATE))
 ```
 
-Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn't include the SMAST and WHOI drop camera data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.
+Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn't include the SMAST drop camera and WHOI/HabCam data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.
 
-Unfortunately, this prompted me to spend much of the afternoon searching for the HabCam data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.
+Unfortunately, this prompted me to spend much of the afternoon searching for the camera data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.
 
 ```{r}
 data.frame(table(scallops$YEAR))
 ```
 
-However, searching for the HabCam data was not a complete waste of time. In my search, I had re-pulled the NOAA Scallop Survey data and found that this newer version had data through 2022, whereas the version that Dr. Deyle shared with me only extended to 2021. See the "Week 2 in Words" page for more about what I found in my search for the post-2006 scallop data.
+However, searching for the camera data was not a complete waste of time. In my search, I had re-pulled the NOAA Scallop Survey data and found that this newer version had data through 2022, whereas the version that Dr. Deyle shared with me only extended to 2021. See the "Week 2 in Words" page for more about what I found in my search for the post-2006 scallop data.
 
 ```{r}
 #re-run setup for new data
@@ -270,7 +270,7 @@ scallopsTest
 
 ```
 
-After learning some GIS basics, I started working with some data sets I found online in hopes of getting the SMAST data that has time series of scallop abundance alongside the abundance of major scallop predators. ([This survey, which is still ongoing](http://www.repstraus.com/wp-content/uploads/2015/03/SMAST-drop-cam-survey-1999-2014-Stokesbury.pdf).)
+After learning some GIS basics, I started working with some data sets I found online in hopes of getting the SMAST data, which has time series of scallop abundance alongside the abundance of major scallop predators. ([This survey, which is still ongoing](http://www.repstraus.com/wp-content/uploads/2015/03/SMAST-drop-cam-survey-1999-2014-Stokesbury.pdf).)
 
 ```{r}
 library(sf)
