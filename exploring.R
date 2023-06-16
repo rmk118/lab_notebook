@@ -5,82 +5,71 @@ library(tidyverse)
 library(lubridate)
 
 dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
+dat_cat <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv")
+dat_bio <- read.csv("data/22564_UNION_FSCS_SVBIO2022.csv", quote = "")
+cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
+df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA2022.csv")
+df_strata <- read.csv("data/newSVDBS_SVMSTRATA.csv")
+
+# Cruises ---------------------------------------------------- 
+
+cruises <- cruises %>%
+  select(c("CRUISE6","SEASON","YEAR")) %>%
+  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
+
+# Length ------------------------------------------------------------------
+
 head(dat_len)
-str(dat_len)
-summary(dat_len) #530652 observations of 13 vars
+str(dat_len) #543666 observations of 13 vars
 
-# 
-# scal <- dat_len %>%
-#   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
-#            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")
-
-# svbio <- read.csv("data/22564_UNION_FSCS_SVBIO.csv", quote = "")
-
-# Predators ---------------------------------------------------------------
-
-# species <- svcat %>% 
-#   group_by(SCIENTIFIC_NAME) %>% 
-#   summarise(avg = mean(EXPCATCHWT))
-#   
-# species
-# trues <- species %>%  filter(!is.na(species$avg)==TRUE)
-# 
-# # preds <- svcat %>% 
-# #   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-# #            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
-
-
-# Data wrangling ----------------------------------------------------------
-
-# svcat <- read.csv("data/22564_UNION_FSCS_SVCAT.csv")
-# head(svcat)
-# summary(svcat)
-# scallops <- svcat %>% 
-#   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
-#            SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
-# 
-# 
-# scallops <- scallops %>% 
-#   mutate(name = SCIENTIFIC_NAME,
-#          CRUISE6 = as.factor(CRUISE6),
-#          CRUISE = as.factor(CRUISE),
-#          CATCHSEX = as.factor(CATCHSEX),
-#          STRATUM = as.factor(STRATUM),
-#          .keep = "unused")
-# 
-# summary(scallops)
-# 
-# scallops <- scallops %>% 
-#   mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
-#                        "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
-# 
-# summarise_all(scallops,n_distinct)
-
-#All have sex = 0, means unknown sex
-#SVSPP is species, listed as either 401 (scallop) or 400 (clapper), redundant info to species
+scallopLen <- dat_len %>%
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
+         SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %>%  #filter to only scallops
+     mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                          "Placopecten magellanicus (sea scallop clapper)" = "clapper")) #shorten for readability
+      
+#All have sex = 0, means sex unknown/not recorded
+#SVSPP is species, either 401 (scallop) or 400 (clapper), redundant to name column
 #So we can remove unnecessary variables
-# scallops <- scallops %>% 
-#   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
+scallopLen <- scallopLen %>% 
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
 
-#ggplot(scallops, aes(x = cruise)) + geom_bar()
-#ggplot(scallops, aes(x = cruise6)) + geom_bar()
-#ggplot(scallops, aes(x = stratum)) + geom_bar()
+scallopLen <- scallopLen %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         .keep = "unused")
+
+summarise_all(scallopLen,n_distinct)
+
+scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
 
 
-# Creating a time series ----------------------------------------------------
-# 
-# cruises <- read.csv("data/22564_SVDBS_CRUISES.csv")
-# cruises <- cruises %>% 
-#   select(c("CRUISE6","SEASON","YEAR")) %>% 
-#   mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
-# 
-# scallops <- left_join(scallops, cruises, by="CRUISE6")
+# Catch ----------------------------------------------------------
 
+scallopCat <- dat_cat %>%
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
+           SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %>%  #filter to only scallops
+  mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop", 
+                       "Placopecten magellanicus (sea scallop clapper)" = "clapper")) #shorten for readability
+
+scallopCat <- scallopCat %>% 
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
+
+summarise_all(scallopLen,n_distinct)
+
+scallopCat <- scallopCat %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         .keep = "unused")
+
+scallopCat <- left_join(scallopCat, cruises, by="CRUISE6")
+
+str(scallopCat)
+summarise_all(scallopCat,n_distinct)
+as_tibble(scallopCat)
+data.frame(table(scallopCat$YEAR))
 
 # Fixing lack of data -----------------------------------------------------
-# 
-# df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA.csv")
-# df_strata <- read.csv("data/SVDBS_SVMSTRATA.csv")
 # 
 # df_stations_wrangled <- df_stations %>%
 #   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
@@ -101,43 +90,6 @@ summary(dat_len) #530652 observations of 13 vars
 # diffMonths <- df_stationsNew %>% 
 #   filter(EST_MONTH != GMT_MONTH)
 
-# Redoing everything with new data ----------------------------------------
-
-svcatNew <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv") #there's more data: 96206 observations instead of 94632 (1574 more entries)
-head(svcatNew)
-summary(svcatNew)
-scallopsNew <- svcatNew %>% 
-  filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
-           SCIENTIFIC_NAME =="Placopecten magellanicus (sea scallop clapper)")
-
-scallopsNew <- scallopsNew %>% 
-  mutate(name = SCIENTIFIC_NAME,
-         CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         CATCHSEX = as.factor(CATCHSEX),
-         .keep = "unused")
-
-scallopsNew <- scallopsNew %>% 
-  mutate(name = recode(name, "Placopecten magellanicus (sea scallop)" = "scallop", 
-                       "Placopecten magellanicus (sea scallop clapper)" = "clapper"))
-
-scallopsNew <- scallopsNew %>% 
-  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
-
-# Creating a time series ----------------------------------------------------
-
-cruisesNew <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
-cruisesNew <- cruisesNew %>% 
-  select(c("CRUISE6","SEASON","YEAR")) %>% 
-  mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
-
-scallopsNew <- left_join(scallopsNew, cruisesNew, by="CRUISE6")
-
-as_tibble(scallopsNew)
-str(scallopsNew)
-data.frame(table(scallopsNew$YEAR))
-
-
 # Find strata with all 45 years of data -----------------------------------------------------
 
 #this gets rid of some weird strata in 1984 with letters, which don't seem to 
@@ -151,43 +103,32 @@ scallopsNew <-  scallopsNew %>%
 #   mutate(strat = as.integer(STRATUM)) %>% 
 #   filter(is.na(strat))
 
-df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
-
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
-data.frame(table(scallopsNew$STRATUM))
+data.frame(table(scallopCat$STRATUM))
 
 #shellfish strata start with 6
 scallopsNew <-  scallopsNew %>%
   filter(STRATUM > 5999)
 
-scallopsTest <- scallopsNew %>% 
+scallopsTest <- scallopCat %>% 
   group_by(STRATUM) %>% 
   summarise(years=n_distinct(YEAR))
 
+# Predators ---------------------------------------------------------------
 
-# Spatial -----------------------------------------------------------------
+speciesLen <- dat_len %>% 
+  group_by(SCIENTIFIC_NAME) %>% 
+  summarise(avg = mean(LENGTH))
 
-library(sf)
+speciesCat <- dat_cat %>% 
+  group_by(SCIENTIFIC_NAME) %>% 
+  summarise(avg = mean(EXPCATCHNUM))
+# trues <- species %>%  filter(!is.na(species$avg)==TRUE)
 
-# SMAST Scallop data - the data I want, but averaged across years
-st_layers("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
-test <- st_read("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
+crabsLen <- dat_len %>% 
+  filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)")
 
-class(test)
-attr(test, "sf_column")
-print(test[1:15], n = 3)
-test_geom <- st_geometry(test)
-
-par(mar = c(0,0,1,0))
-plot(test[6])
-
-# NEFSC scallop survey data - through 2015
-st_layers("~/Downloads/Fish/Fish.gdb")
-fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
-
-attr(fish, "sf_column")
-st_geometry(fish)
-class(fish)
-
-par(mar = c(0,0,1,0))
-plot(fish[6])
+crabsCat <- dat_cat %>% 
+  filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)")
