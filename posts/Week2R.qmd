@@ -289,15 +289,15 @@ plot(test[6])
 ```
 
 
+I also found a version of the NEFSC scallops survey in spatial form and started exploring that dataset:
+```{r, eval=FALSE}
 
-```{r}
+fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
+st_layers("~/Downloads/Fish/Fish.gdb")
+attr(fish, "sf_column")
+st_geometry(fish)
+class(fish)
 
-# fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
-# st_layers("~/Downloads/Fish/Fish.gdb")
-# attr(fish, "sf_column")
-# st_geometry(fish)
-# class(fish)
-# 
-# par(mar = c(0,0,1,0))
-# plot(fish[6])
+par(mar = c(0,0,1,0))
+plot(fish[6])
 ```
