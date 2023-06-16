@@ -156,10 +156,34 @@ df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
 data.frame(table(scallopsNew$STRATUM))
 
-#the key matching strata to location (latitude and longitude) starts from 1010
+#shellfish strata start with 6
 scallopsNew <-  scallopsNew %>%
-  filter(STRATUM > 1000)
+  filter(STRATUM > 5999)
 
 scallopsTest <- scallopsNew %>% 
   group_by(STRATUM) %>% 
   summarise(years=n_distinct(YEAR))
+
+
+# Spatial -----------------------------------------------------------------
+
+# library(sf)
+# 
+# test <- st_read("~/Downloads/SMAST_SCALLOP/SMAST_Scallops.gdb")
+# 
+# class(test)
+# attr(test, "sf_column")
+# print(test[9:15], n = 3)
+# test_geom <- st_geometry(test)
+# 
+# par(mar = c(0,0,1,0))
+# plot(test[6], reset = FALSE)
+# 
+# fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
+# st_layers("~/Downloads/Fish/Fish.gdb")
+# attr(fish, "sf_column")
+# st_geometry(fish)
+# class(fish)
+# 
+# par(mar = c(0,0,1,0))
+# plot(fish[6])

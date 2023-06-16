@@ -1,6 +1,6 @@
 ---
 title: 'Relevant Papers'
-date-modified: '2023-06-12'
+date-modified: '2023-06-16'
 categories: ['Resources']
 description: 'A list of non-EDM scientific literature that is clearly or potentially related to my project. Papers related to EDM can be found on the Intro to EDM page.'
 execute: 
@@ -14,7 +14,7 @@ bibliography: ../references.bib
 # Quantitative Fisheries (from Dr. Deyle)
 
 | Author, year   | Title                                                                                                                                        |
-|------------------|-----------------------------------------------------|
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | @overholtz2009 | A simulation model to explore the response of the Gulf of Maine food web to large-scale environmental and ecological changes                 |
 | @link2009      | Response of balanced network models to large-scale perturbation: Implications for evaluating the role of small pelagics in the Gulf of Maine |
 | @ross2021      | Projecting regions of North Atlantic right whale, *Eubalaena glacialis*, habitat suitability in the Gulfof Maine for the year 2050           |
@@ -22,14 +22,16 @@ bibliography: ../references.bib
 # Food webs & ecosystem-based management
 
 | Author, year | Title                                                                                                 |
-|------------------|------------------------------------------------------|
+|--------------|-------------------------------------------------------------------------------------------------------|
 | @link2002    | Does food web theory work for marine ecosystems?                                                      |
 | @tam2017     | Towards ecosystem-based management: identifying operational food-web indicators for marine ecosystems |
 
 # Atlantic sea scallops
 
+*See the Scallop Resources page for more scallop-related literature*
+
 | Author, year    | Title                                                                                                                                                      |
-|-------------------|------------------------------------------------------|
+|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @bethoney2016   | Implications of extremely high recruitment events into the US sea scallop fishery                                                                          |
 | @cooley2015     | An Integrated Assessment Model for Helping the United States Sea Scallop (Placopecten magellanicus) Fishery Plan Ahead for Ocean Acidification and Warming |
 | @hart2003       | Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop                                          |
@@ -46,11 +48,11 @@ bibliography: ../references.bib
 # Other
 
 | Author, year | Title                                                                                  | Notes                                                                                                                                                                                    |
-|-------------------|------------------------------|------------------------|
+|--------------|----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @maunder2004 | Standardizing catch and effort data: a review of recent approaches                     | Good background on CPUE. Includes intro to catch data standardization, dealing with zeros and interactions, and selecting explanatory variables                                          |
 | @hsieh2008a  | Spatial analysis shows that fishing enhances the climatic sensitivity of marine fishes | Analyzed spatial area of occupancy and index of spatial heterogeneity, and changes in distribution from cold to warm period. Used linear regression and a variety of nonparametric tests |
 
 | Author, year     | Title                                                                                    |
-|-------------------|-----------------------------------------------------|
+|------------------|------------------------------------------------------------------------------------------|
 | @hamel2023       | Natural mortality: Theory, estimation and application in fishery stock assessment models |
 | @kenchington2014 | Natural mortality estimators for information-limited fisheries                           |

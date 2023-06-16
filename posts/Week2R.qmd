@@ -1,6 +1,6 @@
 ---
 title: 'Week 2 in R'
-date: '2023-06-15'
+date: '2023-06-16'
 categories: ['Week 2', 'R']
 description: 'My activities for the week'
 execute: 
@@ -226,7 +226,7 @@ data.frame(table(scallopsNew$YEAR))
   
 ```
 
-I then started to pull data where there was all 45 years of data collection for a single stratum.
+I then started to organize the scallop data for analysis:
 
 ```{r, warning=FALSE}
 
@@ -252,3 +252,4 @@ scallopsNew <-  scallopsNew %>%
 
 ```
 
+# Friday (June 16)

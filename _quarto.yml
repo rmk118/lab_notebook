@@ -15,6 +15,7 @@ website:
       contents:
        - Resources/Papers.qmd
        - Resources/EDM.qmd
+       - Resources/ScallopResources.qmd
     - section: "Project Updates"
       contents:
         - posts/Week1.qmd
