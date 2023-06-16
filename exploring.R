@@ -4,13 +4,13 @@
 library(tidyverse)
 library(lubridate)
 
-# dat_len<- read.csv("22564_UNION_FSCS_SVLEN.csv")
-# head(dat_len)
-# summary(dat_len) #530652 observations of 13 vars
+dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
+head(dat_len)
+str(dat_len)
+summary(dat_len) #530652 observations of 13 vars
+
 # 
-# glimpse(dat_len)
-# 
-# data <- dat_len %>%
+# scal <- dat_len %>%
 #   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
 #            SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)")
 
@@ -103,7 +103,7 @@ library(lubridate)
 
 # Redoing everything with new data ----------------------------------------
 
-svcatNew <- read.csv("data/new22564_UNION_FSCS_SVCAT.csv") #there's more data: 96206 observations instead of 94632 (1574 more entries)
+svcatNew <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv") #there's more data: 96206 observations instead of 94632 (1574 more entries)
 head(svcatNew)
 summary(svcatNew)
 scallopsNew <- svcatNew %>% 
@@ -126,7 +126,7 @@ scallopsNew <- scallopsNew %>%
 
 # Creating a time series ----------------------------------------------------
 
-cruisesNew <- read.csv("data/new22564_SVDBS_CRUISES.csv")
+cruisesNew <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 cruisesNew <- cruisesNew %>% 
   select(c("CRUISE6","SEASON","YEAR")) %>% 
   mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")

@@ -348,179 +348,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallops, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 21,425 × 12
-   CRUISE6 CRUISE STRATUM   TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name 
-   &lt;fct&gt;   &lt;fct&gt;  &lt;fct&gt;   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
- 1 197703  177    06370       1       1 197703063…       4     0.3 " "     scal…
- 2 197703  177    06370       2       2 197703063…       3     0.1 " "     scal…
- 3 197703  177    06370       3       3 197703063…       2     0.3 " "     scal…
- 4 197703  177    06380       1       4 197703063…       4     0.9 " "     scal…
- 5 197703  177    06370       4       5 197703063…      12     1.7 " "     scal…
- 6 197703  177    06370       5       6 197703063…      22     4.6 " "     scal…
- 7 197703  177    06420       1       8 197703064…       1     0.1 " "     scal…
- 8 197703  177    06500       1      13 197703065…       2     0.3 " "     scal…
- 9 197703  177    06500       2      14 197703065…       7     0   " "     clap…
-10 197703  177    06500       2      14 197703065…    1897   154.  " "     scal…
-# … with 21,415 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
-#   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
-</div>
 </div>
 </section>
 <section id="thursday-june-15" class="level1">
 <h1>Thursday (June 15)</h1>
 <p>Load packages</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Dr.&nbsp;Deyle sent me some example code for wrangling lobster data from the NEFSC trawl surveys. I adapted the code for use with the scallop dredge surveys:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the metadata associated with each stratum and station</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_strata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/SVDBS_SVMSTRATA.csv"</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVSTA.csv"</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#standardizing the date formats</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df_stations_wrangled <span class="ot">&lt;-</span> df_stations <span class="sc">%&gt;%</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE =</span> lubridate<span class="sc">::</span><span class="fu">parse_date_time</span>(BEGIN_EST_TOWDATE,<span class="at">orders=</span><span class="st">"mdYHMS"</span>,<span class="at">truncated =</span> <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATION,STRATUM,DATE) <span class="sc">%&gt;%</span> <span class="co">#select relevant columns</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE=</span>lubridate<span class="sc">::</span><span class="fu">year</span>(DATE)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="co">#remove duplicate rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the metadata associated with each stratum and station</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_strata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/SVDBS_SVMSTRATA.csv"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVSTA.csv"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#standardizing the date formats</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>df_stations_wrangled <span class="ot">&lt;-</span> df_stations <span class="sc">%&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE =</span> lubridate<span class="sc">::</span><span class="fu">parse_date_time</span>(BEGIN_EST_TOWDATE,<span class="at">orders=</span><span class="st">"mdYHMS"</span>,<span class="at">truncated =</span> <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATION,STRATUM,DATE) <span class="sc">%&gt;%</span> <span class="co">#select relevant columns</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE=</span>lubridate<span class="sc">::</span><span class="fu">year</span>(DATE)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="co">#remove duplicate rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, I wanted to get a general idea of how many times each station and stratum were in the data (i.e., how many years that station or stratum was sampled).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#data.frame(table(df_stations_wrangled$STATION))</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#data.frame(table(df_stations_wrangled$STRATUM))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>STATION))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., “took 20-30 meters” and “STARFISH NO STARS”).</p>
 <p>I then checked to see how many entries were present for each year:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>DATE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Var1 Freq
-1  1977  333
-2  1978  374
-3  1979  306
-4  1980  369
-5  1981  316
-6  1982  439
-7  1983  615
-8  1984  699
-9  1985  573
-10 1986  505
-11 1987  651
-12 1988  619
-13 1989  435
-14 1990  468
-15 1991  437
-16 1992  424
-17 1993  448
-18 1994  482
-19 1995  561
-20 1996  453
-21 1997  496
-22 1998  570
-23 1999  404
-24 2000  510
-25 2001  511
-26 2002  535
-27 2003  504
-28 2004  596
-29 2005  538
-30 2006  308
-31 2015   12
-32 2021   41</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>DATE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn’t include the SMAST drop camera and WHOI/HabCam data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.</p>
 <p>Unfortunately, this prompted me to spend much of the afternoon searching for the camera data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallops<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Var1 Freq
-1  1977  346
-2  1978  429
-3  1979  335
-4  1980  425
-5  1981  304
-6  1982  425
-7  1983  568
-8  1984  651
-9  1985  512
-10 1986  471
-11 1987  614
-12 1988  656
-13 1989  503
-14 1990  580
-15 1991  583
-16 1992  490
-17 1993  531
-18 1994  519
-19 1995  548
-20 1996  477
-21 1997  527
-22 1998  606
-23 1999  443
-24 2000  539
-25 2001  675
-26 2002  685
-27 2003  681
-28 2004  828
-29 2005  748
-30 2006  765
-31 2007  805
-32 2008  639
-33 2009  590
-34 2010  680
-35 2011  426
-36 2012  315
-37 2013  247
-38 2014  175
-39 2015  242
-40 2016  191
-41 2017  168
-42 2018  212
-43 2019  163
-44 2021  108</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallops<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>However, searching for the camera data was not a complete waste of time. In my search, I had re-pulled the NOAA Scallop Survey data and found that this newer version had data through 2022, whereas the version that Dr.&nbsp;Deyle shared with me only extended to 2021. See the “Week 2 in Words” page for more about what I found in my search for the post-2006 scallop data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#re-run setup for new data</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>svcatNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/new22564_UNION_FSCS_SVCAT.csv"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> svcatNew <span class="sc">%&gt;%</span> </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="sc">|</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop clapper)"</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#turn categorical variables into factors</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> SCIENTIFIC_NAME,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CATCHSEX =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>       <span class="co">#  STRATUM = as.factor(STRATUM), &lt;-- this became unnecessary later</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, </span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the season and year associated with each cruise</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/new22564_SVDBS_CRUISES.csv"</span>)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="co">#select the relevant variables</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> cruisesNew <span class="sc">%&gt;%</span> </span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="co">#combine with the existing dataframe</span></span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopsNew, cruisesNew, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallopsNew)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#re-run setup for new data</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>svcatNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT2022.csv"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> svcatNew <span class="sc">%&gt;%</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="sc">|</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop clapper)"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#turn categorical variables into factors</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> SCIENTIFIC_NAME,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CATCHSEX =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>       <span class="co">#  STRATUM = as.factor(STRATUM), &lt;-- this became unnecessary later</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the season and year associated with each cruise</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES2022.csv"</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#select the relevant variables</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> cruisesNew <span class="sc">%&gt;%</span> </span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co">#combine with the existing dataframe</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopsNew, cruisesNew, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallopsNew)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 21,581 × 12
    CRUISE6 CRUISE STRATUM   TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name 
@@ -538,7 +439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 # … with 21,571 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
 #   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Var1 Freq
 1  1977  346
@@ -590,21 +491,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>I then started to organize the scallop data for analysis:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#this gets rid of some weird strata in 1984 with letters, which don't seem to </span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>scallopsTest <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">STRATUM =</span> <span class="fu">as.integer</span>(STRATUM)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(STRATUM))</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#This will show you which ones were removed</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># scallopsTest &lt;-  scallopsNew %&gt;%</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(strat = as.integer(STRATUM)) %&gt;% </span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(strat))</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>df_strataNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/newSVDBS_SVMSTRATA.csv"</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#this gets rid of some weird strata in 1984 with letters, which don't seem to </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>scallopsTest <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">STRATUM =</span> <span class="fu">as.integer</span>(STRATUM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(STRATUM))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#This will show you which ones were removed</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># scallopsTest &lt;-  scallopsNew %&gt;%</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(strat = as.integer(STRATUM)) %&gt;% </span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(strat))</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>df_strataNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/newSVDBS_SVMSTRATA.csv"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Var1 Freq
 1   01160   15
@@ -708,25 +609,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 99  06740   96
 100 06990   15</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#the key matching strata to location (latitude and longitude) starts from 1010</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STRATUM <span class="sc">&gt;</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#the key matching strata to location (latitude and longitude) starts from 1010</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STRATUM <span class="sc">&gt;</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="friday-june-16" class="level1">
 <h1>Friday (June 16)</h1>
 <p>Continuing from yesterday:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Turns out all shellfish strata start with 6, any of the others were not consistently sampled</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STRATUM <span class="sc">&gt;</span> <span class="dv">5999</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">#See how many years each stratum was sampled</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>scallopsTest <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>scallopsTest</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Turns out all shellfish strata start with 6, any of the others were not consistently sampled</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STRATUM <span class="sc">&gt;</span> <span class="dv">5999</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#See how many years each stratum was sampled</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>scallopsTest <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>scallopsTest</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 0 × 2
 # … with 2 variables: STRATUM &lt;chr&gt;, years &lt;int&gt;</code></pre>
@@ -734,10 +635,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>After learning some GIS basics, I started working with some data sets I found online in hopes of getting the SMAST data, which has time series of scallop abundance alongside the abundance of major scallop predators. (<a href="http://www.repstraus.com/wp-content/uploads/2015/03/SMAST-drop-cam-survey-1999-2014-Stokesbury.pdf">This survey, which is still ongoing</a>.)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># SMAST abundance survey downloaded from </span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/data/SMAST_SCALLOP/SMAST_Scallops.gdb"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># SMAST abundance survey downloaded from </span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/data/SMAST_SCALLOP/SMAST_Scallops.gdb"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `AveragePresenceAbundance' from data source 
   `/Users/rubykrasnow/Downloads/lab_notebook/data/SMAST_SCALLOP/SMAST_Scallops.gdb' 
@@ -748,15 +649,15 @@ Dimension:     XY
 Bounding box:  xmin: -75.14375 ymin: 36.39138 xmax: -66.32867 ymax: 42.49109
 Geodetic CRS:  NAD83</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "sf"         "data.frame"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(test, <span class="st">"sf_column"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(test, <span class="st">"sf_column"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Shape"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(test[<span class="dv">9</span><span class="sc">:</span><span class="dv">15</span>], <span class="at">n =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(test[<span class="dv">9</span><span class="sc">:</span><span class="dv">15</span>], <span class="at">n =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 920 features and 7 fields
 Geometry type: MULTIPOLYGON
@@ -773,7 +674,7 @@ First 3 features:
 2 MULTIPOLYGON (((-74.91487 3...
 3 MULTIPOLYGON (((-74.9217 36...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Geometry set for 920 features 
 Geometry type: MULTIPOLYGON
@@ -782,22 +683,22 @@ Bounding box:  xmin: -75.14375 ymin: 36.39138 xmax: -66.32867 ymax: 42.49109
 Geodetic CRS:  NAD83
 First 5 geometries:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test[<span class="dv">6</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(test[<span class="dv">6</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Week2R_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>I also found a version of the NEFSC scallops survey in spatial form and started exploring that dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fish <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"~/Downloads/Fish/Fish.gdb"</span>, <span class="at">layer=</span><span class="st">"ScallopBiomass"</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_layers</span>(<span class="st">"~/Downloads/Fish/Fish.gdb"</span>)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(fish, <span class="st">"sf_column"</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(fish)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fish)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fish[<span class="dv">6</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>fish <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"~/Downloads/Fish/Fish.gdb"</span>, <span class="at">layer=</span><span class="st">"ScallopBiomass"</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_layers</span>(<span class="st">"~/Downloads/Fish/Fish.gdb"</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(fish, <span class="st">"sf_column"</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(fish)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fish)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fish[<span class="dv">6</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

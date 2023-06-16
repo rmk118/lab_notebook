@@ -78,14 +78,14 @@ scallops <- scallops %>%
 
 Load packages
 
-```{r}
+```{r, eval = FALSE}
 library(tidyverse) #rather than importing separately
 
 ```
 
 Set-up (from June 12)
 
-```{r}
+```{r, eval = FALSE}
 #read data
 svcat <- read.csv("~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVCAT.csv")
 
@@ -117,7 +117,7 @@ scallops <- scallops %>%
 
 I worked on turning the data into an actual time series:
 
-```{r}
+```{r, eval = FALSE}
 #read the file that has the season and year associated with each cruise
 cruises <- read.csv("~/Downloads/lab_notebook/data/Old/22564_SVDBS_CRUISES.csv")
 
@@ -137,7 +137,7 @@ as_tibble(scallops)
 
 Load packages
 
-```{r, eval=FALSE}
+```{r}
 library(tidyverse)
 library(lubridate)
 
@@ -145,7 +145,7 @@ library(lubridate)
 
 Dr. Deyle sent me some example code for wrangling lobster data from the NEFSC trawl surveys. I adapted the code for use with the scallop dredge surveys:
 
-```{r}
+```{r, eval = FALSE}
 #read the file that has the metadata associated with each stratum and station
 df_strata <- read.csv("~/Downloads/lab_notebook/data/Old/SVDBS_SVMSTRATA.csv")
 df_stations <- read.csv("~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVSTA.csv")
@@ -161,17 +161,17 @@ df_stations_wrangled <- df_stations %>%
 
 Then, I wanted to get a general idea of how many times each station and stratum were in the data (i.e., how many years that station or stratum was sampled).
 
-```{r}
+```{r, eval=FALSE}
 #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-#data.frame(table(df_stations_wrangled$STATION))
-#data.frame(table(df_stations_wrangled$STRATUM))
+data.frame(table(df_stations_wrangled$STATION))
+data.frame(table(df_stations_wrangled$STRATUM))
 ```
 
 This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., "took 20-30 meters" and "STARFISH NO STARS").
 
 I then checked to see how many entries were present for each year:
 
-```{r}
+```{r, eval=FALSE}
 data.frame(table(df_stations_wrangled$DATE))
 ```
 
@@ -179,7 +179,7 @@ Importantly, this revealed that the dates for stations only go up to 2006, plus 
 
 Unfortunately, this prompted me to spend much of the afternoon searching for the camera data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.
 
-```{r}
+```{r, eval=FALSE}
 data.frame(table(scallops$YEAR))
 ```
 
@@ -187,7 +187,7 @@ However, searching for the camera data was not a complete waste of time. In my s
 
 ```{r}
 #re-run setup for new data
-svcatNew <- read.csv("~/Downloads/lab_notebook/data/new22564_UNION_FSCS_SVCAT.csv")
+svcatNew <- read.csv("~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT2022.csv")
 
 scallopsNew <- svcatNew %>% 
   filter(SCIENTIFIC_NAME=="Placopecten magellanicus (sea scallop)" | 
@@ -209,7 +209,7 @@ scallopsNew <- scallopsNew %>%
  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP"))
 
 #read the file that has the season and year associated with each cruise
-cruisesNew <- read.csv("~/Downloads/lab_notebook/data/new22564_SVDBS_CRUISES.csv")
+cruisesNew <- read.csv("~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES2022.csv")
 
 #select the relevant variables
 cruisesNew <- cruisesNew %>% 
