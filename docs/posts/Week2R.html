@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ruby Krasnow">
-<meta name="dcterms.date" content="2023-06-15">
+<meta name="dcterms.date" content="2023-06-16">
 <meta name="description" content="My activities for the week">
 
 <title>Ruby’s Lab Notebook - Summer 2023 - Week 2 in R</title>
@@ -198,6 +198,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#monday-june-12" id="toc-monday-june-12" class="nav-link active" data-scroll-target="#monday-june-12">Monday, June 12</a></li>
   <li><a href="#tuesday-and-wednesday-june-13-and-14" id="toc-tuesday-and-wednesday-june-13-and-14" class="nav-link" data-scroll-target="#tuesday-and-wednesday-june-13-and-14">Tuesday and Wednesday (June 13 and 14)</a></li>
   <li><a href="#thursday-june-15" id="toc-thursday-june-15" class="nav-link" data-scroll-target="#thursday-june-15">Thursday (June 15)</a></li>
+  <li><a href="#friday-june-16" id="toc-friday-june-16" class="nav-link" data-scroll-target="#friday-june-16">Friday (June 16)</a></li>
   </ul>
 </nav>
     </div>
@@ -232,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 15, 2023</p>
+      <p class="date">June 16, 2023</p>
     </div>
   </div>
   
@@ -245,7 +246,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Note: I continually refined my code, so some of the older or now-unnecessary code cells below are set to “eval = FALSE” so that the code will still be visible but will not be evaluated and disrupt the output of later cells.</p>
 <section id="monday-june-12" class="level2">
 <h2 class="anchored" data-anchor-id="monday-june-12">Monday, June 12</h2>
-<p><strong>All set to eval = FALSE</strong> Load packages</p>
+<p><strong>All set to eval = FALSE</strong></p>
+<p>Load packages</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -284,8 +286,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise_all</span>(scallops,n_distinct)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#All have sex = 0, means unknown sex</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#SVSPP is species, listed as either 401 (scallop) or 400 (clammer), redundant info to species</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#All have sex = 0, which means "Unsexed, unknown, or sex not observed"</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#SVSPP is species, listed as either 401 (scallop) or 400 (clapper), redundant info to species</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove unnecessary variables</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
@@ -305,7 +307,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Set-up (from June 12)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>svcat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_UNION_FSCS_SVCAT.csv"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>svcat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVCAT.csv"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#filter to only species of interest - reduces it from 94632 observations to 21425</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> svcat <span class="sc">%&gt;%</span> </span>
@@ -315,10 +317,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#turn categorical variables into factors</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> SCIENTIFIC_NAME,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">cruise =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">stratum =</span> <span class="fu">as.factor</span>(STRATUM),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">CATCHSEX =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">STRATUM =</span> <span class="fu">as.factor</span>(STRATUM),</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
@@ -330,36 +332,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># all have the same status code (10), and SVSPP corresponds with name (401 = scallop, </span></span>
 <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 400 = clappers)</span></span>
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> scallops <span class="sc">%&gt;%</span> </span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>I worked on turning the data into an actual time series:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the season and year associated with each cruise</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/22564_SVDBS_CRUISES.csv"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/22564_SVDBS_CRUISES.csv"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#select the relevant variables</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> cruises <span class="sc">%&gt;%</span> </span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cruise6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#combine with the existing dataframe</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallops, cruises, <span class="at">by=</span><span class="st">"cruise6"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>scallops <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallops, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 21,425 × 12
-     TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name  cruise6 cruise stratum
-   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; &lt;fct&gt;   &lt;fct&gt;  &lt;fct&gt;  
- 1     1       1 197703063…       4     0.3 " "     scal… 197703  177    06370  
- 2     2       2 197703063…       3     0.1 " "     scal… 197703  177    06370  
- 3     3       3 197703063…       2     0.3 " "     scal… 197703  177    06370  
- 4     1       4 197703063…       4     0.9 " "     scal… 197703  177    06380  
- 5     4       5 197703063…      12     1.7 " "     scal… 197703  177    06370  
- 6     5       6 197703063…      22     4.6 " "     scal… 197703  177    06370  
- 7     1       8 197703064…       1     0.1 " "     scal… 197703  177    06420  
- 8     1      13 197703065…       2     0.3 " "     scal… 197703  177    06500  
- 9     2      14 197703065…       7     0   " "     clap… 197703  177    06500  
-10     2      14 197703065…    1897   154.  " "     scal… 197703  177    06500  
+   CRUISE6 CRUISE STRATUM   TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name 
+   &lt;fct&gt;   &lt;fct&gt;  &lt;fct&gt;   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 197703  177    06370       1       1 197703063…       4     0.3 " "     scal…
+ 2 197703  177    06370       2       2 197703063…       3     0.1 " "     scal…
+ 3 197703  177    06370       3       3 197703063…       2     0.3 " "     scal…
+ 4 197703  177    06380       1       4 197703063…       4     0.9 " "     scal…
+ 5 197703  177    06370       4       5 197703063…      12     1.7 " "     scal…
+ 6 197703  177    06370       5       6 197703063…      22     4.6 " "     scal…
+ 7 197703  177    06420       1       8 197703064…       1     0.1 " "     scal…
+ 8 197703  177    06500       1      13 197703065…       2     0.3 " "     scal…
+ 9 197703  177    06500       2      14 197703065…       7     0   " "     clap…
+10 197703  177    06500       2      14 197703065…    1897   154.  " "     scal…
 # … with 21,415 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
 #   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
 </div>
@@ -367,10 +369,1283 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="thursday-june-15" class="level1">
 <h1>Thursday (June 15)</h1>
+<p>Load packages</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Dr.&nbsp;Deyle sent me some example code for wrangling lobster data from the NEFSC trawl surveys. I adapted the code for use with the scallop dredge surveys:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the metadata associated with each stratum and station</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_strata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/SVDBS_SVMSTRATA.csv"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVSTA.csv"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#standardizing the date formats</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df_stations_wrangled <span class="ot">&lt;-</span> df_stations <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE =</span> lubridate<span class="sc">::</span><span class="fu">parse_date_time</span>(BEGIN_EST_TOWDATE,<span class="at">orders=</span><span class="st">"mdYHMS"</span>,<span class="at">truncated =</span> <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATION,STRATUM,DATE) <span class="sc">%&gt;%</span> <span class="co">#select relevant columns</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DATE=</span>lubridate<span class="sc">::</span><span class="fu">year</span>(DATE)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="co">#remove duplicate rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, I wanted to get a general idea of how many times each station and stratum were in the data (i.e., how many years that station or stratum was sampled).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>STATION))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                      Var1 Freq
+1                                                            20
+2                                           Stop 15:54:09Z    1
+3                                                 test tow    1
+4         they had already started event for next station.    1
+5                                          {Type:Operation    1
+6                                                {Type:SHG    1
+7                                                     0001   32
+8                                                     0002   32
+9                                                     0003   32
+10                                                    0004   32
+11                                                    0005   32
+12                                                    0006   32
+13                                                    0007   32
+14                                                    0008   32
+15                                                    0009   32
+16                                                    0010   32
+17                                                    0011   32
+18                                                    0012   32
+19                                                    0013   32
+20                                                    0014   32
+21                                                    0015   32
+22                                                    0016   31
+23                                                    0017   31
+24                                                    0018   32
+25                                                    0019   32
+26                                                    0020   32
+27                                                    0021   32
+28                                                    0022   32
+29                                                    0023   32
+30                                                    0024   32
+31                                                    0025   32
+32                                                    0026   32
+33                                                    0027   32
+34                                                    0028   32
+35                                                    0029   32
+36                                                    0030   32
+37                                                    0031   32
+38                                                    0032   32
+39                                                    0033   32
+40                                                    0034   32
+41                                                    0035   32
+42                                                    0036   32
+43                                                    0037   33
+44                                                    0038   33
+45                                                    0039   32
+46                                                    0040   32
+47                                                    0041   33
+48                                                    0042   33
+49                                                    0043   33
+50                                                    0044   33
+51                                                    0045   33
+52                                                    0046   33
+53                                                    0047   33
+54                                                    0048   33
+55                                                    0049   31
+56                                                    0050   32
+57                                                    0051   32
+58                                                    0052   31
+59                                                    0053   31
+60                                                    0054   31
+61                                                    0055   31
+62                                                    0056   31
+63                                                    0057   32
+64                                                    0058   32
+65                                                    0059   32
+66                                                    0060   32
+67                                                    0061   32
+68                                                    0062   32
+69                                                    0063   32
+70                                                    0064   32
+71                                                    0065   32
+72                                                    0066   32
+73                                                    0067   32
+74                                                    0068   32
+75                                                    0069   32
+76                                                    0070   32
+77                                                    0071   32
+78                                                    0072   32
+79                                                    0073   32
+80                                                    0074   32
+81                                                    0075   32
+82                                                    0076   32
+83                                                    0077   31
+84                                                    0078   31
+85                                                    0079   31
+86                                                    0080   32
+87                                                    0081   32
+88                                                    0082   32
+89                                                    0083   32
+90                                                    0084   32
+91                                                    0085   32
+92                                                    0086   32
+93                                                    0087   32
+94                                                    0088   31
+95                                                    0089   32
+96                                                    0090   32
+97                                                    0091   31
+98                                                    0092   32
+99                                                    0093   32
+100                                                   0094   31
+101                                                   0095   32
+102                                                   0096   30
+103                                                   0097   31
+104                                                   0098   30
+105                                                   0099   29
+106                                                   0100   30
+107                                                   0101   30
+108                                                   0102   30
+109                                                   0103   30
+110                                                   0104   30
+111                                                   0105   30
+112                                                   0106   31
+113                                                   0107   31
+114                                                   0108   31
+115                                                   0109   31
+116                                                   0110   32
+117                                                   0111   32
+118                                                   0112   32
+119                                                   0113   32
+120                                                   0114   32
+121                                                   0115   32
+122                                                   0116   31
+123                                                   0117   31
+124                                                   0118   31
+125                                                   0119   31
+126                                                   0120   31
+127                                                   0121   30
+128                                                   0122   31
+129                                                   0123   31
+130                                                   0124   31
+131                                                   0125   31
+132                                                   0126   31
+133                                                   0127   31
+134                                                   0128   30
+135                                                   0129   31
+136                                                   0130   31
+137                                                   0131   31
+138                                                   0132   31
+139                                                   0133   31
+140                                                   0134   31
+141                                                   0135   31
+142                                                   0136   31
+143                                                   0137   31
+144                                                   0138   31
+145                                                   0139   31
+146                                                   0140   31
+147                                                   0141   31
+148                                                   0142   31
+149                                                   0143   30
+150                                                   0144   31
+151                                                   0145   31
+152                                                   0146   31
+153                                                   0147   31
+154                                                   0148   31
+155                                                   0149   31
+156                                                   0150   31
+157                                                   0151   31
+158                                                   0152   31
+159                                                   0153   31
+160                                                   0154   31
+161                                                   0155   31
+162                                                   0156   31
+163                                                   0157   31
+164                                                   0158   31
+165                                                   0159   31
+166                                                   0160   31
+167                                                   0161   31
+168                                                   0162   31
+169                                                   0163   31
+170                                                   0164   30
+171                                                   0165   30
+172                                                   0166   30
+173                                                   0167   30
+174                                                   0168   30
+175                                                   0169   30
+176                                                   0170   30
+177                                                   0171   30
+178                                                   0172   30
+179                                                   0173   30
+180                                                   0174   29
+181                                                   0175   29
+182                                                   0176   29
+183                                                   0177   29
+184                                                   0178   29
+185                                                   0179   29
+186                                                   0180   29
+187                                                   0181   29
+188                                                   0182   29
+189                                                   0183   29
+190                                                   0184   29
+191                                                   0185   29
+192                                                   0186   29
+193                                                   0187   29
+194                                                   0188   29
+195                                                   0189   29
+196                                                   0190   29
+197                                                   0191   29
+198                                                   0192   29
+199                                                   0193   29
+200                                                   0194   29
+201                                                   0195   29
+202                                                   0196   29
+203                                                   0197   29
+204                                                   0198   29
+205                                                   0199   29
+206                                                   0200   29
+207                                                   0201   29
+208                                                   0202   29
+209                                                   0203   29
+210                                                   0204   29
+211                                                   0205   29
+212                                                   0206   29
+213                                                   0207   29
+214                                                   0208   29
+215                                                   0209   29
+216                                                   0210   28
+217                                                   0211   29
+218                                                   0212   29
+219                                                   0213   29
+220                                                   0214   29
+221                                                   0215   29
+222                                                   0216   29
+223                                                   0217   29
+224                                                   0218   29
+225                                                   0219   29
+226                                                   0220   29
+227                                                   0221   29
+228                                                   0222   29
+229                                                   0223   29
+230                                                   0224   29
+231                                                   0225   29
+232                                                   0226   29
+233                                                   0227   29
+234                                                   0228   29
+235                                                   0229   28
+236                                                   0230   29
+237                                                   0231   29
+238                                                   0232   29
+239                                                   0233   29
+240                                                   0234   29
+241                                                   0235   29
+242                                                   0236   29
+243                                                   0237   29
+244                                                   0238   29
+245                                                   0239   29
+246                                                   0240   29
+247                                                   0241   29
+248                                                   0242   29
+249                                                   0243   29
+250                                                   0244   29
+251                                                   0245   29
+252                                                   0246   28
+253                                                   0247   29
+254                                                   0248   29
+255                                                   0249   29
+256                                                   0250   29
+257                                                   0251   29
+258                                                   0252   29
+259                                                   0253   29
+260                                                   0254   29
+261                                                   0255   29
+262                                                   0256   29
+263                                                   0257   29
+264                                                   0258   29
+265                                                   0259   29
+266                                                   0260   29
+267                                                   0261   29
+268                                                   0262   29
+269                                                   0263   29
+270                                                   0264   29
+271                                                   0265   29
+272                                                   0266   29
+273                                                   0267   29
+274                                                   0268   29
+275                                                   0269   29
+276                                                   0270   29
+277                                                   0271   29
+278                                                   0272   29
+279                                                   0273   29
+280                                                   0274   29
+281                                                   0275   29
+282                                                   0276   29
+283                                                   0277   29
+284                                                   0278   29
+285                                                   0279   29
+286                                                   0280   29
+287                                                   0281   29
+288                                                   0282   29
+289                                                   0283   29
+290                                                   0284   29
+291                                                   0285   29
+292                                                   0286   28
+293                                                   0287   29
+294                                                   0288   29
+295                                                   0289   29
+296                                                   0290   29
+297                                                   0291   29
+298                                                   0292   29
+299                                                   0293   29
+300                                                   0294   29
+301                                                   0295   29
+302                                                   0296   29
+303                                                   0297   29
+304                                                   0298   29
+305                                                   0299   29
+306                                                   0300   28
+307                                                   0301   28
+308                                                   0302   28
+309                                                   0303   29
+310                                                   0304   29
+311                                                   0305   29
+312                                                   0306   29
+313                                                   0307   29
+314                                                   0308   29
+315                                                   0309   28
+316                                                   0310   28
+317                                                   0311   28
+318                                                   0312   28
+319                                                   0313   28
+320                                                   0314   28
+321                                                   0315   27
+322                                                   0316   27
+323                                                   0317   27
+324                                                   0318   26
+325                                                   0319   26
+326                                                   0320   26
+327                                                   0321   25
+328                                                   0322   26
+329                                                   0323   26
+330                                                   0324   26
+331                                                   0325   26
+332                                                   0326   26
+333                                                   0327   26
+334                                                   0328   26
+335                                                   0329   26
+336                                                   0330   25
+337                                                   0331   25
+338                                                   0332   25
+339                                                   0333   25
+340                                                   0334   25
+341                                                   0335   25
+342                                                   0336   24
+343                                                   0337   24
+344                                                   0338   24
+345                                                   0339   25
+346                                                   0340   25
+347                                                   0341   25
+348                                                   0342   26
+349                                                   0343   26
+350                                                   0344   26
+351                                                   0345   26
+352                                                   0346   26
+353                                                   0347   26
+354                                                   0348   24
+355                                                   0349   25
+356                                                   0350   25
+357                                                   0351   25
+358                                                   0352   25
+359                                                   0353   25
+360                                                   0354   25
+361                                                   0355   25
+362                                                   0356   25
+363                                                   0357   25
+364                                                   0358   25
+365                                                   0359   25
+366                                                   0360   25
+367                                                   0361   25
+368                                                   0362   25
+369                                                   0363   25
+370                                                   0364   25
+371                                                   0365   25
+372                                                   0366   25
+373                                                   0367   25
+374                                                   0368   25
+375                                                   0369   25
+376                                                   0370   25
+377                                                   0371   25
+378                                                   0372   25
+379                                                   0373   25
+380                                                   0374   25
+381                                                   0375   25
+382                                                   0376   25
+383                                                   0377   25
+384                                                   0378   24
+385                                                   0379   24
+386                                                   0380   24
+387                                                   0381   24
+388                                                   0382   24
+389                                                   0383   24
+390                                                   0384   24
+391                                                   0385   24
+392                                                   0386   24
+393                                                   0387   24
+394                                                   0388   24
+395                                                   0389   24
+396                                                   0390   24
+397                                                   0391   24
+398                                                   0392   24
+399                                                   0393   24
+400                                                   0394   24
+401                                                   0395   24
+402                                                   0396   24
+403                                                   0397   24
+404                                                   0398   24
+405                                                   0399   24
+406                                                   0400   24
+407                                                   0401   24
+408                                                   0402   24
+409                                                   0403   24
+410                                                   0404   24
+411                                                   0405   23
+412                                                   0406   23
+413                                                   0407   23
+414                                                   0408   23
+415                                                   0409   23
+416                                                   0410   23
+417                                                   0411   23
+418                                                   0412   23
+419                                                   0413   23
+420                                                   0414   23
+421                                                   0415   23
+422                                                   0416   23
+423                                                   0417   23
+424                                                   0418   23
+425                                                   0419   23
+426                                                   0420   23
+427                                                   0421   23
+428                                                   0422   23
+429                                                   0423   23
+430                                                   0424   23
+431                                                   0425   22
+432                                                   0426   22
+433                                                   0427   22
+434                                                   0428   22
+435                                                   0429   22
+436                                                   0430   22
+437                                                   0431   22
+438                                                   0432   22
+439                                                   0433   21
+440                                                   0434   22
+441                                                   0435   22
+442                                                   0436   21
+443                                                   0437   21
+444                                                   0438   20
+445                                                   0439   20
+446                                                   0440   19
+447                                                   0441   19
+448                                                   0442   18
+449                                                   0443   18
+450                                                   0444   18
+451                                                   0445   18
+452                                                   0446   18
+453                                                   0447   17
+454                                                   0448   17
+455                                                   0449   17
+456                                                   0450   17
+457                                                   0451   17
+458                                                   0452   17
+459                                                   0453   17
+460                                                   0454   16
+461                                                   0455   16
+462                                                   0456   16
+463                                                   0457   16
+464                                                   0458   16
+465                                                   0459   16
+466                                                   0460   16
+467                                                   0461   16
+468                                                   0462   16
+469                                                   0463   16
+470                                                   0464   16
+471                                                   0465   16
+472                                                   0466   16
+473                                                   0467   16
+474                                                   0468   16
+475                                                   0469   16
+476                                                   0470   15
+477                                                   0471   15
+478                                                   0472   15
+479                                                   0473   16
+480                                                   0474   16
+481                                                   0475   16
+482                                                   0476   16
+483                                                   0477   16
+484                                                   0478   16
+485                                                   0479   16
+486                                                   0480   16
+487                                                   0481   16
+488                                                   0482   16
+489                                                   0483   15
+490                                                   0484   15
+491                                                   0485   14
+492                                                   0486   14
+493                                                   0487   14
+494                                                   0488   14
+495                                                   0489   13
+496                                                   0490   13
+497                                                   0491   13
+498                                                   0492   13
+499                                                   0493   13
+500                                                   0494   13
+501                                                   0495   13
+502                                                   0496   13
+503                                                   0497   12
+504                                                   0498   12
+505                                                   0499   12
+506                                                   0500   13
+507                                                   0501   13
+508                                                   0502   13
+509                                                   0503   13
+510                                                   0504   13
+511                                                   0505   12
+512                                                   0506   11
+513                                                   0507   11
+514                                                   0508   11
+515                                                   0509   11
+516                                                   0510   11
+517                                                   0511   10
+518                                                   0512   10
+519                                                   0513   10
+520                                                   0514   10
+521                                                   0515   10
+522                                                   0516   10
+523                                                   0517   10
+524                                                   0518   10
+525                                                   0519   10
+526                                                   0520   10
+527                                                   0521   10
+528                                                   0522   10
+529                                                   0523   10
+530                                                   0524   10
+531                                                   0525   10
+532                                                   0526   10
+533                                                   0527   10
+534                                                   0528   10
+535                                                   0529   10
+536                                                   0530   10
+537                                                   0531   10
+538                                                   0532   10
+539                                                   0533   10
+540                                                   0534   10
+541                                                   0535   10
+542                                                   0536    9
+543                                                   0537    9
+544                                                   0538    9
+545                                                   0539    8
+546                                                   0540    8
+547                                                   0541    8
+548                                                   0542    8
+549                                                   0543    8
+550                                                   0544    8
+551                                                   0545    8
+552                                                   0546    8
+553                                                   0547    8
+554                                                   0548    8
+555                                                   0549    8
+556                                                   0550    8
+557                                                   0551    8
+558                                                   0552    8
+559                                                   0553    8
+560                                                   0554    7
+561                                                   0555    7
+562                                                   0556    7
+563                                                   0557    7
+564                                                   0558    7
+565                                                   0559    7
+566                                                   0560    7
+567                                                   0561    7
+568                                                   0562    7
+569                                                   0563    7
+570                                                   0564    7
+571                                                   0565    7
+572                                                   0566    7
+573                                                   0567    7
+574                                                   0568    7
+575                                                   0569    7
+576                                                   0570    7
+577                                                   0571    6
+578                                                   0572    6
+579                                                   0573    6
+580                                                   0574    5
+581                                                   0575    5
+582                                                   0576    5
+583                                                   0577    5
+584                                                   0578    5
+585                                                   0579    5
+586                                                   0580    5
+587                                                   0581    5
+588                                                   0582    5
+589                                                   0583    5
+590                                                   0584    5
+591                                                   0585    5
+592                                                   0586    5
+593                                                   0587    5
+594                                                   0588    5
+595                                                   0589    5
+596                                                   0590    5
+597                                                   0591    5
+598                                                   0592    5
+599                                                   0593    5
+600                                                   0594    5
+601                                                   0595    5
+602                                                   0596    5
+603                                                   0597    4
+604                                                   0598    4
+605                                                   0599    4
+606                                                   0600    4
+607                                                   0601    4
+608                                                   0602    4
+609                                                   0603    4
+610                                                   0604    4
+611                                                   0605    4
+612                                                   0606    4
+613                                                   0607    4
+614                                                   0608    4
+615                                                   0609    4
+616                                                   0610    4
+617                                                   0611    4
+618                                                   0612    4
+619                                                   0613    4
+620                                                   0614    4
+621                                                   0615    4
+622                                                   0616    3
+623                                                   0617    3
+624                                                   0618    3
+625                                                   0619    3
+626                                                   0620    2
+627                                                   0621    2
+628                                                   0622    2
+629                                                   0623    2
+630                                                   0624    2
+631                                                   0625    2
+632                                                   0626    2
+633                                                   0627    2
+634                                                   0628    2
+635                                                   0629    2
+636                                                   0630    2
+637                                                   0631    2
+638                                                   0632    2
+639                                                   0633    2
+640                                                   0634    2
+641                                                   0635    2
+642                                                   0636    2
+643                                                   0637    2
+644                                                   0638    2
+645                                                   0639    2
+646                                                   0640    2
+647                                                   0641    2
+648                                                   0642    2
+649                                                   0643    2
+650                                                   0644    2
+651                                                   0645    2
+652                                                   0646    2
+653                                                   0647    2
+654                                                   0648    2
+655                                                   0649    2
+656                                                   0650    2
+657                                                   0651    2
+658                                                   0652    1
+659                                                   0653    1
+660                                                   0654    1
+661                                                   0655    1
+662                                                   0656    1
+663                                                   0657    1
+664                                                   0658    1
+665                                                   0659    1
+666                                                   0660    1
+667                                                   0661    1
+668                                                   0662    1
+669                                                   0663    1
+670                                                   0664    1
+671                                                   0665    1
+672                                                   0666    1
+673                                                   0667    1
+674                                                   0668    1
+675                                                   0669    1
+676                                                   0670    1
+677                                                   0671    1
+678                                                   0672    1
+679                                                   0673    1
+680                                                   0674    1
+681                                                   0675    1
+682                                                   0676    1
+683                                                   0677    1
+684                                                   0678    1
+685                                                   0679    1
+686                                                   0680    1
+687                                                   0681    1
+688                                                   0682    1
+689                                                   0683    1
+690                                                   0684    1
+691                                                   0685    1
+692                                                   0686    1
+693                                                   0687    1
+694                                                   0688    1
+695                                                   0689    1
+696                                                   0690    1
+697                                                   0691    1
+698                                                   0692    1
+699                                                   0693    1
+700                                                   0694    1
+701                                                   0695    1
+702                                                   0696    1
+703                                                   0697    1
+704                                                   0698    1
+705                                                   0699    1
+706                                                   7012    1
+707                                                   7013    1
+708                                                   7024    1
+709                                                   7025    1
+710                                                   7033    1
+711                                                   7044    1
+712                                                   7051    1
+713                                                   7057    1
+714                                                   7070    1
+715                                                   7081    1
+716                                                   7090    1
+717                                                   7093    1
+718                                                   7107    1
+719                                                   7118    1
+720                                                   7119    1
+721                                                   7130    1
+722                                                   7135    1
+723                                                   7144    1
+724                                                   7146    1
+725                                                   7163    1
+726                                                   7164    1
+727                                                   7172    1
+728                                                   7174    1
+729                                                   7179    1
+730                                                   7183    1
+731                                                   7190    1
+732                                                   7192    1
+733                                                   7196    1
+734                                                   7197    1
+735                                                   7201    1
+736                                                   7202    1
+737                                                   7203    1
+738                                                   7204    1
+739                                                   7205    1
+740                                                   7206    1
+741                                                   7209    1
+742                                                   7210    1
+743                                                   7235    1
+744                                                   7237    1
+745                                                   7241    1
+746                                                   7255    1
+747                                                   7264    1
+748                                                   7272    1
+749                                                   7275    1
+750                                                   7277    1
+751                                                   7302    1
+752                                                   7305    1
+753                                                   7307    1
+754                                                   7317    1
+755                                                   7328    1
+756                                                   7342    1
+757                                                   7343    1
+758                                                   7345    1
+759                                                   7346    1
+760                                                   7356    1
+761                                                   7360    1
+762                                                   7372    1
+763                                                   7392    1
+764                                                   7404    1
+765                                                   7407    1
+766                                                   7414    1
+767                                                   7415    1
+768                                                   7421    1
+769                                                   7430    1
+770                                                   7432    1
+771                                                   7436    1
+772                                                   7437    1
+773                                                   7446    1
+774                                                   7447    1
+775                                                   7448    1
+776                                                   7449    1
+777                                                   7456    1
+778                                                   7457    1
+779                                                   7460    1
+780                                                   7478    1
+781                                                   7479    1
+782                                                   7480    1
+783                                                   7481    1
+784                                                   7482    1
+785 No Water Bottle Deployed; ##FSCSDrPerf:Start 18:15:04Z    1
+786                                              OPEN AREA    1
+787                                                  retow    1
+788                                       SOLASTER PRESENT    1
+789          Stars and Crabs; ##FSCSDrPerf:Start 16:03:38Z    1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                         Var1 Freq
+1                                                1
+2                                         1x2    1
+3           At Surface 07:30:21Z used for SHG    1
+4                           dead scall shells    1
+5                                       depth    1
+6                                      EKVLOG    2
+7                                 EKVLOG DATA    1
+8                           took 20-30 meters    1
+9                                 TOWDISTANCE    1
+10                                      01150    2
+11                                      01160   24
+12                                      0116A    4
+13                                      01170    1
+14                                      0121A    4
+15                                      01260   15
+16                                      01270   54
+17                                      01290    2
+18                                      01300    1
+19                                      01370   34
+20                                      0137A    4
+21                                      01380   19
+22                                      03580    1
+23                                      03590   10
+24                                      06010   31
+25                                      06020   29
+26                                      06030   29
+27                                      06040   24
+28                                      06050   41
+29                                      06060  123
+30                                      06070  116
+31                                      06080   26
+32                                      06090   78
+33                                      06100  232
+34                                      06110  269
+35                                      06120   43
+36                                      06130   57
+37                                      06140  327
+38                                      06150  391
+39                                      06160   75
+40                                      06170   51
+41                                      06180  323
+42                                      06190  354
+43                                      06200   29
+44                                      06210   96
+45                                      06220  303
+46                                      06230  598
+47                                      06240  209
+48                                      06250  152
+49                                      06260  358
+50                                      06270  534
+51                                      06280  236
+52                                      06290  177
+53                                      06300  420
+54                                      06310  742
+55                                      06320   52
+56                                      06330  228
+57                                      06340  339
+58                                      06350  259
+59                                      06360   25
+60                                      06370   45
+61                                      06380   57
+62                                      06390   47
+63                                      06400   23
+64                                      06410   31
+65                                      0641G    1
+66                                      06420   29
+67                                      0642G    1
+68                                      06430   23
+69                                      06440   25
+70                                      06450   37
+71                                      0645G    1
+72                                      06460  209
+73                                      06470  451
+74                                      06480   61
+75                                      06490  275
+76                                      06500  412
+77                                      0650G   12
+78                                      06510  420
+79                                      06520  367
+80                                      06530  278
+81                                      06540  251
+82                                      06550  289
+83                                      06560   28
+84                                      06570   36
+85                                      06580  178
+86                                      06590  332
+87                                      0659F    2
+88                                      06600  327
+89                                      0660F   30
+90                                      06610  282
+91                                      06620   39
+92                                      06621  334
+93                                      06622   84
+94                                      06630   48
+95                                      06631  130
+96                                      06632   88
+97                                      06640  279
+98                                      0664B    4
+99                                      0664D   10
+100                                     0664E    8
+101                                     06650   46
+102                                     06651  237
+103                                     06652  143
+104                                     0665E    2
+105                                     06660   56
+106                                     06661  269
+107                                     06662  103
+108                                     0666A    6
+109                                     06670    4
+110                                     06680    4
+111                                     06690    2
+112                                     0669A    1
+113                                     06700    5
+114                                     06710  177
+115                                     0671C    5
+116                                     06720  109
+117                                     06730   45
+118                                     06740  157
+119                                     06990   26
+120                               250@console    1
+121                     CLOSED AREA NANTUCKET    1
+122        CLOSED AREA NANTUCKET - NON-RANDOM    1
+123                                       CTD    1
+124                               No Comments    1
+125                                 OPEN AREA    1
+126                  Recorder:Michael Bergman    3
+127                     Recorder:Zachary Fyke    2
+128                               Rock chains    1
+129                                  STARFISH    1
+130                        STARFISH AND CRABS    1
+131                            STARFISH CRABS    1
+132                         STARFISH NO STARS    1
+133 STARFISH present but not sampled NO CRABS    1
+134                     starfish/crab station    1
+135                     STARFISH/CRAB station    1
+136                            STARFISH/CRABS    1</code></pre>
+</div>
+</div>
+<p>This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., “took 20-30 meters” and “STARFISH NO STARS”).</p>
+<p>I then checked to see how many entries were present for each year:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(df_stations_wrangled<span class="sc">$</span>DATE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Var1 Freq
+1  1977  333
+2  1978  374
+3  1979  306
+4  1980  369
+5  1981  316
+6  1982  439
+7  1983  615
+8  1984  699
+9  1985  573
+10 1986  505
+11 1987  651
+12 1988  619
+13 1989  435
+14 1990  468
+15 1991  437
+16 1992  424
+17 1993  448
+18 1994  482
+19 1995  561
+20 1996  453
+21 1997  496
+22 1998  570
+23 1999  404
+24 2000  510
+25 2001  511
+26 2002  535
+27 2003  504
+28 2004  596
+29 2005  538
+30 2006  308
+31 2015   12
+32 2021   41</code></pre>
+</div>
+</div>
+<p>Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn’t include the SMAST and WHOI drop camera data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.</p>
+<p>Unfortunately, this prompted me to spend much of the afternoon searching for the HabCam data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallops<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Var1 Freq
+1  1977  346
+2  1978  429
+3  1979  335
+4  1980  425
+5  1981  304
+6  1982  425
+7  1983  568
+8  1984  651
+9  1985  512
+10 1986  471
+11 1987  614
+12 1988  656
+13 1989  503
+14 1990  580
+15 1991  583
+16 1992  490
+17 1993  531
+18 1994  519
+19 1995  548
+20 1996  477
+21 1997  527
+22 1998  606
+23 1999  443
+24 2000  539
+25 2001  675
+26 2002  685
+27 2003  681
+28 2004  828
+29 2005  748
+30 2006  765
+31 2007  805
+32 2008  639
+33 2009  590
+34 2010  680
+35 2011  426
+36 2012  315
+37 2013  247
+38 2014  175
+39 2015  242
+40 2016  191
+41 2017  168
+42 2018  212
+43 2019  163
+44 2021  108</code></pre>
+</div>
+</div>
+<p>However, searching for the HabCam data was not a complete waste of time. In my search, I had re-pulled the NOAA Scallop Survey data and found that this newer version had data through 2022, whereas the version that Dr.&nbsp;Deyle shared with me only extended to 2021. See the “Week 2 in Words” page for more about what I found in my search for the post-2006 scallop data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#re-run setup for new data</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>svcatNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/new22564_UNION_FSCS_SVCAT.csv"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> svcatNew <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="sc">|</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Placopecten magellanicus (sea scallop clapper)"</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#turn categorical variables into factors</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> SCIENTIFIC_NAME,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CATCHSEX =</span> <span class="fu">as.factor</span>(CATCHSEX),</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>       <span class="co">#  STRATUM = as.factor(STRATUM), &lt;-- this became unnecessary later</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten for clarity</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> scallopsNew <span class="sc">%&gt;%</span> </span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">recode</span>(name, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>, </span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Placopecten magellanicus (sea scallop clapper)"</span> <span class="ot">=</span> <span class="st">"clapper"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>))</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="co">#read the file that has the season and year associated with each cruise</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/new22564_SVDBS_CRUISES.csv"</span>)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="co">#select the relevant variables</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>cruisesNew <span class="ot">&lt;-</span> cruisesNew <span class="sc">%&gt;%</span> </span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="co">#combine with the existing dataframe</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopsNew, cruisesNew, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallopsNew)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21,581 × 12
+   CRUISE6 CRUISE STRATUM   TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ name 
+   &lt;fct&gt;   &lt;fct&gt;  &lt;chr&gt;   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 197703  177    06370       1       1 197703063…       4     0.3 ""      scal…
+ 2 197703  177    06370       2       2 197703063…       3     0.1 ""      scal…
+ 3 197703  177    06370       3       3 197703063…       2     0.3 ""      scal…
+ 4 197703  177    06380       1       4 197703063…       4     0.9 ""      scal…
+ 5 197703  177    06370       4       5 197703063…      12     1.7 ""      scal…
+ 6 197703  177    06370       5       6 197703063…      22     4.6 ""      scal…
+ 7 197703  177    06420       1       8 197703064…       1     0.1 ""      scal…
+ 8 197703  177    06500       1      13 197703065…       2     0.3 ""      scal…
+ 9 197703  177    06500       2      14 197703065…       7     0   ""      clap…
+10 197703  177    06500       2      14 197703065…    1897   154.  ""      scal…
+# … with 21,571 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
+#   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Var1 Freq
+1  1977  346
+2  1978  429
+3  1979  335
+4  1980  425
+5  1981  304
+6  1982  425
+7  1983  568
+8  1984  651
+9  1985  512
+10 1986  471
+11 1987  614
+12 1988  656
+13 1989  503
+14 1990  580
+15 1991  583
+16 1992  490
+17 1993  531
+18 1994  519
+19 1995  548
+20 1996  477
+21 1997  527
+22 1998  606
+23 1999  443
+24 2000  539
+25 2001  675
+26 2002  685
+27 2003  681
+28 2004  828
+29 2005  748
+30 2006  765
+31 2007  805
+32 2008  639
+33 2009  590
+34 2010  680
+35 2011  426
+36 2012  315
+37 2013  247
+38 2014  175
+39 2015  242
+40 2016  191
+41 2017  168
+42 2018  212
+43 2019  163
+44 2021  108
+45 2022  156</code></pre>
+</div>
+</div>
+<p>I then started to organize the scallop data for analysis:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#this gets rid of some weird strata in 1984 with letters, which don't seem to </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>scallopsTest <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">STRATUM =</span> <span class="fu">as.integer</span>(STRATUM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(STRATUM))</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">#This will show you which ones were removed</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># scallopsTest &lt;-  scallopsNew %&gt;%</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(strat = as.integer(STRATUM)) %&gt;% </span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(strat))</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>df_strataNew <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/newSVDBS_SVMSTRATA.csv"</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopsNew<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Var1 Freq
+1   01160   15
+2   0116A    5
+3   0121A    5
+4   01260    9
+5   01270   38
+6   01370   45
+7   0137A    7
+8   01380   20
+9   03580    1
+10  03590   11
+11  06010    5
+12  06020    9
+13  06030   11
+14  06040    6
+15  06050    7
+16  06060  141
+17  06070  118
+18  06080    8
+19  06090   53
+20  06100  330
+21  06110  493
+22  06120   25
+23  06130   51
+24  06140  570
+25  06150  766
+26  06160   54
+27  06170   71
+28  06180  656
+29  06190  712
+30  06200   19
+31  06210  113
+32  06220  447
+33  06230 1104
+34  06240  194
+35  06250  215
+36  06260  466
+37  06270  840
+38  06280  178
+39  06290  233
+40  06300  579
+41  06310 1050
+42  06320   36
+43  06330  267
+44  06340  431
+45  06350  197
+46  06360    1
+47  06370   40
+48  06380   58
+49  06390   14
+50  06400    2
+51  06410   16
+52  06420    5
+53  06440    3
+54  06450   10
+55  06460  247
+56  06470  789
+57  06480   27
+58  06490  396
+59  06500  880
+60  0650G   16
+61  06510  618
+62  06520  666
+63  06530  530
+64  06540  549
+65  06550  382
+66  06560   15
+67  06570   29
+68  06580  208
+69  06590  442
+70  0659F    2
+71  06600  437
+72  0660F   33
+73  06610  488
+74  06620   52
+75  06621  687
+76  06622  133
+77  06630   38
+78  06631   78
+79  06632  118
+80  06640  507
+81  0664B    6
+82  0664D   13
+83  0664E   12
+84  06650   60
+85  06651  476
+86  06652  321
+87  0665E    4
+88  06660   79
+89  06661  495
+90  06662  220
+91  0666A   11
+92  06670   10
+93  06680    2
+94  06700    1
+95  06710  521
+96  0671C    5
+97  06720   96
+98  06730   11
+99  06740   96
+100 06990   15</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#the key matching strata to location (latitude and longitude) starts from 1010</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>scallopsNew <span class="ot">&lt;-</span>  scallopsNew <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STRATUM <span class="sc">&gt;</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="friday-june-16" class="level1">
+<h1>Friday (June 16)</h1>
 
 
 </section>

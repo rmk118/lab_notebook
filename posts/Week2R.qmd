@@ -152,9 +152,9 @@ df_stations <- read.csv("~/Downloads/lab_notebook/data/Old/22564_UNION_FSCS_SVST
 
 #standardizing the date formats
 df_stations_wrangled <- df_stations %>%
-  mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
+  mutate(DATE = lubridate::parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
   select(STATION,STRATUM,DATE) %>% #select relevant columns
-  mutate(DATE=year(DATE)) %>%
+  mutate(DATE=lubridate::year(DATE)) %>%
   distinct() #remove duplicate rows
 
 ```
@@ -169,14 +169,13 @@ data.frame(table(df_stations_wrangled$STRATUM))
 
 This revealed that 20 rows had no station recorded. Additionally, many rows had text of some sort rather than a station or stratum number recorded in the corresponding column (e.g., "took 20-30 meters" and "STARFISH NO STARS").
 
-
 I then checked to see how many entries were present for each year:
+
 ```{r}
 data.frame(table(df_stations_wrangled$DATE))
 ```
 
-Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. 
-At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn't include the SMAST and WHOI drop camera data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.
+Importantly, this revealed that the dates for stations only go up to 2006, plus a few observations in 2015 and 2021. At first, I thought that this meant there was only scallop data until 2006, and that this dataset didn't include the SMAST and WHOI drop camera data that has been collected since around 2003 as part of the NEFSC scallop survey. The example code for wrangling lobster data relies on the fact that each lobster observation is associated with a station, so I assumed (incorrectly) that the scallop data would be the same.
 
 Unfortunately, this prompted me to spend much of the afternoon searching for the HabCam data, until I eventually realized that only having stations until 2006 did not mean there was only scallop data until 2006. Checking the entries per year for the scallop data rather than the stations revealed that there was in fact scallop data from 1977 through 2021.
 
@@ -241,7 +240,7 @@ scallopsTest <-  scallopsNew %>%
 #   mutate(strat = as.integer(STRATUM)) %>% 
 #   filter(is.na(strat))
 
-df_strataNew <- read.csv("data/newSVDBS_SVMSTRATA.csv")
+df_strataNew <- read.csv("~/Downloads/lab_notebook/data/newSVDBS_SVMSTRATA.csv")
 
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
 data.frame(table(scallopsNew$STRATUM))
@@ -253,3 +252,47 @@ scallopsNew <-  scallopsNew %>%
 ```
 
 # Friday (June 16)
+
+Continuing from yesterday:
+
+```{r, warning=FALSE}
+
+# Turns out all shellfish strata start with 6, any of the others were not consistently sampled
+scallopsNew <-  scallopsNew %>%
+  filter(STRATUM > 5999)
+
+#See how many years each stratum was sampled
+scallopsTest <- scallopsNew %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))
+
+scallopsTest
+
+```
+
+After learning some GIS basics, I started working with some data sets I found online in hopes of getting the SMAST data that has time series of scallop abundance alongside the abundance of major scallop predators. ([This survey, which is still ongoing](http://www.repstraus.com/wp-content/uploads/2015/03/SMAST-drop-cam-survey-1999-2014-Stokesbury.pdf).)
+
+```{r}
+library(sf)
+
+# SMAST abundance survey downloaded from 
+test <- st_read("~/Downloads/lab_notebook/data/SMAST_SCALLOP/SMAST_Scallops.gdb")
+
+class(test)
+attr(test, "sf_column")
+print(test[9:15], n = 3)
+st_geometry(test)
+
+par(mar = c(0,0,1,0))
+plot(test[6])
+
+# 
+# fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
+# st_layers("~/Downloads/Fish/Fish.gdb")
+# attr(fish, "sf_column")
+# st_geometry(fish)
+# class(fish)
+# 
+# par(mar = c(0,0,1,0))
+# plot(fish[6])
+```

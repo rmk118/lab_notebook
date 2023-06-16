@@ -1,5 +1,5 @@
 #Exploratory data analysis
-#June 14, 2023
+#June 16, 2023
 
 library(tidyverse)
 library(lubridate)
@@ -167,23 +167,26 @@ scallopsTest <- scallopsNew %>%
 
 # Spatial -----------------------------------------------------------------
 
-# library(sf)
-# 
-# test <- st_read("~/Downloads/SMAST_SCALLOP/SMAST_Scallops.gdb")
-# 
-# class(test)
-# attr(test, "sf_column")
-# print(test[9:15], n = 3)
-# test_geom <- st_geometry(test)
-# 
-# par(mar = c(0,0,1,0))
-# plot(test[6], reset = FALSE)
-# 
-# fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
-# st_layers("~/Downloads/Fish/Fish.gdb")
-# attr(fish, "sf_column")
-# st_geometry(fish)
-# class(fish)
-# 
-# par(mar = c(0,0,1,0))
-# plot(fish[6])
+library(sf)
+
+st_layers("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
+test <- st_read("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
+
+class(test)
+attr(test, "sf_column")
+print(test[1:15], n = 3)
+test_geom <- st_geometry(test)
+
+par(mar = c(0,0,1,0))
+plot(test[6])
+
+
+st_layers("~/Downloads/Fish/Fish.gdb")
+fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
+
+attr(fish, "sf_column")
+st_geometry(fish)
+class(fish)
+
+par(mar = c(0,0,1,0))
+plot(fish[6])
