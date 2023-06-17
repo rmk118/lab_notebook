@@ -11,11 +11,21 @@ cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA2022.csv")
 df_strata <- read.csv("data/newSVDBS_SVMSTRATA.csv")
 
-# Cruises ---------------------------------------------------- 
+# Cruises & stations ---------------------------------------------------- 
 
 cruises <- cruises %>%
   select(c("CRUISE6","SEASON","YEAR")) %>%
   mutate(CRUISE6 = as.factor(CRUISE6), .keep="unused")
+
+df_stations <- df_stations %>% 
+  mutate(STATION = as.numeric(STATION), YEAR = EST_YEAR) %>% 
+  select(c("CRUISE6","CRUISE","STRATUM", "TOW","STATION","ID","AREA","SVVESSEL","SVGEAR",
+     "BEGIN_EST_TOWDATE","YEAR","SETDEPTH", "AVGDEPTH", "BEGLAT", "BEGLON"))
+
+df_stations <- df_stations %>% 
+  mutate(BEGIN_EST_TOWDATE = lubridate::dmy(BEGIN_EST_TOWDATE)) %>% 
+  mutate(YEAR = year(BEGIN_EST_TOWDATE)) %>% 
+  mutate(TOW = as.integer(TOW))
 
 # Length ------------------------------------------------------------------
 
@@ -23,7 +33,7 @@ head(dat_len)
 str(dat_len) #543666 observations of 13 vars
 
 scallopLen <- dat_len %>%
-  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" %>% 
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
      mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop")) #shorten for readability
                            
 #If interested in clappers also:
@@ -40,17 +50,23 @@ scallopLen <- scallopLen %>%
 scallopLen <- scallopLen %>%
   mutate(CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
          .keep = "unused")
 
 summarise_all(scallopLen,n_distinct)
 
 scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
 
+scallopLen <- scallopLen %>%
+  mutate(YEAR = as.numeric(YEAR)) %>%
+  filter(as.numeric(STRATUM) > 5999) #shellfish strata start with 6
+
+len <- left_join(scallopLen, df_stations)
 
 # Catch ----------------------------------------------------------
 
 scallopCat <- dat_cat %>%
-  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" %>% 
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
   mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop"))
 
 scallopCat <- scallopCat %>% 
@@ -61,6 +77,7 @@ summarise_all(scallopLen,n_distinct)
 scallopCat <- scallopCat %>%
   mutate(CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
          .keep = "unused")
 
 scallopCat <- left_join(scallopCat, cruises, by="CRUISE6")
@@ -74,29 +91,9 @@ summarise_all(scallopCat,n_distinct)
 as_tibble(scallopCat)
 data.frame(table(scallopCat$YEAR))
 
-# df_stations_wrangled <- df_stations %>%
-#   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
-#   mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
-#   select(STATION,STRATUM,DATE) %>%
-#   mutate(DATE=year(DATE)) %>%
-#   distinct()
-# 
-# #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-data.frame(table(df_stations$STATION))
-
-# data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
-
-
-
-
+cat <- left_join(scallopCat, df_stations)
 
 # Find strata with all 45 years of data -----------------------------------------------------
-
-#this gets rid of some weird strata in 1984 with letters, which don't seem to 
-# correspond to any of the NOAA (shellfish, dredge, or trawl survey) strata
-scallopsNew <-  scallopsNew %>%
-  mutate(STRATUM = as.integer(STRATUM)) %>% 
-  filter(!is.na(STRATUM))
 
 #This will show you which ones were removed
 # scallopsTest <-  scallopsNew %>%
@@ -104,12 +101,14 @@ scallopsNew <-  scallopsNew %>%
 #   filter(is.na(strat))
 
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
-data.frame(table(scallopCat$STRATUM))
-data.frame(table(scallopLen$STRATUM))
+data.frame(table(cat$STRATUM))
+data.frame(table(len$STRATUM))
 
+catTest <- cat %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))
 
-
-scallopsTest <- scallopCat %>% 
+lenTest <- len %>% 
   group_by(STRATUM) %>% 
   summarise(years=n_distinct(YEAR))
 
@@ -121,12 +120,65 @@ speciesLen <- dat_len %>%
 
 speciesCat <- dat_cat %>% 
   group_by(SCIENTIFIC_NAME) %>% 
-  summarise(avg = mean(EXPCATCHNUM))
+  summarise(count = n_distinct(ID))
 
+
+########## crabs
 crabsLen <- dat_len %>% 
   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)")
+           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+crabsLen <- left_join(crabsLen, cruises, by="CRUISE6")
+crabsTest <- crabsLen %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))
 
 crabsCat <- dat_cat %>% 
   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)")
+           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+crabsCat <- left_join(crabsCat, cruises, by="CRUISE6")
+crabsTest2 <- crabsCat %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))
+
+
+########## starfish
+
+starLen <- dat_len %>% 
+  filter(SCIENTIFIC_NAME=="Astropecten" | #none
+        SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)" | #none
+        SCIENTIFIC_NAME =="Asterias" | #one
+        SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>% #one
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+starLen <- left_join(starLen, cruises, by="CRUISE6")
+starTest <- starLen %>% 
+  group_by(STRATUM) %>% 
+  summarise(years=n_distinct(YEAR))
+
+starCat <- dat_cat %>% 
+  filter(SCIENTIFIC_NAME=="Astropecten" |
+           SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)" |
+           SCIENTIFIC_NAME =="Asterias" |
+           SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+starCat <- left_join(starCat, cruises, by="CRUISE6")
+starTest2 <- starCat %>% 
+  group_by(STRATUM, SCIENTIFIC_NAME) %>% 
+  summarise(years=n_distinct(YEAR))
