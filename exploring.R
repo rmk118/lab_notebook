@@ -23,14 +23,17 @@ head(dat_len)
 str(dat_len) #543666 observations of 13 vars
 
 scallopLen <- dat_len %>%
-  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
-         SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %>%  #filter to only scallops
-     mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop", 
-                          "Placopecten magellanicus (sea scallop clapper)" = "clapper")) #shorten for readability
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" %>% 
+     mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop")) #shorten for readability
+                           
+#If interested in clappers also:
+# SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %>%  #filter to only scallops
+# recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop clapper)" = "clapper")
       
 #All have sex = 0, means sex unknown/not recorded
 #SVSPP is species, either 401 (scallop) or 400 (clapper), redundant to name column
 #So we can remove unnecessary variables
+
 scallopLen <- scallopLen %>% 
   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
 
@@ -47,10 +50,8 @@ scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
 # Catch ----------------------------------------------------------
 
 scallopCat <- dat_cat %>%
-  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" | 
-           SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %>%  #filter to only scallops
-  mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop", 
-                       "Placopecten magellanicus (sea scallop clapper)" = "clapper")) #shorten for readability
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)" %>% 
+  mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop"))
 
 scallopCat <- scallopCat %>% 
   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
@@ -64,13 +65,15 @@ scallopCat <- scallopCat %>%
 
 scallopCat <- left_join(scallopCat, cruises, by="CRUISE6")
 
+#shellfish strata start with 6
+ scallopCat <-  scallopCat %>%
+   filter(as.numeric(STRATUM) > 5999)
+
 str(scallopCat)
 summarise_all(scallopCat,n_distinct)
 as_tibble(scallopCat)
 data.frame(table(scallopCat$YEAR))
 
-# Fixing lack of data -----------------------------------------------------
-# 
 # df_stations_wrangled <- df_stations %>%
 #   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
 #   mutate(DATE = parse_date_time(BEGIN_EST_TOWDATE,orders="mdYHMS",truncated = 3)) %>%
@@ -79,16 +82,13 @@ data.frame(table(scallopCat$YEAR))
 #   distinct()
 # 
 # #shows how many occurrences of each station are in the data (i.e. how many years that station was sampled)
-# data.frame(table(df_stations_wrangled$STATION))
-# data.frame(table(df_stations_wrangled$STRATUM))
+data.frame(table(df_stations$STATION))
+
 # data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
 
-#ggplot(scallopsNew, aes(x = CRUISE)) + geom_bar()
-#ggplot(scallopsNew, aes(x = CRUISE6)) + geom_bar()
-#ggplot(scallopsNew, aes(x = STRATUM)) + geom_bar()
 
-# diffMonths <- df_stationsNew %>% 
-#   filter(EST_MONTH != GMT_MONTH)
+
+
 
 # Find strata with all 45 years of data -----------------------------------------------------
 
@@ -105,10 +105,9 @@ scallopsNew <-  scallopsNew %>%
 
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
 data.frame(table(scallopCat$STRATUM))
+data.frame(table(scallopLen$STRATUM))
 
-#shellfish strata start with 6
-scallopsNew <-  scallopsNew %>%
-  filter(STRATUM > 5999)
+
 
 scallopsTest <- scallopCat %>% 
   group_by(STRATUM) %>% 
@@ -123,7 +122,6 @@ speciesLen <- dat_len %>%
 speciesCat <- dat_cat %>% 
   group_by(SCIENTIFIC_NAME) %>% 
   summarise(avg = mean(EXPCATCHNUM))
-# trues <- species %>%  filter(!is.na(species$avg)==TRUE)
 
 crabsLen <- dat_len %>% 
   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 

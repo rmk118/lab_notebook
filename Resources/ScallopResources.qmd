@@ -14,24 +14,22 @@ editor:
     wrap: 72
 ---
 
-### General/Misc.
+### General
 
--   [Resource Abundance, Fisheries Management, and Fishing Ports: The
-    U.S. Atlantic Sea Scallop
-    Fishery](https://www.cambridge.org/core/journals/agricultural-and-resource-economics-review/article/resource-abundance-fisheries-management-and-fishing-ports-the-us-atlantic-sea-scallop-fishery/C123D92B0821542C2185D6A2F42EB62F)
-    (Lee, 2019)
 -   [Long-Term Dynamics of U.S. Atlantic Sea Scallop Placopecten
     magellanicus
     Populations](https://afspubs.onlinelibrary.wiley.com/doi/full/10.1577/M04-116.1)
     (Hart and Rago, 2006)
--   [Modeling Atlantic sea scallop (Placopecten magellanicus) scope for
-    growth on the Northeast U.S.
-    Shelf](https://onlinelibrary.wiley.com/doi/full/10.1111/fog.12577)
-    (Zang et al., 2022)
 -   [To split or not to split: Assessment of Georges Bank sea scallops
     in the presence of marine protected
     areas](https://www.sciencedirect.com/science/article/pii/S0165783612003396#bib0040)
     (Hart et al., 2013)
+
+| Author, year      | Title                                                                                                                                                                                                                                                                                                                           | Notes                                                                                                                                |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Lee, 2019         | [Resource Abundance, Fisheries Management, and Fishing Ports: The U.S. Atlantic Sea Scallop Fishery](https://www.cambridge.org/core/journals/agricultural-and-resource-economics-review/article/resource-abundance-fisheries-management-and-fishing-ports-the-us-atlantic-sea-scallop-fishery/C123D92B0821542C2185D6A2F42EB62F) |                                                                                                                                      |
+| Zang et al., 2022 | [Modeling Atlantic sea scallop (Placopecten magellanicus) scope for growth on the Northeast U.S. Shelf](https://onlinelibrary.wiley.com/doi/full/10.1111/fog.12577)                                                                                                                                                             | MATLAB scope for growth model [available here](http://ulysse2.whoi.edu:8080/thredds/catalog/data/zzang/Project_Scallop/catalog.html) |
+|                   |                                                                                                                                                                                                                                                                                                                                 |                                                                                                                                      |
 
 ### Recruitment
 
@@ -85,7 +83,7 @@ editor:
 -   [Measurement errors in body size of sea scallops (Placopecten
     magellanicus) and their effect on stock assessment
     models](https://aquadocs.org/handle/1834/25410) (Jacobson et al.,
-    2010)
+    2010) 
 -   [Estimation of Sea Scallop Abundance in Closed Areas of Georges
     Bank,
     USA](https://doi.org/10.1577/1548-8659(2002)131%3C1081:EOSSAI%3E2.0.CO;2)
@@ -103,7 +101,7 @@ editor:
     -   [High Densities of Juvenile Sea Scallop (Placopecten
         magellanicus) on Banks and Ledges in the Central Gulf of
         Maine](https://doi.org/10.2983/035.029.0212) (Stokesbury et al.,
-        2010)
+        2010) 
     -   [Estimating similarity in benthic communities over decades and
         in areas open and closed to fishing in the central Gulf of
         Maine, USA](https://www.int-res.com/abstracts/meps/v595/p15-26/)
@@ -124,8 +122,8 @@ editor:
         (Sarro and Stokesbury, 2009)
 
     -   [Variability in the relationship between sea scallop shell
-        height and meat weight
-        ](https://academic.oup.com/icesjms/article/66/9/1972/726292)(Rothschild
+        height and meat
+        weight](https://academic.oup.com/icesjms/article/66/9/1972/726292)(Rothschild
         et al., 2009)
 
 ### Impacts of warming, fishing, and OA
@@ -156,7 +154,7 @@ editor:
 -   [Impact of larval behaviors on dispersal and connectivity of sea
     scallop larvae over the northeast U.S.
     shelf](https://doi.org/10.1016/j.pocean.2021.102604) (Chen et al.,
-    2022)
+    2022) 
 -   [Spillover of sea scallops from rotational closures in the
     Mid-Atlantic
     Bight](https://academic.oup.com/icesjms/article/77/5/1992/5864487?login=true)
@@ -222,8 +220,8 @@ editor:
     mid-Atlantic](https://www.int-res.com/abstracts/meps/v425/p167-173)
     (Stokesbury et al., 2011)
     -   [Mortality of sea scallops Placopecten magellanicus in the
-        Mid-Atlantic Bight: Comment on Stokesbury et al.
-        ](https://www.int-res.com/abstracts/meps/v443/p293-297/)(Hart
+        Mid-Atlantic Bight: Comment on Stokesbury et
+        al.](https://www.int-res.com/abstracts/meps/v443/p293-297/)(Hart
         and Shank, 2011) - concluded it was actually crab predation
 
 ### Data
