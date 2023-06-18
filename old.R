@@ -30,3 +30,14 @@ scallopsNew <-  scallopsNew %>%
 data.frame(table(df_stations$STATION))
 
 # data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
+
+# Find strata with all 45 years of data -----------------------------------------------------
+
+#This will show you which ones were removed
+# scallopsTest <-  scallopsNew %>%
+#   mutate(strat = as.integer(STRATUM)) %>% 
+#   filter(is.na(strat))
+
+#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
+data.frame(table(cat$STRATUM))
+data.frame(table(len$STRATUM))

@@ -458,262 +458,84 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopCat, df_stations)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Find strata with all 45 years of data -----------------------------------------------------</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#This will show you which ones were removed</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># scallopsTest &lt;-  scallopsNew %&gt;%</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(strat = as.integer(STRATUM)) %&gt;% </span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(strat))</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(cat<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Var1 Freq
-1  06010    5
-2  06020    9
-3  06030   10
-4  06040    5
-5  06050    7
-6  06060  117
-7  06070   86
-8  06080    6
-9  06090   44
-10 06100  257
-11 06110  334
-12 06120   24
-13 06130   40
-14 06140  391
-15 06150  499
-16 06160   49
-17 06170   51
-18 06180  419
-19 06190  470
-20 06200   18
-21 06210   83
-22 06220  327
-23 06230  711
-24 06240  158
-25 06250  183
-26 06260  341
-27 06270  559
-28 06280  145
-29 06290  192
-30 06300  443
-31 06310  790
-32 06320   32
-33 06330  225
-34 06340  365
-35 06350  169
-36 06360    1
-37 06370   35
-38 06380   52
-39 06390   13
-40 06400    2
-41 06410   15
-42 06420    5
-43 06440    3
-44 06450    7
-45 06460  190
-46 06470  567
-47 06480   23
-48 06490  306
-49 06500  600
-50 06510  454
-51 06520  477
-52 06530  397
-53 06540  389
-54 06550  328
-55 06560   14
-56 06570   27
-57 06580  188
-58 06590  375
-59 06600  334
-60 06610  350
-61 06620   38
-62 06621  471
-63 06622   90
-64 06630   28
-65 06631   71
-66 06632   78
-67 06640  306
-68 06650   44
-69 06651  365
-70 06652  170
-71 06660   52
-72 06661  362
-73 06662  123
-74 06670    8
-75 06680    2
-76 06700    1
-77 06710  327
-78 06720   76
-79 06730    9
-80 06740   82
-81 06990   14</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(len<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Var1  Freq
-1  06010    20
-2  06020    34
-3  06030    24
-4  06040    10
-5  06050    36
-6  06060  1143
-7  06070   608
-8  06080    27
-9  06090   322
-10 06100  4407
-11 06110  8417
-12 06120    82
-13 06130  1212
-14 06140  9907
-15 06150 14760
-16 06160   301
-17 06170  1533
-18 06180 19529
-19 06190 14057
-20 06200    71
-21 06210  2185
-22 06220  7065
-23 06230 18799
-24 06240  1418
-25 06250  4076
-26 06260  6374
-27 06270 13634
-28 06280  1211
-29 06290  3332
-30 06300  7437
-31 06310 13169
-32 06320    99
-33 06330  3314
-34 06340  5973
-35 06350  1576
-36 06360     1
-37 06370   305
-38 06380   621
-39 06390    61
-40 06400     2
-41 06410    56
-42 06420    42
-43 06440    10
-44 06450    39
-45 06460  5432
-46 06470 18852
-47 06480   229
-48 06490  5415
-49 06500 30044
-50 06510 13663
-51 06520 16254
-52 06530 10792
-53 06540 10884
-54 06550  5658
-55 06560    67
-56 06570   156
-57 06580  3026
-58 06590  6817
-59 06600  5783
-60 06610  7454
-61 06620   491
-62 06621 13447
-63 06622  1806
-64 06630   302
-65 06631   444
-66 06632  1050
-67 06640  7326
-68 06650   559
-69 06651 11073
-70 06652  5110
-71 06660   759
-72 06661 12692
-73 06662  3595
-74 06670   253
-75 06680    25
-76 06700     2
-77 06710 17655
-78 06720  1002
-79 06730    57
-80 06740   686
-81 06990    82</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>catTest <span class="ot">&lt;-</span> cat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>lenTest <span class="ot">&lt;-</span> len <span class="sc">%&gt;%</span> </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Predators ---------------------------------------------------------------</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>speciesLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(LENGTH))</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>speciesCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n_distinct</span>(ID))</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="do">########## crabs</span></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>crabsTest <span class="ot">&lt;-</span> crabsLen <span class="sc">%&gt;%</span> </span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>crabsTest2 <span class="ot">&lt;-</span> crabsCat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a><span class="do">########## starfish</span></span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span> <span class="co">#none</span></span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span> <span class="co">#none</span></span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span> <span class="co">#one</span></span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span> <span class="co">#one</span></span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>starTest <span class="ot">&lt;-</span> starLen <span class="sc">%&gt;%</span> </span>
-<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span></span>
-<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span></span>
-<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span></span>
-<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>starTest2 <span class="ot">&lt;-</span> starCat <span class="sc">%&gt;%</span> </span>
-<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>catTest <span class="ot">&lt;-</span> cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>lenTest <span class="ot">&lt;-</span> len <span class="sc">%&gt;%</span> </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Predators ---------------------------------------------------------------</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>speciesLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(LENGTH))</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>speciesCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n_distinct</span>(ID))</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="do">########## crabs</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>crabsTest <span class="ot">&lt;-</span> crabsLen <span class="sc">%&gt;%</span> </span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>crabsTest2 <span class="ot">&lt;-</span> crabsCat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="do">########## starfish</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span> <span class="co">#none</span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span> <span class="co">#none</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span> <span class="co">#one</span></span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span> <span class="co">#one</span></span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a>starTest <span class="ot">&lt;-</span> starLen <span class="sc">%&gt;%</span> </span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span></span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span></span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>           <span class="co"># SCIENTIFIC_NAME =="Asterias" |</span></span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a>starTest2 <span class="ot">&lt;-</span> starCat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
