@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Clean summary of code so far.">
+
+<title>Ruby’s Lab Notebook - Summer 2023 - Exploring</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Resources/Papers.html">Resources</a></li><li class="breadcrumb-item"><a href="./exploringR.html">Exploring</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Ruby’s Lab Notebook - Summer 2023</a> 
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Resources</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Resources/Papers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Relevant Papers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Resources/EDM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Intro to EDM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Resources/ScallopResources.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scallop Links</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringR.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Exploring</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Project Updates</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./posts/Week1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Week 1 in Words</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./posts/Week2words.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Week 2 in Words</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./posts/Week2R.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Week 2 in R</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploring</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Resources</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Clean summary of code so far.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">June 17, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Summary of data analysis thus far</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Last updated: June 17, 2023</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dat_len<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/22564_UNION_FSCS_SVLEN2022.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dat_cat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/22564_UNION_FSCS_SVCAT2022.csv"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dat_bio <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/22564_UNION_FSCS_SVBIO2022.csv"</span>, <span class="at">quote =</span> <span class="st">""</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/22564_SVDBS_CRUISES2022.csv"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/22564_UNION_FSCS_SVSTA2022.csv"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_strata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/newSVDBS_SVMSTRATA.csv"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Cruises &amp; stations ---------------------------------------------------- </span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>cruises <span class="ot">&lt;-</span> cruises <span class="sc">%&gt;%</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"SEASON"</span>,<span class="st">"YEAR"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6), <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> df_stations <span class="sc">%&gt;%</span> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION), <span class="at">YEAR =</span> EST_YEAR) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"CRUISE6"</span>,<span class="st">"CRUISE"</span>,<span class="st">"STRATUM"</span>, <span class="st">"TOW"</span>,<span class="st">"STATION"</span>,<span class="st">"ID"</span>,<span class="st">"AREA"</span>,<span class="st">"SVVESSEL"</span>,<span class="st">"SVGEAR"</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>     <span class="st">"BEGIN_EST_TOWDATE"</span>,<span class="st">"YEAR"</span>,<span class="st">"SETDEPTH"</span>, <span class="st">"AVGDEPTH"</span>, <span class="st">"BEGLAT"</span>, <span class="st">"BEGLON"</span>))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>df_stations <span class="ot">&lt;-</span> df_stations <span class="sc">%&gt;%</span> </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">BEGIN_EST_TOWDATE =</span> lubridate<span class="sc">::</span><span class="fu">dmy</span>(BEGIN_EST_TOWDATE)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">YEAR =</span> <span class="fu">year</span>(BEGIN_EST_TOWDATE)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TOW =</span> <span class="fu">as.integer</span>(TOW))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Length ------------------------------------------------------------------</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dat_len)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CRUISE6 CRUISE STRATUM TOW STATION STATUS_CODE                 ID SVSPP
+1  197703    177   06370   1       1          10 197703063700010001   401
+2  197703    177   06370   1       1          10 197703063700010001   401
+3  197703    177   06370   1       1          10 197703063700010001   401
+4  197703    177   06370   1       1          10 197703063700010001   401
+5  197703    177   06370   2       2          10 197703063700020002   401
+6  197703    177   06370   2       2          10 197703063700020002   401
+  CATCHSEX LENGTH EXPNUMLEN                        SCIENTIFIC_NAME
+1        0    6.7         1 Placopecten magellanicus (sea scallop)
+2        0    8.3         1 Placopecten magellanicus (sea scallop)
+3        0    8.7         1 Placopecten magellanicus (sea scallop)
+4        0   10.3         1 Placopecten magellanicus (sea scallop)
+5        0    5.7         1 Placopecten magellanicus (sea scallop)
+6        0    6.7         2 Placopecten magellanicus (sea scallop)
+  LENGTH_COMMENT
+1               
+2               
+3               
+4               
+5               
+6               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dat_len) <span class="co">#543666 observations of 13 vars</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   543666 obs. of  13 variables:
+ $ CRUISE6        : int  197703 197703 197703 197703 197703 197703 197703 197703 197703 197703 ...
+ $ CRUISE         : int  177 177 177 177 177 177 177 177 177 177 ...
+ $ STRATUM        : chr  "06370" "06370" "06370" "06370" ...
+ $ TOW            : int  1 1 1 1 2 2 3 3 1 1 ...
+ $ STATION        : int  1 1 1 1 2 2 3 3 4 4 ...
+ $ STATUS_CODE    : int  10 10 10 10 10 10 10 10 10 10 ...
+ $ ID             : chr  "197703063700010001" "197703063700010001" "197703063700010001" "197703063700010001" ...
+ $ SVSPP          : int  401 401 401 401 401 401 401 401 401 401 ...
+ $ CATCHSEX       : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ LENGTH         : num  6.7 8.3 8.7 10.3 5.7 6.7 9.7 10.7 10.3 11.7 ...
+ $ EXPNUMLEN      : int  1 1 1 1 1 2 1 1 1 1 ...
+ $ SCIENTIFIC_NAME: chr  "Placopecten magellanicus (sea scallop)" "Placopecten magellanicus (sea scallop)" "Placopecten magellanicus (sea scallop)" "Placopecten magellanicus (sea scallop)" ...
+ $ LENGTH_COMMENT : chr  "" "" "" "" ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scallopLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME <span class="sc">==</span> <span class="st">"Placopecten magellanicus (sea scallop)"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="fu">mutate</span>(<span class="at">NAME =</span> <span class="fu">recode</span>(SCIENTIFIC_NAME, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>)) <span class="co">#shorten for readability</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                           </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#If interested in clappers also:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop clapper)") %&gt;%  #filter to only scallops</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop clapper)" = "clapper")</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#All have sex = 0, means sex unknown/not recorded</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#SVSPP is species, either 401 (scallop) or 400 (clapper), redundant to name column</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#So we can remove unnecessary variables</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>scallopLen <span class="ot">&lt;-</span> scallopLen <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>, <span class="st">"SCIENTIFIC_NAME"</span>))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>scallopLen <span class="ot">&lt;-</span> scallopLen <span class="sc">%&gt;%</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise_all</span>(scallopLen,n_distinct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CRUISE6 CRUISE STRATUM TOW STATION    ID LENGTH EXPNUMLEN LENGTH_COMMENT NAME
+1      47     49     100 138     692 15629   1638      1127              1    1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>scallopLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>scallopLen <span class="ot">&lt;-</span> scallopLen <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">YEAR =</span> <span class="fu">as.numeric</span>(YEAR)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">as.numeric</span>(STRATUM) <span class="sc">&gt;</span> <span class="dv">5999</span>) <span class="co">#shellfish strata start with 6</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>len <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopLen, df_stations)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Catch ----------------------------------------------------------</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>scallopCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME <span class="sc">==</span> <span class="st">"Placopecten magellanicus (sea scallop)"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NAME =</span> <span class="fu">recode</span>(SCIENTIFIC_NAME, <span class="st">"Placopecten magellanicus (sea scallop)"</span> <span class="ot">=</span> <span class="st">"scallop"</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>scallopCat <span class="ot">&lt;-</span> scallopCat <span class="sc">%&gt;%</span> </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"CATCHSEX"</span>, <span class="st">"STATUS_CODE"</span>, <span class="st">"SVSPP"</span>, <span class="st">"SCIENTIFIC_NAME"</span>))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise_all</span>(scallopLen,n_distinct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CRUISE6 CRUISE STRATUM TOW STATION    ID LENGTH EXPNUMLEN LENGTH_COMMENT NAME
+1      47     49      81 138     628 15430   1638      1119              1    1
+  SEASON YEAR
+1      3   45</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>scallopCat <span class="ot">&lt;-</span> scallopCat <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>scallopCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#shellfish strata start with 6</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a> scallopCat <span class="ot">&lt;-</span>  scallopCat <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>   <span class="fu">filter</span>(<span class="fu">as.numeric</span>(STRATUM) <span class="sc">&gt;</span> <span class="dv">5999</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(scallopCat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   15433 obs. of  12 variables:
+ $ CRUISE6      : Factor w/ 47 levels "197703","197708",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ CRUISE       : Factor w/ 49 levels "177","200107",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ STRATUM      : chr  "06370" "06370" "06370" "06380" ...
+ $ TOW          : int  1 2 3 1 4 5 1 1 2 1 ...
+ $ STATION      : num  1 2 3 4 5 6 8 13 14 15 ...
+ $ ID           : chr  "197703063700010001" "197703063700020002" "197703063700030003" "197703063800010004" ...
+ $ EXPCATCHNUM  : int  4 3 2 4 12 22 1 2 1897 22 ...
+ $ EXPCATCHWT   : num  0.3 0.1 0.3 0.9 1.7 ...
+ $ CATCH_COMMENT: chr  "" "" "" "" ...
+ $ NAME         : chr  "scallop" "scallop" "scallop" "scallop" ...
+ $ SEASON       : chr  "SPRING" "SPRING" "SPRING" "SPRING" ...
+ $ YEAR         : int  1977 1977 1977 1977 1977 1977 1977 1977 1977 1977 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise_all</span>(scallopCat,n_distinct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CRUISE6 CRUISE STRATUM TOW STATION    ID EXPCATCHNUM EXPCATCHWT CATCH_COMMENT
+1      47     49      81 138     628 15433        2035       4923           202
+  NAME SEASON YEAR
+1    1      3   45</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(scallopCat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15,433 × 12
+   CRUISE6 CRUISE STRATUM   TOW STATION ID         EXPCA…¹ EXPCA…² CATCH…³ NAME 
+   &lt;fct&gt;   &lt;fct&gt;  &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 197703  177    06370       1       1 197703063…       4     0.3 ""      scal…
+ 2 197703  177    06370       2       2 197703063…       3     0.1 ""      scal…
+ 3 197703  177    06370       3       3 197703063…       2     0.3 ""      scal…
+ 4 197703  177    06380       1       4 197703063…       4     0.9 ""      scal…
+ 5 197703  177    06370       4       5 197703063…      12     1.7 ""      scal…
+ 6 197703  177    06370       5       6 197703063…      22     4.6 ""      scal…
+ 7 197703  177    06420       1       8 197703064…       1     0.1 ""      scal…
+ 8 197703  177    06500       1      13 197703065…       2     0.3 ""      scal…
+ 9 197703  177    06500       2      14 197703065…    1897   154.  ""      scal…
+10 197703  177    06520       1      15 197703065…      22     5   ""      scal…
+# … with 15,423 more rows, 2 more variables: SEASON &lt;chr&gt;, YEAR &lt;int&gt;, and
+#   abbreviated variable names ¹​EXPCATCHNUM, ²​EXPCATCHWT, ³​CATCH_COMMENT</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(scallopCat<span class="sc">$</span>YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Var1 Freq
+1  1977  244
+2  1978  287
+3  1979  240
+4  1980  317
+5  1981  268
+6  1982  346
+7  1983  424
+8  1984  387
+9  1985  433
+10 1986  392
+11 1987  472
+12 1988  487
+13 1989  367
+14 1990  389
+15 1991  395
+16 1992  367
+17 1993  404
+18 1994  423
+19 1995  431
+20 1996  391
+21 1997  432
+22 1998  470
+23 1999  354
+24 2000  423
+25 2001  483
+26 2002  461
+27 2003  422
+28 2004  510
+29 2005  482
+30 2006  490
+31 2007  534
+32 2008  423
+33 2009  382
+34 2010  440
+35 2011  289
+36 2012  201
+37 2013  181
+38 2014  119
+39 2015  170
+40 2016  140
+41 2017  120
+42 2018  149
+43 2019  112
+44 2021   76
+45 2022  106</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(scallopCat, df_stations)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Find strata with all 45 years of data -----------------------------------------------------</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#This will show you which ones were removed</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># scallopsTest &lt;-  scallopsNew %&gt;%</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(strat = as.integer(STRATUM)) %&gt;% </span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(is.na(strat))</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(cat<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Var1 Freq
+1  06010    5
+2  06020    9
+3  06030   10
+4  06040    5
+5  06050    7
+6  06060  117
+7  06070   86
+8  06080    6
+9  06090   44
+10 06100  257
+11 06110  334
+12 06120   24
+13 06130   40
+14 06140  391
+15 06150  499
+16 06160   49
+17 06170   51
+18 06180  419
+19 06190  470
+20 06200   18
+21 06210   83
+22 06220  327
+23 06230  711
+24 06240  158
+25 06250  183
+26 06260  341
+27 06270  559
+28 06280  145
+29 06290  192
+30 06300  443
+31 06310  790
+32 06320   32
+33 06330  225
+34 06340  365
+35 06350  169
+36 06360    1
+37 06370   35
+38 06380   52
+39 06390   13
+40 06400    2
+41 06410   15
+42 06420    5
+43 06440    3
+44 06450    7
+45 06460  190
+46 06470  567
+47 06480   23
+48 06490  306
+49 06500  600
+50 06510  454
+51 06520  477
+52 06530  397
+53 06540  389
+54 06550  328
+55 06560   14
+56 06570   27
+57 06580  188
+58 06590  375
+59 06600  334
+60 06610  350
+61 06620   38
+62 06621  471
+63 06622   90
+64 06630   28
+65 06631   71
+66 06632   78
+67 06640  306
+68 06650   44
+69 06651  365
+70 06652  170
+71 06660   52
+72 06661  362
+73 06662  123
+74 06670    8
+75 06680    2
+76 06700    1
+77 06710  327
+78 06720   76
+79 06730    9
+80 06740   82
+81 06990   14</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">table</span>(len<span class="sc">$</span>STRATUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Var1  Freq
+1  06010    20
+2  06020    34
+3  06030    24
+4  06040    10
+5  06050    36
+6  06060  1143
+7  06070   608
+8  06080    27
+9  06090   322
+10 06100  4407
+11 06110  8417
+12 06120    82
+13 06130  1212
+14 06140  9907
+15 06150 14760
+16 06160   301
+17 06170  1533
+18 06180 19529
+19 06190 14057
+20 06200    71
+21 06210  2185
+22 06220  7065
+23 06230 18799
+24 06240  1418
+25 06250  4076
+26 06260  6374
+27 06270 13634
+28 06280  1211
+29 06290  3332
+30 06300  7437
+31 06310 13169
+32 06320    99
+33 06330  3314
+34 06340  5973
+35 06350  1576
+36 06360     1
+37 06370   305
+38 06380   621
+39 06390    61
+40 06400     2
+41 06410    56
+42 06420    42
+43 06440    10
+44 06450    39
+45 06460  5432
+46 06470 18852
+47 06480   229
+48 06490  5415
+49 06500 30044
+50 06510 13663
+51 06520 16254
+52 06530 10792
+53 06540 10884
+54 06550  5658
+55 06560    67
+56 06570   156
+57 06580  3026
+58 06590  6817
+59 06600  5783
+60 06610  7454
+61 06620   491
+62 06621 13447
+63 06622  1806
+64 06630   302
+65 06631   444
+66 06632  1050
+67 06640  7326
+68 06650   559
+69 06651 11073
+70 06652  5110
+71 06660   759
+72 06661 12692
+73 06662  3595
+74 06670   253
+75 06680    25
+76 06700     2
+77 06710 17655
+78 06720  1002
+79 06730    57
+80 06740   686
+81 06990    82</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>catTest <span class="ot">&lt;-</span> cat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>lenTest <span class="ot">&lt;-</span> len <span class="sc">%&gt;%</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Predators ---------------------------------------------------------------</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>speciesLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(LENGTH))</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>speciesCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n_distinct</span>(ID))</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="do">########## crabs</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>crabsLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>crabsTest <span class="ot">&lt;-</span> crabsLen <span class="sc">%&gt;%</span> </span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Cancer borealis (Jonah crab)"</span> <span class="sc">|</span> </span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Cancer irroratus (Atlantic rock crab)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>crabsCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(crabsCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>crabsTest2 <span class="ot">&lt;-</span> crabsCat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a><span class="do">########## starfish</span></span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span> <span class="co">#none</span></span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span> <span class="co">#none</span></span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span> <span class="co">#one</span></span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span> <span class="co">#one</span></span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>starTest <span class="ot">&lt;-</span> starLen <span class="sc">%&gt;%</span> </span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span></span>
+<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span></span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span></span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>starTest2 <span class="ot">&lt;-</span> starCat <span class="sc">%&gt;%</span> </span>
+<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

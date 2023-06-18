@@ -1,3 +1,18 @@
+---
+title: 'Exploring'
+date-modified: '2023-06-17'
+categories: ['Resources']
+description: 'Clean summary of code so far.'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r}
 #Summary of data analysis thus far
 #Last updated: June 17, 2023
 
@@ -182,3 +197,5 @@ starCat <- left_join(starCat, cruises, by="CRUISE6")
 starTest2 <- starCat %>% 
   group_by(STRATUM, SCIENTIFIC_NAME) %>% 
   summarise(years=n_distinct(YEAR))
+
+```

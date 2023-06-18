@@ -139,6 +139,9 @@ div.csl-indent {
  <span class="menu-text">Scallop Links</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+ <span class="menu-text">Resources/exploringR.html</span>
+  </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -366,7 +369,12 @@ div.csl-indent {
 <tr class="even">
 <td><span class="citation" data-cites="johnson2021">Johnson, Gomez, and Munch (<a href="#ref-johnson2021" role="doc-biblioref">2021</a>)</span></td>
 <td>Leveraging spatial information to forecast nonlinear ecological dynamics</td>
-<td>MATLAB code <a href="https://zenodo.org/record/4041565">available here</a></td>
+<td>MATLAB code <a href="https://zenodo.org/record/4041565">available here</a>. Examples with simulated data and NEFSC trawl survey. Univariate only, prediction rather than causality.</td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="tsai2023">Tsai et al. (<a href="#ref-tsai2023" role="doc-biblioref">2023</a>)</span></td>
+<td>Predicting nonlinear dynamics of short-lived penaeid shrimp species in the Gulf of Mexico</td>
+<td>Extends GP-EDM to incorporate spatial data (adds additional layer of covariance structure between manifolds estimated for each statistical zone). Also incorporates environmental variables.</td>
 </tr>
 </tbody>
 </table>
@@ -382,7 +390,6 @@ div.csl-indent {
 <li><a href="https://cdnsciencepub.com/doi/10.1139/cjfas-2022-0219">Age structure augments the predictive power of time series for fisheries and conservation</a> (Dolan et al., 2023)</li>
 <li><a href="https://academic.oup.com/icesjms/article/77/4/1480/5531239">Model-free time series analysis detected the contributions of middle-age spawner biomass and the environment on Pacific bluefin tuna recruitment</a> (Nakayama et al., 2019)</li>
 <li><a href="https://doi.org/10.1111/faf.12287">Ecosystem-based forecasts of recruitment in two menhaden species</a> (Deyle et al., 2018)</li>
-<li><a href="https://cdnsciencepub.com/doi/full/10.1139/cjfas-2022-0029">Predicting nonlinear dynamics of short-lived penaeid shrimp species in the Gulf of Mexico</a> (Tsai et al., 2022)</li>
 </ul>
 </section>
 <section id="other-edm-papers" class="level1">
@@ -422,14 +429,29 @@ div.csl-indent {
 <td>Compares EDM spawner-recruit forecast model for sockeye salmon to Ricker model and incoroporates environment: compares extended Ricker to multivariate EDM. EDM &gt; Ricker, and including envi variables improves forecasting. 9 different salmon stocks, modeled separately. <strong>Includes R scripts!</strong></td>
 </tr>
 <tr class="even">
+<td><span class="citation" data-cites="munch2017">Munch, Poynor, and Arriaza (<a href="#ref-munch2017" role="doc-biblioref">2017</a>)</span></td>
+<td>Circumventing structural uncertainty: A Bayesian perspective on nonlinear forecasting for ecology</td>
+<td>Introduces GP-EDM</td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="rogers2020">Rogers and Munch (<a href="#ref-rogers2020" role="doc-biblioref">2020</a>)</span></td>
+<td>Hidden similarities in the dynamics of a weakly synchronous marine metapopulation</td>
+<td>GP-EDM, accounting for spatial dynamics</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="giron-nava2021">Giron-Nava et al. (<a href="#ref-giron-nava2021" role="doc-biblioref">2021</a>)</span></td>
+<td>Environmental variability and fishing effects on the Pacific sardine fisheries in the Gulf of California</td>
+<td>(i) Multivariate linear analysis as predictability benchmark, (ii) CCM and multivariate EDM to test for causality, (iii) empirical dynamic programming model to estimate ideal harvest policy</td>
+</tr>
+<tr class="odd">
 <td><span class="citation" data-cites="liu2022">Liu and Gaines (<a href="#ref-liu2022" role="doc-biblioref">2022</a>)</span></td>
 <td>Environmental context dependency in species interactions</td>
 <td>Excellent <a href="https://github.com/owenrliu/env_context_dependency">annotated R code stored on GitHub</a></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="citation" data-cites="munch2023">Munch, Rogers, and Sugihara (<a href="#ref-munch2023" role="doc-biblioref">2023</a>)</span></td>
 <td>Recent developments in empirical dynamic modelling</td>
-<td></td>
+<td>Good overview, including sEDM, GP-EDM, machine learning developments, etc.</td>
 </tr>
 </tbody>
 </table>
@@ -472,6 +494,9 @@ Deyle, Ethan, Amy M Schueller, Hao Ye, Gerald M Pao, and George Sugihara. 2018. 
 <div id="ref-dixon1999" class="csl-entry" role="listitem">
 Dixon, Paul A., Maria J. Milicich, and George Sugihara. 1999. <span>“Episodic Fluctuations in Larval Supply.”</span> <em>Science</em> 283 (5407): 1528–30. <a href="https://doi.org/10.1126/science.283.5407.1528">https://doi.org/10.1126/science.283.5407.1528</a>.
 </div>
+<div id="ref-giron-nava2021" class="csl-entry" role="listitem">
+Giron-Nava, Alfredo, Exequiel Ezcurra, Antoine Brias, Enriqueta Velarde, Ethan Deyle, Andrés M. Cisneros-Montemayor, Stephan B. Munch, George Sugihara, and Octavio Aburto-Oropeza. 2021. <span>“Environmental Variability and Fishing Effects on the Pacific Sardine Fisheries in the Gulf of California.”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 78 (5): 623–30. <a href="https://doi.org/10.1139/cjfas-2020-0010">https://doi.org/10.1139/cjfas-2020-0010</a>.
+</div>
 <div id="ref-glaser2011" class="csl-entry" role="listitem">
 Glaser, Sarah M., Hao Ye, Mark Maunder, Alec MacCall, Michael Fogarty, and George Sugihara. 2011. <span>“Detecting and Forecasting Complex Nonlinear Dynamics in Spatially Structured Catch-Per-Unit-Effort Time Series for North Pacific Albacore (Thunnus Alalunga).”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 68 (3): 400–412. <a href="https://doi.org/10.1139/F10-160">https://doi.org/10.1139/F10-160</a>.
 </div>
@@ -493,8 +518,14 @@ McGowan, John A., Ethan R. Deyle, Hao Ye, Melissa L. Carter, Charles T. Perretti
 <div id="ref-mcnamara2019" class="csl-entry" role="listitem">
 McNamara, Dylan E., Nick Cortale, Clinton Edwards, Yoan Eynaud, and Stuart A. Sandin. 2019. <span>“Insights into Coral Reef Benthic Dynamics from Nonlinear Spatial Forecasting.”</span> <em>Journal of The Royal Society Interface</em> 16 (153): 20190047. <a href="https://doi.org/10.1098/rsif.2019.0047">https://doi.org/10.1098/rsif.2019.0047</a>.
 </div>
+<div id="ref-munch2017" class="csl-entry" role="listitem">
+Munch, Stephan B., Valerie Poynor, and Juan Lopez Arriaza. 2017. <span>“Circumventing Structural Uncertainty: A Bayesian Perspective on Nonlinear Forecasting for Ecology.”</span> <em>Ecological Complexity</em>, Uncertainty in Ecology, 32 (December): 134–43. <a href="https://doi.org/10.1016/j.ecocom.2016.08.006">https://doi.org/10.1016/j.ecocom.2016.08.006</a>.
+</div>
 <div id="ref-munch2023" class="csl-entry" role="listitem">
 Munch, Stephan B., Tanya L. Rogers, and George Sugihara. 2023. <span>“Recent Developments in Empirical Dynamic Modelling.”</span> <em>Methods in Ecology and Evolution</em> 14 (3): 732–45. <a href="https://doi.org/10.1111/2041-210X.13983">https://doi.org/10.1111/2041-210X.13983</a>.
+</div>
+<div id="ref-rogers2020" class="csl-entry" role="listitem">
+Rogers, Tanya L., and Stephan B. Munch. 2020. <span>“Hidden Similarities in the Dynamics of a Weakly Synchronous Marine Metapopulation.”</span> <em>Proceedings of the National Academy of Sciences</em> 117 (1): 479–85. <a href="https://doi.org/10.1073/pnas.1910964117">https://doi.org/10.1073/pnas.1910964117</a>.
 </div>
 <div id="ref-royer2006" class="csl-entry" role="listitem">
 Royer, F., and J. M. Fromentin. 2006. <span>“Recurrent and Density-Dependent Patterns in Long-Term Fluctuations of Atlantic Bluefin Tuna Trap Catches.”</span> <em>Marine Ecology Progress Series</em> 319 (August): 237–49. <a href="https://doi.org/10.3354/meps319237">https://doi.org/10.3354/meps319237</a>.
@@ -510,6 +541,9 @@ Sugihara, George, and Robert M. May. 1990. <span>“Nonlinear Forecasting as a W
 </div>
 <div id="ref-sugihara2012" class="csl-entry" role="listitem">
 Sugihara, George, Robert May, Hao Ye, Chih-hao Hsieh, Ethan Deyle, Michael Fogarty, and Stephan Munch. 2012. <span>“Detecting Causality in Complex Ecosystems.”</span> <em>Science</em> 338 (6106): 496–500. <a href="https://doi.org/10.1126/science.1227079">https://doi.org/10.1126/science.1227079</a>.
+</div>
+<div id="ref-tsai2023" class="csl-entry" role="listitem">
+Tsai, Cheng-Han, Stephan B. Munch, Michelle D. Masi, and Adam G. Pollack. 2023. <span>“Predicting Nonlinear Dynamics of Short-Lived Penaeid Shrimp Species in the Gulf of Mexico.”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 80 (1): 57–68. <a href="https://doi.org/10.1139/cjfas-2022-0029">https://doi.org/10.1139/cjfas-2022-0029</a>.
 </div>
 <div id="ref-tsonis2015" class="csl-entry" role="listitem">
 Tsonis, Anastasios A., Ethan R. Deyle, Robert M. May, George Sugihara, Kyle Swanson, Joshua D. Verbeten, and Geli Wang. 2015. <span>“Dynamical Evidence for Causality Between Galactic Cosmic Rays and Interannual Variation in Global Temperature.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (11): 3253–56. <a href="https://doi.org/10.1073/pnas.1420291112">https://doi.org/10.1073/pnas.1420291112</a>.
