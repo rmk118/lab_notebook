@@ -11,16 +11,14 @@ editor_options:
 bibliography: references.bib
 ---
 
-# CURRENTLY BEING UPDATED
-
 ## Monday, June 19
 
-I read...
+Since today was a holiday, I didn't come into the lab and do "work" in the form of direct project tasks or data analysis. However, I spent many hours reading the book *Fisheries Ecosystem Dynamics* ([Fogarty and Collie, 2020](https://academic.oup.com/book/41043)). I have not yet taken any classes directly focused on ecology, population dynamics, or fisheries, and I believe that I will be able to produce more meaningful and accurate results for my BRITE project if I have a higher level of background knowledge. I like to take a lot of time and work through the calculations and derivations presented in the book myself, so I really understand both the biological significance and mathematical properties of important equations. Today I got through Chapter 1: Introduction (Sections 1.1-1.4), Chapter 2: Density-Independent Population Growth (Sections 2.1-2.4), and started on Chapter 3: Density-Dependent Population Growth (Section 3.1). I hope to continue to work through at least a few sections of the book each day, at least until I get to Chapter 14: Empirical Dynamic Modeling.
 
 ## Tuesday, June 20
 
-I worked on the proposal...
+I spent most of today working on a project proposal document. Having a concrete outline will be useful for me personally to provide direction and structure for moving forward with the project, but it will also be valuable to have a document that can be shared with others who could provide meaningful input. I conducted a fairly comprehensive literature review for the Relevance & Background and Summary of Selected Literature sections, and added many of those papers to the EDM and Scallop links pages on this website. I also started Section 3.2 in *Fisheries Ecosystem Dynamics,* "Compensation in simple population models", which included subsections on continuous-time models (3.2.1) and multiple equilibria (3.2.2).
 
 ## Wednesday, June 21
 
-I updated my lab notebook...
+Today I finalized the Proposed Methods and Hypotheses sections of my project proposal and shared the document with Dr. Deyle and Dr. Kaufman. I also updated and reformatted several pages on my lab notebook so it can be useful as a resource/literature repository in addition to documenting my progress. In the afternoon, I attended the monthly Zoom working session for the American Fisheries Society Climate Ambassador Program, a 2-year science communication program for fisheries scientists. Each month, we have a training session covering a different topic (e.g., May's topic was dealing with challenging audiences), with a working session the following week to practice implementing what we've learned. The program has definitely made me more skilled at creating effective posters and presentations about my research, as I will need to do for the BRITE REU symposium in August. After the training session, I started working through some of the R code provided as supplementary material to EDM papers, with the goal of building skill and confidence working with the rEDM and multispatialCCM packages. I also read subsection 3.3.3 in *Fisheries Ecosystem Dynamics,* which focused on discrete-time density-dependent models and included a sub-subsection titled "Complex Dynamics" that was highly relevant to EDM.
