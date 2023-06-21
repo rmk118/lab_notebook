@@ -1,5 +1,5 @@
 #Summary of data analysis thus far
-#Last updated: June 17, 2023
+#Last updated: June 21, 2023
 
 library(tidyverse)
 library(lubridate)
@@ -140,34 +140,53 @@ crabsTest2 <- crabsCat %>%
   summarise(years=n_distinct(YEAR))
 
 
-########## starfish
+########## Astropecten
 
-starLen <- dat_len %>% 
+astroLen <- dat_len %>% 
   filter(SCIENTIFIC_NAME=="Astropecten" | #none
-        SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)" | #none
-        SCIENTIFIC_NAME =="Asterias" | #one
-        SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>% #one
+        SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)") %>%  #none
   mutate(CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
          STATION = as.numeric(STATION),
          .keep = "unused")
 
-starLen <- left_join(starLen, cruises, by="CRUISE6")
-starTest <- starLen %>% 
-  group_by(STRATUM) %>% 
+astroCat <- dat_cat %>% 
+  filter(SCIENTIFIC_NAME=="Astropecten" |
+           SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)") %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+astroCat <- left_join(astroCat, cruises, by="CRUISE6")
+astroTest2 <- astroCat %>% 
+  group_by(STRATUM, SCIENTIFIC_NAME) %>% 
   summarise(years=n_distinct(YEAR))
 
-starCat <- dat_cat %>% 
-  filter(SCIENTIFIC_NAME=="Astropecten" |
-           SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)" |
-           SCIENTIFIC_NAME =="Asterias" |
-           SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>%
+########## Asterias
+
+# aLen <- dat_len %>% 
+#   filter(SCIENTIFIC_NAME =="Asterias" | #one
+#            SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>% #one
+#   mutate(CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          STATION = as.numeric(STATION),
+#          .keep = "unused")
+# 
+# aLen <- left_join(aLen, cruises, by="CRUISE6")
+# aTest <- aLen %>% 
+#   group_by(STRATUM) %>% 
+#   summarise(years=n_distinct(YEAR)) #only one year
+
+aCat <- dat_cat %>% 
+  filter(SCIENTIFIC_NAME =="Asterias") %>% 
+            # | SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>%
   mutate(CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
          STATION = as.numeric(STATION),
          .keep = "unused")
 
-starCat <- left_join(starCat, cruises, by="CRUISE6")
-starTest2 <- starCat %>% 
+aCat <- left_join(aCat, cruises, by="CRUISE6")
+aTest2 <- aCat %>% 
   group_by(STRATUM, SCIENTIFIC_NAME) %>% 
   summarise(years=n_distinct(YEAR))

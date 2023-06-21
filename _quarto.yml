@@ -13,7 +13,7 @@ website:
     contents:
     - section: "Resources"
       contents:
-       - Resources/Papers.qmd
+       # - Resources/Papers.qmd
        - Resources/EDM.qmd
        - Resources/ScallopResources.qmd
        - exploringR.qmd

@@ -108,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Resources/Papers.html">Resources</a></li><li class="breadcrumb-item"><a href="./exploringR.html">Exploring</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Resources/EDM.html">Resources</a></li><li class="breadcrumb-item"><a href="./exploringR.html">Exploring</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -134,12 +134,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Resources/Papers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Relevant Papers</span></a>
-  </div>
-</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Resources/EDM.html" class="sidebar-item-text sidebar-link">
@@ -239,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Summary of data analysis thus far</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Last updated: June 17, 2023</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Last updated: June 21, 2023</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
@@ -511,37 +505,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
 <span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="do">########## starfish</span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="do">########## Astropecten</span></span>
 <span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>astroLen <span class="ot">&lt;-</span> dat_len <span class="sc">%&gt;%</span> </span>
 <span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span> <span class="co">#none</span></span>
-<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span> <span class="co">#none</span></span>
-<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span> <span class="sc">|</span> <span class="co">#one</span></span>
-<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span> <span class="co">#one</span></span>
-<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a>starLen <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starLen, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a>starTest <span class="ot">&lt;-</span> starLen <span class="sc">%&gt;%</span> </span>
-<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
-<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
-<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span></span>
-<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span> <span class="sc">|</span></span>
-<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>           <span class="co"># SCIENTIFIC_NAME =="Asterias" |</span></span>
-<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias rubens (boreal asterias)"</span>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
-<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
-<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
-<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
-<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a>starCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(starCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
-<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a>starTest2 <span class="ot">&lt;-</span> starCat <span class="sc">%&gt;%</span> </span>
-<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>        SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span>) <span class="sc">%&gt;%</span>  <span class="co">#none</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>astroCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME<span class="sc">==</span><span class="st">"Astropecten"</span> <span class="sc">|</span></span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a>           SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Astropecten articulatus (royal sea star)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a>astroCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(astroCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a>astroTest2 <span class="ot">&lt;-</span> astroCat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a><span class="do">########## Asterias</span></span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a><span class="co"># aLen &lt;- dat_len %&gt;% </span></span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(SCIENTIFIC_NAME =="Asterias" | #one</span></span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a><span class="co">#            SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %&gt;% #one</span></span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(CRUISE6 = as.factor(CRUISE6),</span></span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a><span class="co">#          CRUISE = as.factor(CRUISE),</span></span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a><span class="co">#          STATION = as.numeric(STATION),</span></span>
+<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a><span class="co">#          .keep = "unused")</span></span>
+<span id="cb17-82"><a href="#cb17-82" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb17-83"><a href="#cb17-83" aria-hidden="true" tabindex="-1"></a><span class="co"># aLen &lt;- left_join(aLen, cruises, by="CRUISE6")</span></span>
+<span id="cb17-84"><a href="#cb17-84" aria-hidden="true" tabindex="-1"></a><span class="co"># aTest &lt;- aLen %&gt;% </span></span>
+<span id="cb17-85"><a href="#cb17-85" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(STRATUM) %&gt;% </span></span>
+<span id="cb17-86"><a href="#cb17-86" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarise(years=n_distinct(YEAR)) #only one year</span></span>
+<span id="cb17-87"><a href="#cb17-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-88"><a href="#cb17-88" aria-hidden="true" tabindex="-1"></a>aCat <span class="ot">&lt;-</span> dat_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-89"><a href="#cb17-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SCIENTIFIC_NAME <span class="sc">==</span><span class="st">"Asterias"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-90"><a href="#cb17-90" aria-hidden="true" tabindex="-1"></a>            <span class="co"># | SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %&gt;%</span></span>
+<span id="cb17-91"><a href="#cb17-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CRUISE6 =</span> <span class="fu">as.factor</span>(CRUISE6),</span>
+<span id="cb17-92"><a href="#cb17-92" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRUISE =</span> <span class="fu">as.factor</span>(CRUISE),</span>
+<span id="cb17-93"><a href="#cb17-93" aria-hidden="true" tabindex="-1"></a>         <span class="at">STATION =</span> <span class="fu">as.numeric</span>(STATION),</span>
+<span id="cb17-94"><a href="#cb17-94" aria-hidden="true" tabindex="-1"></a>         <span class="at">.keep =</span> <span class="st">"unused"</span>)</span>
+<span id="cb17-95"><a href="#cb17-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-96"><a href="#cb17-96" aria-hidden="true" tabindex="-1"></a>aCat <span class="ot">&lt;-</span> <span class="fu">left_join</span>(aCat, cruises, <span class="at">by=</span><span class="st">"CRUISE6"</span>)</span>
+<span id="cb17-97"><a href="#cb17-97" aria-hidden="true" tabindex="-1"></a>aTest2 <span class="ot">&lt;-</span> aCat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-98"><a href="#cb17-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STRATUM, SCIENTIFIC_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-99"><a href="#cb17-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(YEAR))</span>
+<span id="cb17-100"><a href="#cb17-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-101"><a href="#cb17-101" aria-hidden="true" tabindex="-1"></a>aTest2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51 × 3
+# Groups:   STRATUM [51]
+   STRATUM SCIENTIFIC_NAME years
+   &lt;chr&gt;   &lt;chr&gt;           &lt;int&gt;
+ 1 06060   Asterias           10
+ 2 06070   Asterias            6
+ 3 06100   Asterias           10
+ 4 06110   Asterias           12
+ 5 06130   Asterias            6
+ 6 06140   Asterias           14
+ 7 06150   Asterias           13
+ 8 06170   Asterias            6
+ 9 06180   Asterias           15
+10 06190   Asterias           12
+# … with 41 more rows</code></pre>
+</div>
 </div>
 
 

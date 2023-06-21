@@ -75,7 +75,7 @@ editor:
 -   [Measurement errors in body size of sea scallops (Placopecten
     magellanicus) and their effect on stock assessment
     models](https://aquadocs.org/handle/1834/25410) (Jacobson et al.,
-    2010) 
+    2020)
 -   [Estimation of Sea Scallop Abundance in Closed Areas of Georges
     Bank,
     USA](https://doi.org/10.1577/1548-8659(2002)131%3C1081:EOSSAI%3E2.0.CO;2)
@@ -93,7 +93,7 @@ editor:
     -   [High Densities of Juvenile Sea Scallop (Placopecten
         magellanicus) on Banks and Ledges in the Central Gulf of
         Maine](https://doi.org/10.2983/035.029.0212) (Stokesbury et al.,
-        2010) 
+        2020)
     -   [Estimating similarity in benthic communities over decades and
         in areas open and closed to fishing in the central Gulf of
         Maine, USA](https://www.int-res.com/abstracts/meps/v595/p15-26/)
@@ -115,8 +115,8 @@ editor:
 
     -   [Variability in the relationship between sea scallop shell
         height and meat
-        weight](https://academic.oup.com/icesjms/article/66/9/1972/726292)(Rothschild
-        et al., 2009)
+        weight](https://academic.oup.com/icesjms/article/66/9/1972/726292)
+        (Rothschild et al., 2009)
 
 ### Impacts of warming, fishing, and OA
 
@@ -135,6 +135,10 @@ editor:
     Scallop Fishery Plan Ahead for Ocean Acidification and
     Warming](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0124145)
     (Cooley, 2015)
+-   [Impact of limited short-term sea scallop fishery on epibenthic
+    community of Georges Bank closed
+    areas](https://www.int-res.com/articles/meps2006/307/m307p085.pdf)
+    (Stokesbury and Harris, 2006)
 -   Experimental, not modeling: [Juvenile Atlantic sea scallop,
     Placopecten magellanicus, energetic response to increased carbon
     dioxide and temperature
@@ -186,7 +190,7 @@ editor:
     models](https://www.sciencedirect.com/science/article/pii/S0165783623000310)
     (Hamel et al., 2023)
 
-### Predation
+### Predation and other species interactions
 
 -   [Effects of sea stars and crabs on sea scallop recruitment in the
     Mid-Atlantic
@@ -238,6 +242,11 @@ editor:
         varying density of juvenile sea
         scallops](https://doi.org/10.1016/S0044-8486(98)00321-4)
         (Barbeau et al., 1998)
+-   [Evaluating the interaction of the invasive tunicate Didemnum
+    vexillum with the Atlantic sea scallop Placopecten magellanicus on
+    open and closed fishing grounds of Georges
+    Bank](https://academic.oup.com/icesjms/article/74/9/2470/3831747)
+    (Kaplan et al., 2017)
 
 ### Data
 
@@ -251,9 +260,13 @@ editor:
 -   [Northeast Ocean Data \| Data
     Explorer](https://www.northeastoceandata.org/data-explorer/)
 -   [Data.gov Habitat Mapping Camera
-    (HABCAM)](https://catalog.data.gov/dataset/habitat-mapping-camera-habcam)
+    (HABCAM)](https://catalog.data.gov/dataset/habitat-mapping-camera-habcam),
+    [NOAA Fisheries HABCAM \|
+    InPort](https://www.fisheries.noaa.gov/inport/item/27598)
 -   [Data.gov Sea Scallop
-    Survey](https://catalog.data.gov/dataset/sea-scallop-survey)
+    Survey](https://catalog.data.gov/dataset/sea-scallop-survey), [NOAA
+    Fisheries Sea Scallop Survey \|
+    InPort](https://www.fisheries.noaa.gov/inport/item/22564)
 -   [Data.gov BOEM Benthic Habitat
     Assessment](https://catalog.data.gov/dataset/boem-benthic-habitat-assessment)
 -   [Data.gov Benthic Habitat
@@ -262,10 +275,6 @@ editor:
     (Placopecten magellanicus) from an Atlantic Sea Scallop Integrated
     Assessment
     Model](https://catalog.data.gov/dataset/population-and-biomass-of-united-states-sea-scallop-placopecten-magellanicus-from-an-atlantic-s)
--   [NOAA Fisheries Habitat Mapping Camera (HABCAM) \|
-    InPort](https://www.fisheries.noaa.gov/inport/item/27598)
--   [NOAA Fisheries Sea Scallop Survey \|
-    InPort](https://www.fisheries.noaa.gov/inport/item/22564) 
 
 ### Survey metadata, overviews, and methodology
 
