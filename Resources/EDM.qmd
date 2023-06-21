@@ -1,6 +1,6 @@
 ---
 title: 'Intro to EDM'
-date-modified: '2023-06-15'
+date-modified: '2023-06-21'
 categories: ['Resources']
 description: 'An overview of Empirical Dynamic Modeling (EDM). The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.'
 execute: 
@@ -99,6 +99,9 @@ There are several different approaches to incorporating spatial dynamics into ED
 -   [Age structure augments the predictive power of time series for fisheries and conservation](https://cdnsciencepub.com/doi/10.1139/cjfas-2022-0219) (Dolan et al., 2023)
 -   [Model-free time series analysis detected the contributions of middle-age spawner biomass and the environment on Pacific bluefin tuna recruitment](https://academic.oup.com/icesjms/article/77/4/1480/5531239) (Nakayama et al., 2019)
 -   [Ecosystem-based forecasts of recruitment in two menhaden species](https://doi.org/10.1111/faf.12287) (Deyle et al., 2018)
+-   [A complex past: historical and contemporary fisheries demonstrate nonlinear dynamics and a loss of determinism](https://www.int-res.com/abstracts/meps/v557/p237-246/) (Klein et al., 2016)
+-   [Non-parametric modeling reveals environmental effects on bluefin tuna recruitment in Atlantic, Pacific, and Southern Oceans](https://onlinelibrary.wiley.com/doi/abs/10.1111/fog.12205) (Harford et al., 2017)
+-   [Nonlinear dynamic features and co-predictability of the Georges Bank fish community](https://www.int-res.com/abstracts/meps/v464/p195-207/) (Liu et al., 2012)
 
 # Other EDM papers
 

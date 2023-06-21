@@ -1,6 +1,6 @@
 ---
 title: 'Scallop Links'
-date-modified: '2023-06-16'
+date-modified: '2023-06-21'
 categories: ['Resources']
 description: 'A list of key scientific literature related to North Atlantic sea scallops, with an emphasis on the use of NMFS survey data for modeling purposes.'
 execute: 
@@ -17,7 +17,7 @@ editor:
 ### General
 
 | Author, year        | Title                                                                                                                                                                                                                                                                                                                           | Notes                                                                                                                                |
-|--------------|-------------------------------------------|----------------|
+|----------------|---------------------------------------|----------------|
 | Hart and Rago, 2006 | [Long-Term Dynamics of U.S. Atlantic Sea Scallop Placopecten magellanicus Populations](https://afspubs.onlinelibrary.wiley.com/doi/full/10.1577/M04-116.1)                                                                                                                                                                      | Excellent historical overview                                                                                                        |
 | Hart et al., 2013   | [To split or not to split: Assessment of Georges Bank sea scallops in the presence of marine protected areas](https://www.sciencedirect.com/science/article/pii/S0165783612003396#bib0040)                                                                                                                                      | Ran CASA model (aggregate and split by area) on real data and SAMS simulated data                                                    |
 | Lee et al., 2019    | [Resource Abundance, Fisheries Management, and Fishing Ports: The U.S. Atlantic Sea Scallop Fishery](https://www.cambridge.org/core/journals/agricultural-and-resource-economics-review/article/resource-abundance-fisheries-management-and-fishing-ports-the-us-atlantic-sea-scallop-fishery/C123D92B0821542C2185D6A2F42EB62F) | Uses inverse-distance weighted available biomass index                                                                               |
@@ -215,6 +215,29 @@ editor:
         Mid-Atlantic Bight: Comment on Stokesbury et
         al.](https://www.int-res.com/abstracts/meps/v443/p293-297/)(Hart
         and Shank, 2011) - concluded it was actually crab predation
+-   Experimental
+    -   [Survival analysis of tethered juvenile sea scallops Placopecten
+        magellanicus in field experiments: Effects of predators, scallop
+        size and density, site and
+        season](https://dalspace.library.dal.ca/handle/10222/29655)
+        (Barbeau et al., 1994)
+    -   [Behavioral mechanisms of prey size selection by sea stars
+        (Asterias Vulgaris) and crabs (cancer irroratus) preying on
+        juvenile sea scallops (placopecten
+        magellanicus)](https://doi.org/10.1016/0022-0981(94)90082-5)
+        (Barbeau and Scheibling, 1994a)
+    -   [Temperature effects on predation of juvenile sea scallops
+        \[Placopecten magellanicus\] by sea stars (Asterias vulgaris)
+        and crabs (Cancer
+        irroratus)](https://doi.org/10.1016/0022-0981(94)90209-7)
+        (Barbeau and Scheibling, 1994b)
+    -   [Dynamics of juvenile sea scallop (Placopecten magellanicus) and
+        their predators in bottom seeding trials in Lunenburg Bay, Nova
+        Scotia](https://doi.org/10.1139/f96-202) (Barbeau et al., 1996)
+    -   [Behavioural responses of predatory crabs and sea stars to
+        varying density of juvenile sea
+        scallops](https://doi.org/10.1016/S0044-8486(98)00321-4)
+        (Barbeau et al., 1998)
 
 ### Data
 

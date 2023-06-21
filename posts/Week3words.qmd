@@ -1,0 +1,26 @@
+---
+title: 'Week 3 in Words'
+date: '2023-06-21'
+categories: ['Week 3', 'Reading', 'Data exploration']
+description: 'My activities for the week'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+# CURRENTLY BEING UPDATED
+
+## Monday, June 19
+
+I read...
+
+## Tuesday, June 20
+
+I worked on the proposal...
+
+## Wednesday, June 21
+
+I updated my lab notebook...
