@@ -22,3 +22,7 @@ I spent most of today working on a project proposal document. Having a concrete 
 ## Wednesday, June 21
 
 Today I finalized the Proposed Methods and Hypotheses sections of my project proposal and shared the document with Dr. Deyle and Dr. Kaufman. I also updated and reformatted several pages on my lab notebook so it can be useful as a resource/literature repository in addition to documenting my progress. In the afternoon, I attended the monthly Zoom working session for the American Fisheries Society Climate Ambassador Program, a 2-year science communication program for fisheries scientists. Each month, we have a training session covering a different topic (e.g., May's topic was dealing with challenging audiences), with a working session the following week to practice implementing what we've learned. The program has definitely made me more skilled at creating effective posters and presentations about my research, as I will need to do for the BRITE REU symposium in August. After the training session, I started working through some of the R code provided as supplementary material to EDM papers, with the goal of building skill and confidence working with the rEDM and multispatialCCM packages. I also read subsection 3.3.3 in *Fisheries Ecosystem Dynamics,* which focused on discrete-time density-dependent models and included a sub-subsection titled "Complex Dynamics" that was highly relevant to EDM.
+
+## Thursday, June 22
+
+This morning we had an R programming workshop.
