@@ -51,7 +51,7 @@ make_block <- function(data, cols, delays,
 simplex_deltas <- function(time_series, lib = c(1, NROW(time_series)), pred = lib,
                            E = 1:10, tau = 1, tp = 1, num_neighbors = "e+1",...){
     
-    #   This function is used to apply univeriate simplex projection where raw data are
+    #   This function is used to apply univariate simplex projection where raw data are
     #   used to construct the lag coordinates for the embedding, i.e. x(t), x(t-1), ...
     #   but the variable that is predicted is the first difference, deltax(t + tp) =
     #   x(t + tp) - x(t + tp -1) rather than the value x(t + tp).
@@ -70,7 +70,8 @@ simplex_deltas <- function(time_series, lib = c(1, NROW(time_series)), pred = li
                           method = "simplex", tp = 1, num_neighbors = "e+1",
                           columns = L_columns, target_column = 1, stats_only = FALSE,
                           first_column_time = FALSE,theta = NULL, save_smap_coefficients = FALSE,
-                          short_output = FALSE,...)
+                         # short_output = FALSE,
+                          ...)
     
     out <- list(delta_stats=NULL,delta_preds=NULL,raw_stats=NULL,raw_preds=NULL)
     out$delta_stats <- do.call(rbind,lapply(out.raw,function(df) cbind(data.frame(E=length(strsplit(df$embedding,',')[[1]]),

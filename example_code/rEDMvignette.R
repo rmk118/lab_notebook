@@ -1,6 +1,6 @@
 #Examples/practice from the rEDM vignette
 #Ruby Krasnow
-#6/21/23
+#6/22/23
 
 library(rEDM)
 
