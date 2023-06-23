@@ -1,6 +1,6 @@
 ---
-title: 'Week 3 in Words'
-date: '2023-06-21'
+title: 'Week 3'
+date: '2023-06-23'
 categories: ['Week 3', 'Reading', 'Data exploration']
 description: 'My activities for the week'
 execute: 
@@ -25,12 +25,42 @@ Today I finalized the Proposed Methods and Hypotheses sections of my project pro
 
 ## Thursday, June 22
 
-This morning we had an R programming workshop.
+Today, I...
 
--   Worked through rEDM vignette code, wrote up a list of questions to ask Ethan
+**1. Attended the BRITE R programming workshop.** I was already relatively comfortable working in R (certainly compared to working in Python), but it was still valuable to see alternative ways to accomplish a given task. The workshop also introduced me to Bioconductor packages, which are used for "statistical analysis and comprehension of high-throughput genomic data".
 
--   Tried to debug code provided with menhaden paper (Deyle et al., 2018)
+**2. Worked through the [rEDM vignette](https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf)**. I tried to reproduce all of the R code in the vignette and as I did so, I wrote up a list of questions to ask Dr. Deyle. In particular, I would like to know more about how to specify function inputs like the sizes of the training and prediction libraries for Simplex, S-map, and CCM; the method used to produce surrogate data for testing statistical significance, and different approaches to normalizing data before analysis.
+
+**3. Tried to debug code.** After finishing the rEDM vignette, I tried to reproduce the code provided as supplementary material to the paper "Ecosystem-based forecasts of recruitment in two menhaden species"([Deyle et al., 2018](https://doi.org/10.1111/faf.12287)). Unlike the vignette, many of the functions produced errors when called, so I tried to identify the cause of the error and potential alternative solutions. However, the error messages were somewhat hard to interpret because the error tracebacks often referred to the underlying C++ code. For example, RStudio would produce an error message that an integer had been provided where a string was expected, but to some function called by the rEDM package, not to a function that was in my R script that I could edit.
 
 ## Friday, June 23
 
--   Continued to debug code provided with menhaden paper (Deyle et al., 2018)
+Today, I...
+
+**1. Worked through EDM code.** I continued to try and debug the code provided with the menhaden paper, and also worked through the code accompanying [Chang et al., (2017)](https://link.springer.com/article/10.1007/s11284-017-1469-9). I was comparatively more successful at debugging Chang et al., and I managed to figure out alternative ways to create the figures in the paper.
+
+**2. Read papers applying EDM to fisheries.** I especially focused on the methods sections, and took notes on steps in their analysis that would be useful perform on the scallop data (see Intro to EDM page). For example, I identified many different ways that authors have chosen to assess the statistical significance of EDM results.
+
+**3. Tested out NOAA R packages in the SCC.** I installed and explored three different packages to see if they would be useful for my project: [NEFSC-Spatial](https://nefsc.github.io/NEFSC-Spatial/index.html) (has shellfish strata), [stocksmart](https://noaa-edab.github.io/stocksmart/), and [ecodata](https://noaa-edab.github.io/ecodata/landing_page%20https://noaa-edab.github.io/ecodata/). As the packages come with fairly large data files, I leveraged the power of the SCC when testing their functionality. My conclusion is that the data included in the packages has relatively coarse resolution and will likely not be directly useful for my EDM scallop project, but that they are excellent for data visualization. The plots I can produce with the NOAA packages might be good for providing context about the geographical, biological, and economic context of my project.
+
+```{r, eval=FALSE}
+library(tidyverse)
+
+library(ecodata)
+comdat #aggregated commercial fishing data (landings, value, etc.)
+str(comdat)
+levels(comdat$EPU)
+
+varFactors <- as.factor(comdat$Var)
+levels(varFactors)
+
+library(stocksmart)
+hab<- habitat_occupancy
+get_available_ts(itis = 79718, jurisdiction = "NEFMC") #ITIS = 79718 refers to the Integrated Taxonomic Information System number for the sea scallop.
+plot_ts(itis = 79718, facetplot = T) #plots time series
+get_latest_full_assessment(itis = 79718)
+scal<-get_latest_metrics(itis = 79718)
+
+scallopData<- stockAssessmentData %>% 
+  filter(ITIS==79718)
+```

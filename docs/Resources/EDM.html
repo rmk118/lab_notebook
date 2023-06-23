@@ -95,7 +95,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Resources/Papers.html">Resources</a></li><li class="breadcrumb-item"><a href="../Resources/EDM.html">Intro to EDM</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Resources/EDM.html">Resources</a></li><li class="breadcrumb-item"><a href="../Resources/EDM.html">Intro to EDM</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -121,12 +121,6 @@ div.csl-indent {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Relevant Papers</span></a>
-  </div>
-</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../Resources/EDM.html" class="sidebar-item-text sidebar-link active">
@@ -177,7 +171,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../posts/Week3words.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Week 3 in Words</span></a>
+ <span class="menu-text">Week 3</span></a>
   </div>
 </li>
       </ul>
@@ -230,7 +224,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 21, 2023</p>
+      <p class="date-modified">June 23, 2023</p>
     </div>
   </div>
     
@@ -383,24 +377,57 @@ div.csl-indent {
 <tr class="odd">
 <td><span class="citation" data-cites="tsai2023">Tsai et al. (<a href="#ref-tsai2023" role="doc-biblioref">2023</a>)</span></td>
 <td>Predicting nonlinear dynamics of short-lived penaeid shrimp species in the Gulf of Mexico</td>
-<td>Extends GP-EDM to incorporate spatial data (adds additional layer of covariance structure between manifolds estimated for each statistical zone). Also incorporates environmental variables.</td>
+<td>(no code) Extends GP-EDM to incorporate spatial data; adds additional layer of covariance structure between manifolds estimated for each statistical zone. Also incorporates environmental variables.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="recent-papers-applying-edm-to-fisheries" class="level1">
 <h1>Recent papers applying EDM to fisheries</h1>
+<p>Many of the notes here related to the methods used by the authors for data analysis, as I am trying to identify best practices and common approaches to provide guidance for my own data analysis.</p>
+<table class="table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Author, year</th>
+<th>Title</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="citation" data-cites="pierre2018">Pierre et al. (<a href="#ref-pierre2018" role="doc-biblioref">2018</a>)</span></td>
+<td>Assessing causal links in fish stock–recruitment relationships</td>
+<td>(no code) Supplementary material has graphs of CCM and tables of statistical results for all fish stocks examined, but All data normalized (the mean was subtracted and they were divided by their standard deviation) and recruitment time series were lagged so that years corresponded to age 0 fish. Simplex testing/prediction was done by splitting data in half. Range of E tested was “arbitrarily set from 2 to the quarter of the size of the time series considered”. Used GLMM and Mann-Kendall to test for significant negative trend in MASE with increasing library size.</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="wasserman2022">Wasserman et al. (<a href="#ref-wasserman2022" role="doc-biblioref">2022</a>)</span></td>
+<td>Applying empirical dynamic modeling to distinguish abiotic and biotic drivers of population fluctuations in sympatric fishes</td>
+<td>(no code) Normalized all variables to mean 0 and standard deviation 1. Univariate simplex to identify optimal E for each species. Tested for significant CCM by comparing ρ for target variable from model to ρ from null distribution. Extracted correlation coefficients from multivariate S-map model of lags of species abundance + predictor variables, then used ANOVA to determine if either of the season variables or any of the environmental variables were associated with the interaction strengths between the 2 species. Checked for multicollinearity using VIF</td>
+</tr>
+<tr class="odd">
+<td><span class="citation" data-cites="dolan2023">Dolan et al. (<a href="#ref-dolan2023" role="doc-biblioref">2023</a>)</span></td>
+<td>Age structure augments the predictive power of time series for fisheries and conservation</td>
+<td>(no code) Fig. 3 in supplementary material is interesting visualization of predictive skill (out-of-sample r<sup>2</sup> and RMSE) of model over a grid of values for tau and embedding dimension. Data log-transformed before analysis. Used GP-EDM to make hierarchical age-structured and mixed-age models. Leveraging age structure can improve forecasts, but the improvement is greatest for short ts (&lt;10 years)</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="harford2017">Harford et al. (<a href="#ref-harford2017" role="doc-biblioref">2017</a>)</span></td>
+<td>Non-parametric modeling reveals environmental effects on bluefin tuna recruitment in Atlantic, Pacific, and Southern Oceans</td>
+<td>(no code)</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><a href="https://doi.org/10.1093/icesjms/fsx202">Assessing causal links in fish stock–recruitment relationships</a> (Pierre et al., 2017)</li>
 <li><a href="https://www.sciencedirect.com/science/article/pii/S0304380022000680#bib0007">An empirical dynamic modeling framework for missing or irregular samples</a> (Johnson and Munch, 2022)</li>
 <li><a href="https://onlinelibrary.wiley.com/doi/10.1111/faf.12037">Complex dynamics may limit prediction in marine fisheries</a> (Glaser et al., 2013)</li>
-<li><a href="https://aslopubs.onlinelibrary.wiley.com/doi/full/10.1002/lno.12042">Applying empirical dynamic modeling to distinguish abiotic and biotic drivers of population fluctuations in sympatric fishes</a> (Wasserman et al., 2022)</li>
 <li><a href="https://doi.org/10.1111/faf.12304">Nonlinear dynamics and noise in fisheries recruitment: A global meta-analysis</a> (Munch, Giron-Nava, and Sugihara, 2018)</li>
-<li><a href="https://cdnsciencepub.com/doi/10.1139/cjfas-2022-0219">Age structure augments the predictive power of time series for fisheries and conservation</a> (Dolan et al., 2023)</li>
-<li><a href="https://academic.oup.com/icesjms/article/77/4/1480/5531239">Model-free time series analysis detected the contributions of middle-age spawner biomass and the environment on Pacific bluefin tuna recruitment</a> (Nakayama et al., 2019)</li>
+<li><a href="https://academic.oup.com/icesjms/article/77/4/1480/5531239">Model-free time series analysis detected the contributions of middle-age spawner biomass and the environment on Pacific bluefin tuna recruitment</a> (Nakayama et al., 2019) - no code</li>
 <li><a href="https://doi.org/10.1111/faf.12287">Ecosystem-based forecasts of recruitment in two menhaden species</a> (Deyle et al., 2018)</li>
 <li><a href="https://www.int-res.com/abstracts/meps/v557/p237-246/">A complex past: historical and contemporary fisheries demonstrate nonlinear dynamics and a loss of determinism</a> (Klein et al., 2016)</li>
-<li><a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/fog.12205">Non-parametric modeling reveals environmental effects on bluefin tuna recruitment in Atlantic, Pacific, and Southern Oceans</a> (Harford et al., 2017)</li>
 <li><a href="https://www.int-res.com/abstracts/meps/v464/p195-207/">Nonlinear dynamic features and co-predictability of the Georges Bank fish community</a> (Liu et al., 2012)</li>
 </ul>
 </section>
@@ -453,7 +480,7 @@ div.csl-indent {
 <tr class="even">
 <td><span class="citation" data-cites="giron-nava2021">Giron-Nava et al. (<a href="#ref-giron-nava2021" role="doc-biblioref">2021</a>)</span></td>
 <td>Environmental variability and fishing effects on the Pacific sardine fisheries in the Gulf of California</td>
-<td>(i) Multivariate linear analysis as predictability benchmark, (ii) CCM and multivariate EDM to test for causality, (iii) empirical dynamic programming model to estimate ideal harvest policy</td>
+<td>(no code) (i) Multivariate linear analysis as predictability benchmark, (ii) CCM and multivariate EDM to test for causality, (iii) empirical dynamic programming model to estimate ideal harvest policy</td>
 </tr>
 <tr class="odd">
 <td><span class="citation" data-cites="liu2022">Liu and Gaines (<a href="#ref-liu2022" role="doc-biblioref">2022</a>)</span></td>
@@ -463,7 +490,7 @@ div.csl-indent {
 <tr class="even">
 <td><span class="citation" data-cites="munch2023">Munch, Rogers, and Sugihara (<a href="#ref-munch2023" role="doc-biblioref">2023</a>)</span></td>
 <td>Recent developments in empirical dynamic modelling</td>
-<td>Good overview, including sEDM, GP-EDM, machine learning developments, etc.</td>
+<td>(no code) Good overview, including sEDM, GP-EDM, machine learning developments, etc.</td>
 </tr>
 </tbody>
 </table>
@@ -506,11 +533,17 @@ Deyle, Ethan, Amy M Schueller, Hao Ye, Gerald M Pao, and George Sugihara. 2018. 
 <div id="ref-dixon1999" class="csl-entry" role="listitem">
 Dixon, Paul A., Maria J. Milicich, and George Sugihara. 1999. <span>“Episodic Fluctuations in Larval Supply.”</span> <em>Science</em> 283 (5407): 1528–30. <a href="https://doi.org/10.1126/science.283.5407.1528">https://doi.org/10.1126/science.283.5407.1528</a>.
 </div>
+<div id="ref-dolan2023" class="csl-entry" role="listitem">
+Dolan, Tara E., Eric P. Palkovacs, Tanya L. Rogers, and Stephan B. Munch. 2023. <span>“Age Structure Augments the Predictive Power of Time Series for Fisheries and Conservation.”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 80 (5): 795–807. <a href="https://doi.org/10.1139/cjfas-2022-0219">https://doi.org/10.1139/cjfas-2022-0219</a>.
+</div>
 <div id="ref-giron-nava2021" class="csl-entry" role="listitem">
 Giron-Nava, Alfredo, Exequiel Ezcurra, Antoine Brias, Enriqueta Velarde, Ethan Deyle, Andrés M. Cisneros-Montemayor, Stephan B. Munch, George Sugihara, and Octavio Aburto-Oropeza. 2021. <span>“Environmental Variability and Fishing Effects on the Pacific Sardine Fisheries in the Gulf of California.”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 78 (5): 623–30. <a href="https://doi.org/10.1139/cjfas-2020-0010">https://doi.org/10.1139/cjfas-2020-0010</a>.
 </div>
 <div id="ref-glaser2011" class="csl-entry" role="listitem">
 Glaser, Sarah M., Hao Ye, Mark Maunder, Alec MacCall, Michael Fogarty, and George Sugihara. 2011. <span>“Detecting and Forecasting Complex Nonlinear Dynamics in Spatially Structured Catch-Per-Unit-Effort Time Series for North Pacific Albacore (Thunnus Alalunga).”</span> <em>Canadian Journal of Fisheries and Aquatic Sciences</em> 68 (3): 400–412. <a href="https://doi.org/10.1139/F10-160">https://doi.org/10.1139/F10-160</a>.
+</div>
+<div id="ref-harford2017" class="csl-entry" role="listitem">
+Harford, William J., Mandy Karnauskas, John F. Walter, and Hui Liu. 2017. <span>“Non-Parametric Modeling Reveals Environmental Effects on Bluefin Tuna Recruitment in Atlantic, Pacific, and Southern Oceans.”</span> <em>Fisheries Oceanography</em> 26 (4): 396–412. <a href="https://doi.org/10.1111/fog.12205">https://doi.org/10.1111/fog.12205</a>.
 </div>
 <div id="ref-hsieh2008" class="csl-entry" role="listitem">
 Hsieh, Chih-hao, Christian Anderson, and George Sugihara. 2008. <span>“Extending Nonlinear Analysis to Short Ecological Time Series.”</span> <em>The American Naturalist</em> 171 (1): 71–80. <a href="https://doi.org/10.1086/524202">https://doi.org/10.1086/524202</a>.
@@ -536,6 +569,9 @@ Munch, Stephan B., Valerie Poynor, and Juan Lopez Arriaza. 2017. <span>“Circum
 <div id="ref-munch2023" class="csl-entry" role="listitem">
 Munch, Stephan B., Tanya L. Rogers, and George Sugihara. 2023. <span>“Recent Developments in Empirical Dynamic Modelling.”</span> <em>Methods in Ecology and Evolution</em> 14 (3): 732–45. <a href="https://doi.org/10.1111/2041-210X.13983">https://doi.org/10.1111/2041-210X.13983</a>.
 </div>
+<div id="ref-pierre2018" class="csl-entry" role="listitem">
+Pierre, Maud, Tristan Rouyer, Sylvain Bonhommeau, and J M Fromentin. 2018. <span>“Assessing Causal Links in Fish Stock<span></span>recruitment Relationships.”</span> <em>ICES Journal of Marine Science</em> 75 (3): 903–11. <a href="https://doi.org/10.1093/icesjms/fsx202">https://doi.org/10.1093/icesjms/fsx202</a>.
+</div>
 <div id="ref-rogers2020" class="csl-entry" role="listitem">
 Rogers, Tanya L., and Stephan B. Munch. 2020. <span>“Hidden Similarities in the Dynamics of a Weakly Synchronous Marine Metapopulation.”</span> <em>Proceedings of the National Academy of Sciences</em> 117 (1): 479–85. <a href="https://doi.org/10.1073/pnas.1910964117">https://doi.org/10.1073/pnas.1910964117</a>.
 </div>
@@ -559,6 +595,9 @@ Tsai, Cheng-Han, Stephan B. Munch, Michelle D. Masi, and Adam G. Pollack. 2023. 
 </div>
 <div id="ref-tsonis2015" class="csl-entry" role="listitem">
 Tsonis, Anastasios A., Ethan R. Deyle, Robert M. May, George Sugihara, Kyle Swanson, Joshua D. Verbeten, and Geli Wang. 2015. <span>“Dynamical Evidence for Causality Between Galactic Cosmic Rays and Interannual Variation in Global Temperature.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (11): 3253–56. <a href="https://doi.org/10.1073/pnas.1420291112">https://doi.org/10.1073/pnas.1420291112</a>.
+</div>
+<div id="ref-wasserman2022" class="csl-entry" role="listitem">
+Wasserman, Ben A., Tanya L. Rogers, Stephan B. Munch, and Eric P. Palkovacs. 2022. <span>“Applying Empirical Dynamic Modeling to Distinguish Abiotic and Biotic Drivers of Population Fluctuations in Sympatric Fishes.”</span> <em>Limnology and Oceanography</em> 67 (S1): S403–15. <a href="https://doi.org/10.1002/lno.12042">https://doi.org/10.1002/lno.12042</a>.
 </div>
 <div id="ref-ye2015" class="csl-entry" role="listitem">
 Ye, Hao, Richard J. Beamish, Sarah M. Glaser, Sue C. H. Grant, Chih-hao Hsieh, Laura J. Richards, Jon T. Schnute, and George Sugihara. 2015. <span>“Equation-Free Mechanistic Ecosystem Forecasting Using Empirical Dynamic Modeling.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (13). <a href="https://doi.org/10.1073/pnas.1417063112">https://doi.org/10.1073/pnas.1417063112</a>.

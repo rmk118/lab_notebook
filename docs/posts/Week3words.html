@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ruby Krasnow">
-<meta name="dcterms.date" content="2023-06-21">
+<meta name="dcterms.date" content="2023-06-23">
 <meta name="description" content="My activities for the week">
 
-<title>Ruby’s Lab Notebook - Summer 2023 - Week 3 in Words</title>
+<title>Ruby’s Lab Notebook - Summer 2023 - Week 3</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -76,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Week1.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Week3words.html">Week 3 in Words</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Week1.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Week3words.html">Week 3</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -102,12 +136,6 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Resources/Papers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Relevant Papers</span></a>
-  </div>
-</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../Resources/EDM.html" class="sidebar-item-text sidebar-link">
@@ -158,7 +186,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../posts/Week3words.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Week 3 in Words</span></a>
+ <span class="menu-text">Week 3</span></a>
   </div>
 </li>
       </ul>
@@ -173,12 +201,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#currently-being-updated" id="toc-currently-being-updated" class="nav-link active" data-scroll-target="#currently-being-updated">CURRENTLY BEING UPDATED</a>
-  <ul class="collapse">
-  <li><a href="#monday-june-19" id="toc-monday-june-19" class="nav-link" data-scroll-target="#monday-june-19">Monday, June 19</a></li>
+  <li><a href="#monday-june-19" id="toc-monday-june-19" class="nav-link active" data-scroll-target="#monday-june-19">Monday, June 19</a></li>
   <li><a href="#tuesday-june-20" id="toc-tuesday-june-20" class="nav-link" data-scroll-target="#tuesday-june-20">Tuesday, June 20</a></li>
   <li><a href="#wednesday-june-21" id="toc-wednesday-june-21" class="nav-link" data-scroll-target="#wednesday-june-21">Wednesday, June 21</a></li>
-  </ul></li>
+  <li><a href="#thursday-june-22" id="toc-thursday-june-22" class="nav-link" data-scroll-target="#thursday-june-22">Thursday, June 22</a></li>
+  <li><a href="#friday-june-23" id="toc-friday-june-23" class="nav-link" data-scroll-target="#friday-june-23">Friday, June 23</a></li>
   </ul>
 </nav>
     </div>
@@ -187,7 +214,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Week 3 in Words</h1>
+<h1 class="title">Week 3</h1>
   <div class="quarto-categories">
     <div class="quarto-category">Week 3</div>
     <div class="quarto-category">Reading</div>
@@ -214,7 +241,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 21, 2023</p>
+      <p class="date">June 23, 2023</p>
     </div>
   </div>
   
@@ -224,22 +251,54 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="currently-being-updated" class="level1">
-<h1>CURRENTLY BEING UPDATED</h1>
 <section id="monday-june-19" class="level2">
 <h2 class="anchored" data-anchor-id="monday-june-19">Monday, June 19</h2>
-<p>I read…</p>
+<p>Since today was a holiday, I didn’t come into the lab and do “work” in the form of direct project tasks or data analysis. However, I spent many hours reading the book <em>Fisheries Ecosystem Dynamics</em> (<a href="https://academic.oup.com/book/41043">Fogarty and Collie, 2020</a>). I have not yet taken any classes directly focused on ecology, population dynamics, or fisheries, and I believe that I will be able to produce more meaningful and accurate results for my BRITE project if I have a higher level of background knowledge. I like to take a lot of time and work through the calculations and derivations presented in the book myself, so I really understand both the biological significance and mathematical properties of important equations. Today I got through Chapter 1: Introduction (Sections 1.1-1.4), Chapter 2: Density-Independent Population Growth (Sections 2.1-2.4), and started on Chapter 3: Density-Dependent Population Growth (Section 3.1). I hope to continue to work through at least a few sections of the book each day, at least until I get to Chapter 14: Empirical Dynamic Modeling.</p>
 </section>
 <section id="tuesday-june-20" class="level2">
 <h2 class="anchored" data-anchor-id="tuesday-june-20">Tuesday, June 20</h2>
-<p>I worked on the proposal…</p>
+<p>I spent most of today working on a project proposal document. Having a concrete outline will be useful for me personally to provide direction and structure for moving forward with the project, but it will also be valuable to have a document that can be shared with others who could provide meaningful input. I conducted a fairly comprehensive literature review for the Relevance &amp; Background and Summary of Selected Literature sections, and added many of those papers to the EDM and Scallop links pages on this website. I also started Section 3.2 in <em>Fisheries Ecosystem Dynamics,</em> “Compensation in simple population models”, which included subsections on continuous-time models (3.2.1) and multiple equilibria (3.2.2).</p>
 </section>
 <section id="wednesday-june-21" class="level2">
 <h2 class="anchored" data-anchor-id="wednesday-june-21">Wednesday, June 21</h2>
-<p>I updated my lab notebook…</p>
-
-
+<p>Today I finalized the Proposed Methods and Hypotheses sections of my project proposal and shared the document with Dr.&nbsp;Deyle and Dr.&nbsp;Kaufman. I also updated and reformatted several pages on my lab notebook so it can be useful as a resource/literature repository in addition to documenting my progress. In the afternoon, I attended the monthly Zoom working session for the American Fisheries Society Climate Ambassador Program, a 2-year science communication program for fisheries scientists. Each month, we have a training session covering a different topic (e.g., May’s topic was dealing with challenging audiences), with a working session the following week to practice implementing what we’ve learned. The program has definitely made me more skilled at creating effective posters and presentations about my research, as I will need to do for the BRITE REU symposium in August. After the training session, I started working through some of the R code provided as supplementary material to EDM papers, with the goal of building skill and confidence working with the rEDM and multispatialCCM packages. I also read subsection 3.3.3 in <em>Fisheries Ecosystem Dynamics,</em> which focused on discrete-time density-dependent models and included a sub-subsection titled “Complex Dynamics” that was highly relevant to EDM.</p>
 </section>
+<section id="thursday-june-22" class="level2">
+<h2 class="anchored" data-anchor-id="thursday-june-22">Thursday, June 22</h2>
+<p>Today, I…</p>
+<p><strong>1. Attended the BRITE R programming workshop.</strong> I was already relatively comfortable working in R (certainly compared to working in Python), but it was still valuable to see alternative ways to accomplish a given task. The workshop also introduced me to Bioconductor packages, which are used for “statistical analysis and comprehension of high-throughput genomic data”.</p>
+<p><strong>2. Worked through the <a href="https://cran.r-project.org/web/packages/rEDM/vignettes/rEDM-tutorial.pdf">rEDM vignette</a></strong>. I tried to reproduce all of the R code in the vignette and as I did so, I wrote up a list of questions to ask Dr.&nbsp;Deyle. In particular, I would like to know more about how to specify function inputs like the sizes of the training and prediction libraries for Simplex, S-map, and CCM; the method used to produce surrogate data for testing statistical significance, and different approaches to normalizing data before analysis.</p>
+<p><strong>3. Tried to debug code.</strong> After finishing the rEDM vignette, I tried to reproduce the code provided as supplementary material to the paper “Ecosystem-based forecasts of recruitment in two menhaden species”(<a href="https://doi.org/10.1111/faf.12287">Deyle et al., 2018</a>). Unlike the vignette, many of the functions produced errors when called, so I tried to identify the cause of the error and potential alternative solutions. However, the error messages were somewhat hard to interpret because the error tracebacks often referred to the underlying C++ code. For example, RStudio would produce an error message that an integer had been provided where a string was expected, but to some function called by the rEDM package, not to a function that was in my R script that I could edit.</p>
+</section>
+<section id="friday-june-23" class="level2">
+<h2 class="anchored" data-anchor-id="friday-june-23">Friday, June 23</h2>
+<p>Today, I…</p>
+<p><strong>1. Worked through EDM code.</strong> I continued to try and debug the code provided with the menhaden paper, and also worked through the code accompanying <a href="https://link.springer.com/article/10.1007/s11284-017-1469-9">Chang et al., (2017)</a>. I was comparatively more successful at debugging Chang et al., and I managed to figure out alternative ways to create the figures in the paper.</p>
+<p><strong>2. Read papers applying EDM to fisheries.</strong> I especially focused on the methods sections, and took notes on steps in their analysis that would be useful perform on the scallop data (see Intro to EDM page). For example, I identified many different ways that authors have chosen to assess the statistical significance of EDM results.</p>
+<p><strong>3. Tested out NOAA R packages in the SCC.</strong> I installed and explored three different packages to see if they would be useful for my project: <a href="https://nefsc.github.io/NEFSC-Spatial/index.html">NEFSC-Spatial</a> (has shellfish strata), <a href="https://noaa-edab.github.io/stocksmart/">stocksmart</a>, and <a href="https://noaa-edab.github.io/ecodata/landing_page%20https://noaa-edab.github.io/ecodata/">ecodata</a>. As the packages come with fairly large data files, I leveraged the power of the SCC when testing their functionality. My conclusion is that the data included in the packages has relatively coarse resolution and will likely not be directly useful for my EDM scallop project, but that they are excellent for data visualization. The plots I can produce with the NOAA packages might be good for providing context about the geographical, biological, and economic context of my project.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ecodata)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>comdat <span class="co">#aggregated commercial fishing data (landings, value, etc.)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(comdat)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(comdat<span class="sc">$</span>EPU)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>varFactors <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(comdat<span class="sc">$</span>Var)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(varFactors)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stocksmart)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>hab<span class="ot">&lt;-</span> habitat_occupancy</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">get_available_ts</span>(<span class="at">itis =</span> <span class="dv">79718</span>, <span class="at">jurisdiction =</span> <span class="st">"NEFMC"</span>) <span class="co">#ITIS = 79718 refers to the Integrated Taxonomic Information System number for the sea scallop.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_ts</span>(<span class="at">itis =</span> <span class="dv">79718</span>, <span class="at">facetplot =</span> T) <span class="co">#plots time series</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">get_latest_full_assessment</span>(<span class="at">itis =</span> <span class="dv">79718</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>scal<span class="ot">&lt;-</span><span class="fu">get_latest_metrics</span>(<span class="at">itis =</span> <span class="dv">79718</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>scallopData<span class="ot">&lt;-</span> stockAssessmentData <span class="sc">%&gt;%</span> </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ITIS<span class="sc">==</span><span class="dv">79718</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->

@@ -1,6 +1,6 @@
 ---
 title: 'Intro to EDM'
-date-modified: '2023-06-21'
+date-modified: '2023-06-23'
 categories: ['Resources']
 description: 'An overview of Empirical Dynamic Modeling (EDM). The goal is to perform somewhat of a literature review and solidify my understanding of EDM and its applications by describing the concepts in my own words, or at least compile language from the various sources that have been most helpful in building my intuition around EDM.'
 execute: 
