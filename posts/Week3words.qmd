@@ -26,3 +26,11 @@ Today I finalized the Proposed Methods and Hypotheses sections of my project pro
 ## Thursday, June 22
 
 This morning we had an R programming workshop.
+
+-   Worked through rEDM vignette code, wrote up a list of questions to ask Ethan
+
+-   Tried to debug code provided with menhaden paper (Deyle et al., 2018)
+
+## Friday, June 23
+
+-   Continued to debug code provided with menhaden paper (Deyle et al., 2018)
