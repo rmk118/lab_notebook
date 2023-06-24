@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en">
+	<Esri>
+		<CreaDate>2023-04-14</CreaDate>
+		<CreaTime>15:08:32.70</CreaTime>
+		<ModDate>2023-04-19</ModDate>
+		<ModTime>16:33:19.100</ModTime>
+		<PublishStatus>editor:esri.dijit.metadata.editor</PublishStatus>
+		<ArcGISFormat>1.0</ArcGISFormat>
+		<ArcGISstyle>ISO 19139 Metadata Implementation Specification GML3.2</ArcGISstyle>
+		<ArcGISProfile>ISO19139</ArcGISProfile>
+		<MapLyrSync>false</MapLyrSync>
+		<SyncDate>2023-02-15</SyncDate>
+		<SyncTime>16393300</SyncTime>
+		<DataProperties>
+			<itemProps>
+				<imsContentType>002</imsContentType>
+				<itemName>GOM_Cod_Protection_Closure_Areas</itemName>
+				<itemSize>1.262</itemSize>
+				<nativeExtBox>
+					<westBL>-71.113480</westBL>
+					<eastBL>-68.500000</eastBL>
+					<southBL>42.000000</southBL>
+					<northBL>44.324844</northBL>
+					<exTypeCode>1</exTypeCode>
+				</nativeExtBox>
+			</itemProps>
+			<coordRef>
+				<type>Geographic</type>
+				<geogcsn>GCS_North_American_1983</geogcsn>
+				<csUnits>Angular Unit: Degree (0.017453)</csUnits>
+				<peXml>&lt;GeographicCoordinateSystem xsi:type=&apos;typens:GeographicCoordinateSystem&apos; xmlns:xsi=&apos;http://www.w3.org/2001/XMLSchema-instance&apos; xmlns:xs=&apos;http://www.w3.org/2001/XMLSchema&apos; xmlns:typens=&apos;http://www.esri.com/schemas/ArcGIS/3.0.0&apos;&gt;&lt;WKT&gt;GEOGCS[&amp;quot;GCS_North_American_1983&amp;quot;,DATUM[&amp;quot;D_North_American_1983&amp;quot;,SPHEROID[&amp;quot;GRS_1980&amp;quot;,6378137.0,298.257222101]],PRIMEM[&amp;quot;Greenwich&amp;quot;,0.0],UNIT[&amp;quot;Degree&amp;quot;,0.0174532925199433],AUTHORITY[&amp;quot;EPSG&amp;quot;,4269]]&lt;/WKT&gt;&lt;XOrigin&gt;-400&lt;/XOrigin&gt;&lt;YOrigin&gt;-400&lt;/YOrigin&gt;&lt;XYScale&gt;11258999068426.238&lt;/XYScale&gt;&lt;ZOrigin&gt;-100000&lt;/ZOrigin&gt;&lt;ZScale&gt;10000&lt;/ZScale&gt;&lt;MOrigin&gt;-100000&lt;/MOrigin&gt;&lt;MScale&gt;10000&lt;/MScale&gt;&lt;XYTolerance&gt;8.983152841195215e-09&lt;/XYTolerance&gt;&lt;ZTolerance&gt;0.001&lt;/ZTolerance&gt;&lt;MTolerance&gt;0.001&lt;/MTolerance&gt;&lt;HighPrecision&gt;true&lt;/HighPrecision&gt;&lt;LeftLongitude&gt;-180&lt;/LeftLongitude&gt;&lt;WKID&gt;4269&lt;/WKID&gt;&lt;LatestWKID&gt;4269&lt;/LatestWKID&gt;&lt;/GeographicCoordinateSystem&gt;</peXml>
+			</coordRef>
+		</DataProperties>
+	</Esri>
+	<mdHrLv>
+		<ScopeCd value="005"/>
+	</mdHrLv>
+	<mdHrLvName>dataset</mdHrLvName>
+	<mdFileID>1681499313133r8350384407075879</mdFileID>
+	<mdLang>
+		<languageCode value="eng"/>
+	</mdLang>
+	<mdChar>
+		<CharSetCd value="004"/>
+	</mdChar>
+	<mdContact>
+		<rpIndName>Talya ten Brink</rpIndName>
+		<rpOrgName>NOAA Fisheries Service Greater Atlantic Regional Fisheries Office, GIS Committee</rpOrgName>
+		<rpPosName>GIS Specialist</rpPosName>
+		<role>
+			<RoleCd value="007"/>
+		</role>
+		<rpCntInfo>
+			<cntAddress addressType="both">
+				<eMailAdd>talya.tenbrink@noaa.gov</eMailAdd>
+				<delPoint>55 Great Republic Drive</delPoint>
+				<city>Gloucester</city>
+				<adminArea>MA</adminArea>
+				<postCode>01930</postCode>
+			</cntAddress>
+			<cntPhone>
+				<voiceNum>(978) 675-2190</voiceNum>
+				<faxNum>(978) 675-2190</faxNum>
+			</cntPhone>
+			<cntInstr>http://www.greateratlantic.fisheries.noaa.gov/</cntInstr>
+		</rpCntInfo>
+	</mdContact>
+	<mdDateSt>2023-04-14</mdDateSt>
+	<mdTimeSt>15:08:32.70</mdTimeSt>
+	<mdMaint>
+		<maintFreq>
+			<MaintFreqCd value="012"/>
+		</maintFreq>
+	</mdMaint>
+	<spdoinfo>
+		<ptvctinf>
+			<esriterm Name="GOM_Cod_Protection_Closure_Areas">
+				<efeatyp>Simple</efeatyp>
+				<efeageom code="4"/>
+				<esritopo>FALSE</esritopo>
+				<efeacnt>5</efeacnt>
+				<spindex>FALSE</spindex>
+				<linrefer>FALSE</linrefer>
+			</esriterm>
+		</ptvctinf>
+	</spdoinfo>
+	<dataIdInfo>
+		<idCitation>
+			<resTitle>Scallop Rotational Areas 20230419</resTitle>
+			<date>
+				<createDate>2023-04-14T15:08:50.151-04:00</createDate>
+				<pubDate>2023-04-14T15:08:53.136-04:00</pubDate>
+			</date>
+			<presForm>
+				<PresFormCd value="005"/>
+			</presForm>
+			<citRespParty>
+				<rpIndName>Talya ten Brink</rpIndName>
+				<rpOrgName>NOAA Fisheries Greater Atlantic Regional Fisheries Office</rpOrgName>
+				<rpPosName>GIS Specialist</rpPosName>
+				<role>
+					<RoleCd value="006"/>
+				</role>
+			</citRespParty>
+			<citRespParty>
+				<rpOrgName>NOAA National Marine Fisheries Service (NMFS) - Greater Atlantic Regional Fisheries Office (GARFO)</rpOrgName>
+				<role>
+					<RoleCd value="010"/>
+				</role>
+				<rpCntInfo>
+					<cntAddress>
+						<delPoint>Gloucester, MA</delPoint>
+					</cntAddress>
+				</rpCntInfo>
+			</citRespParty>
+		</idCitation>
+		<idAbs>This dataset depicts the boundaries of the Scallop Rotational Areas of 2023 in ESRI shapefile format for the NOAA Fisheries Service’s Greater Atlantic Regional Fisheries Office (GARFO).  This shapefile includes boundaries for the following Regulated Areas:
+Area II Scallop Rotational Area
+
+Nantucket Lightship North Scallop Rotational Area
+
+Area I Scallop Rotational Area
+
+New York Bight Scallop Rotational Area
+
+Nantucket Lightship West Scallop Rotational Area
+
+Elephant Trunk Scallop Rotational Area
+
+Because GIS projection and topology functions can change or generalize coordinates, these GIS files are considered to be approximate representations and are NOT an OFFICIAL record for the exact regulated area boundaries.  For information on the official legal definition refer to the Use Constraints metadata section.</idAbs>
+		<idPurp>Beginning in 2010 and in response to mounting requests for digital depictions of NMFS Regulated Areas in Northeast and Mid-Atlantic Waters (Regulated Areas), the NMFS Greater Atlantic Regional Fisheries Office (GARFO) Geographic Information Systems (GIS) Committee launched a project to standardize the development, publication and regular updating of GIS files depicting Regulated Area boundaries.  This dataset is a product of that initiative. 
+
+This dataset was created to depict the boundaries of NMFS Regulated Areas in Northeast and Mid-Atlantic Waters (Regulated Areas) only.  For information on the proper use of the dataset refer to the Use Constraints metadata section.</idPurp>
+		<envirDesc>Esri ArcGIS 13.0.2.36056</envirDesc>
+		<dataLang>
+			<languageCode value="eng"/>
+			<countryCode value="USA"/>
+		</dataLang>
+		<dataChar>
+			<CharSetCd value="004"/>
+		</dataChar>
+		<idStatus>
+			<ProgCd value="001"/>
+		</idStatus>
+		<spatRpType>
+			<SpatRepTypCd value="001"/>
+		</spatRpType>
+		<tpCat>
+			<TopicCatCd value='003'/>
+		</tpCat>
+		<tpCat>
+			<TopicCatCd value='007'/>
+		</tpCat>
+		<tpCat>
+			<TopicCatCd value='013'/>
+		</tpCat>
+		<tpCat>
+			<TopicCatCd value='014'/>
+		</tpCat>
+		<tpCat>
+			<TopicCatCd value='015'/>
+		</tpCat>
+		<searchKeys>
+			<keyword>boundaries</keyword>
+			<keyword>environment</keyword>
+			<keyword>location</keyword>
+			<keyword>oceans</keyword>
+			<keyword>planningCadastre</keyword>
+			<keyword>Biology</keyword>
+			<keyword>Compliance</keyword>
+			<keyword>Conservation</keyword>
+			<keyword>Ecology</keyword>
+			<keyword>Ecosystem</keyword>
+			<keyword>Environment</keyword>
+			<keyword>Human</keyword>
+			<keyword>Management</keyword>
+			<keyword>Marine</keyword>
+			<keyword>Monitoring</keyword>
+			<keyword>Natural Resources</keyword>
+			<keyword>Permits</keyword>
+			<keyword>Regulatory</keyword>
+			<keyword>Water</keyword>
+			<keyword>Atlantic Ocean</keyword>
+			<keyword>Cape Cod Bay</keyword>
+			<keyword>Georges Bank</keyword>
+			<keyword>Greater Atlantic Region</keyword>
+			<keyword>Gulf of Maine</keyword>
+			<keyword>New England</keyword>
+			<keyword>United States</keyword>
+			<keyword>US EEZ</keyword>
+			<keyword>US Exclusive Economic Zone</keyword>
+			<keyword>Atlantic</keyword>
+			<keyword>EEZ</keyword>
+			<keyword>Exclusive Economic Zone</keyword>
+			<keyword>GARFO</keyword>
+			<keyword>Greater Atlantic Regional Fisheries Office</keyword>
+			<keyword>Groundfish</keyword>
+			<keyword>Magnuson-Stevens Act</keyword>
+			<keyword>MSA</keyword>
+			<keyword>National Marine Fisheries Service</keyword>
+			<keyword>National Oceanic and Atmospheric Administration</keyword>
+			<keyword>NEFMC</keyword>
+			<keyword>New England Fishery Management Council</keyword>
+			<keyword>NMFS</keyword>
+			<keyword>NOAA</keyword>
+			<keyword>Northeast Multispecies</keyword>
+			<keyword>US EEZ</keyword>
+		</searchKeys>
+		<themeKeys>
+			<keyword>boundaries</keyword>
+			<keyword>environment</keyword>
+			<keyword>location</keyword>
+			<keyword>oceans</keyword>
+			<keyword>planningCadastre</keyword>
+			<thesaName>
+				<resTitle>ISO 19115 Topic Category</resTitle>
+			</thesaName>
+		</themeKeys>
+		<themeKeys>
+			<keyword>Biology</keyword>
+			<keyword>Compliance</keyword>
+			<keyword>Conservation</keyword>
+			<keyword>Ecology</keyword>
+			<keyword>Ecosystem</keyword>
+			<keyword>Environment</keyword>
+			<keyword>Human</keyword>
+			<keyword>Management</keyword>
+			<keyword>Marine</keyword>
+			<keyword>Monitoring</keyword>
+			<keyword>Natural Resources</keyword>
+			<keyword>Permits</keyword>
+			<keyword>Regulatory</keyword>
+			<keyword>Water</keyword>
+			<thesaName>
+				<resTitle>EPA GIS Keyword Thesaurus</resTitle>
+			</thesaName>
+		</themeKeys>
+		<themeKeys>
+			<keyword>Atlantic</keyword>
+			<keyword>EEZ</keyword>
+			<keyword>Exclusive Economic Zone</keyword>
+			<keyword>GARFO</keyword>
+			<keyword>Greater Atlantic Regional Fisheries Office</keyword>
+			<keyword>Groundfish</keyword>
+			<keyword>Magnuson-Stevens Act</keyword>
+			<keyword>MSA</keyword>
+			<keyword>National Marine Fisheries Service</keyword>
+			<keyword>National Oceanic and Atmospheric Administration</keyword>
+			<keyword>NEFMC</keyword>
+			<keyword>New England Fishery Management Council</keyword>
+			<keyword>NMFS</keyword>
+			<keyword>NOAA</keyword>
+			<keyword>Northeast Multispecies</keyword>
+			<keyword>US EEZ</keyword>
+			<thesaName>
+				<resTitle>GARFO Keywords</resTitle>
+			</thesaName>
+		</themeKeys>
+		<placeKeys>
+			<keyword>Atlantic Ocean</keyword>
+			<keyword>Cape Cod Bay</keyword>
+			<keyword>Georges Bank</keyword>
+			<keyword>Greater Atlantic Region</keyword>
+			<keyword>Gulf of Maine</keyword>
+			<keyword>New England</keyword>
+			<keyword>United States</keyword>
+			<keyword>US EEZ</keyword>
+			<keyword>US Exclusive Economic Zone</keyword>
+		</placeKeys>
+		<dataExt>
+			<geoEle>
+				<GeoBndBox>
+					<exTypeCode>1</exTypeCode>
+					<westBL>-80</westBL>
+					<eastBL>-64</eastBL>
+					<southBL>32</southBL>
+					<northBL>46</northBL>
+				</GeoBndBox>
+			</geoEle>
+		</dataExt>
+		<dataExt>
+			<geoEle>
+				<GeoBndBox>
+					<westBL>-180</westBL>
+					<eastBL>180</eastBL>
+					<southBL>-90</southBL>
+					<northBL>90</northBL>
+				</GeoBndBox>
+			</geoEle>
+			<tempEle>
+				<TempExtent>
+					<exTemp>
+						<TM_Instant>
+							<tmPosition>2023-04-14T15:15:24.720-04:00</tmPosition>
+						</TM_Instant>
+					</exTemp>
+				</TempExtent>
+			</tempEle>
+			<exDesc>Publication date</exDesc>
+		</dataExt>
+		<dataExt>
+			<geoEle>
+				<GeoBndBox>
+					<exTypeCode>1</exTypeCode>
+					<westBL>-71.113480</westBL>
+					<eastBL>-68.500000</eastBL>
+					<southBL>42.000000</southBL>
+					<northBL>44.324844</northBL>
+				</GeoBndBox>
+			</geoEle>
+		</dataExt>
+		<idPoC>
+			<rpIndName>Louis Forristall</rpIndName>
+			<rpOrgName>NOAA Fisheries Service Greater Atlantic Regional Fisheries Office, Sustainable Fisheries Division</rpOrgName>
+			<rpPosName>GIS Committee Sustainable Fisheries Representative</rpPosName>
+			<role>
+				<RoleCd value="007"/>
+			</role>
+			<rpCntInfo>
+				<cntAddress addressType="both">
+					<eMailAdd>louis.forristall@noaa.gov</eMailAdd>
+					<delPoint>55 Great Republic Drive</delPoint>
+					<city>Gloucester</city>
+					<adminArea>MA</adminArea>
+					<postCode>01930</postCode>
+				</cntAddress>
+				<cntPhone>
+					<voiceNum>(978) 281-9321</voiceNum>
+					<faxNum>(978) 281-9321</faxNum>
+				</cntPhone>
+				<cntInstr>http://www.greateratlantic.fisheries.noaa.gov/</cntInstr>
+			</rpCntInfo>
+		</idPoC>
+		<resMaint>
+			<maintFreq>
+				<MaintFreqCd value="009"/>
+			</maintFreq>
+		</resMaint>
+		<resConst>
+			<Consts>
+				<useLimit>*** Attribution *** Whenever NMFS material is reproduced and re-disseminated, we request that users attribute the material appropriately.  Pursuant to 17 U.S.C. 403, parties who produce copyrighted works consisting predominantly of material created by the Federal Government are encouraged to provide notice with such work(s) identifying the U.S. Government material incorporated and stating that such material is not subject to copyright protection. Please cite Regulated Area datasets as follows, with the appropriate information substituted for all text in {CURLY BRACKETS}:
+NOAA Fisheries Service. NMFS Regulated Areas in Northeast and Mid-Atlantic Waters.  {SHAPEFILE TITLE} [Shapefile]. Gloucester, MA: National Oceanic and Atmospheric Administration (NOAA), National Marine Fisheries Service (NMFS), Greater Atlantic Regional Fisheries Office (GARFO) [producer] {SHAPEFILE PUBLICATION DATE}. http://www.greateratlantic.fisheries.noaa.gov/gis.
+*** No Warranty*** The user assumes the entire risk related to its use of these data. NMFS is providing these data &quot;as is,&quot; and NMFS disclaims any and all warranties, whether express or implied, including (without limitation) any implied warranties of merchantability or fitness for a particular purpose. No warranty expressed or implied is made regarding the accuracy or utility of the data on any other system or for general or scientific purposes, nor shall the act of distribution constitute any such warranty. It is strongly recommended that careful attention be paid to the contents of the metadata file associated with these data to evaluate dataset limitations, restrictions or intended use.  In no event will NMFS be liable to you or to any third party for any direct, indirect, incidental, consequential, special or exemplary damages or lost profit resulting from any use or misuse of this data.
+*** Proper Usage *** The information on government servers are in the public domain, unless specifically annotated otherwise, and may be used freely by the public. Before using information obtained from this server, special attention should be given to the date and time of the data and products being displayed. This information shall not be modified in content and then presented as official government material.
+This dataset was created to depict the boundaries of NMFS Regulated Areas in Northeast and Mid-Atlantic Waters (Regulated Areas) only.  The dataset should not be used for a legal definition.  The dataset should not be used to infer information regarding the existence or details of other marine features or resources, including, but not limited to, navigable waters, coastlines, bathymetry, submerged features, or man-made structures.  Users assume responsibility for determining the appropriate use of this dataset.
+*** Not the Legal Definition *** This Geographic Information System (GIS) dataset is not the legal definition of the Regulated Area. The description published in the U.S. Code of Federal Regulations is the only legal definition.  This dataset and metadata document provide a broad overview of a subset of applicable fishing regulations, restrictions and requirements; it is not a substitute for the actual regulations. Users are encouraged to read the applicable regulations in conjunction with use of this dataset.  
+*** Temporal Considerations *** Regulated Area boundary definitions are subject to change or modification.  Published datasets may represent historic, current, or future Regulated Areas.  When changes to fishing regulations affect this dataset, it will be archived and replaced by an updated version as soon as feasible.  Approved Regulated Area boundaries may also be published prior to their effective date.  It is the user’s responsibility to ensure the applicable Regulated Area boundaries are being used.  
+*** Shorelines/Base Layers *** The accuracy of this dataset is dependent upon the accuracy and resolution of the datasets (e.g., shoreline, bathymetry, shared administrative boundaries) used in the creation process. Source datasets used are specified in the metadata.  These data sources were selected for their suitability to a broad audience, and may not be suitable for specific uses requiring higher-resolution information. 
+Coastlines change.  Unless otherwise noted, where the NOAA Medium Resolution Shoreline is used, assume the regulatory boundary reaches the most current coastline delineation available.</useLimit>
+			</Consts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<useLimit>The user assumes the entire risk related to use of these data. NMFS is providing these data &quot;as is,&quot; and NMFS disclaims any and all warranties, whether express or implied, including (without limitation) any implied warranties of merchantability or fitness for a particular purpose. No warranty expressed or implied is made regarding the accuracy or utility of the data on any other system or for general or scientific purposes, nor shall the act of distribution constitute any such warranty. It is strongly recommended that careful attention be paid to the contents of the metadata file associated with these data to evaluate dataset limitations, restrictions or intended use.  In no event will NMFS be liable to you or to any third party for any direct, indirect, incidental, consequential, special or exemplary damages, or lost profit resulting from any use or misuse of this data</useLimit>
+				<accessConsts>
+					<RestrictCd value="008"/>
+				</accessConsts>
+				<othConsts>None.</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<SecConsts>
+				<class>
+					<ClasscationCd value="public"/>
+				</class>
+				<classSys>FIPS Pub 199</classSys>
+				<handDesc>Standard Technical Controls</handDesc>
+			</SecConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<accessConsts>
+					<RestrictCd value="008"/>
+				</accessConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<useConsts>
+					<RestrictCd value="008"/>
+				</useConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<accessConsts>
+					<RestrictCd value="008"/>
+				</accessConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<useConsts>
+					<RestrictCd value="008"/>
+				</useConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<accessConsts>
+					<RestrictCd value="008"/>
+				</accessConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<useConsts>
+					<RestrictCd value="008"/>
+				</useConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<accessConsts>
+					<RestrictCd value="008"/>
+				</accessConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+		<resConst>
+			<LegConsts>
+				<useConsts>
+					<RestrictCd value="008"/>
+				</useConsts>
+				<othConsts>Other Constraints</othConsts>
+			</LegConsts>
+		</resConst>
+	</dataIdInfo>
+	<dqInfo>
+		<dqScope>
+			<scpLvl>
+				<ScopeCd value="005"/>
+			</scpLvl>
+		</dqScope>
+		<dataLineage>
+			<prcStep>
+				<stepDesc>[Template Generation] Many NMFS Regulated Areas in Northeast and Mid-Atlantic Waters (Regulated Areas) share boundaries that are partially coincident with any combination of the following: 1) the U.S. Atlantic coastline; 2) the Submerged Lands Act boundary; 3) the U.S.-Canada Maritime Boundary in the Gulf of Maine; 4) the outward extent of the U.S. Exclusive Economic Zone (a.k.a. the &quot;200-nautical mile line&quot;). To standardize Regulated Area features sharing these boundaries, published shapefiles of the shared administrative boundaries were obtained from the authoritative agencies.  A shoreline was selected that was suitable for general mapping purposes, freely and publicly available, of medium-resolution, and covering the extent of the U.S..  When necessary, the boundaries were transformed to NAD83. A series of template polygon shapefiles were then generated, using these authoritative boundaries as the outward extents of the polygon.  All templates were generated in NAD83 geographic coordinate system.  The templates created are: 1) Coast-to-EEZ: bounded by the coastline, the U.S.-Canada Maritime Boundary, the U.S. EEZ, and 81°W longitude off the southern extent of Florida (an arbitrary cut-off for the Atlantic); 2) Coast-to-SLA: bounded by the coastline, the U.S.-Canada Maritime Boundary, the Submerged Lands Act boundary, and 81°W longitude off the southern extent of Florida; 3) SLA-to-EEZ: bounded by the Submerged Lands Act boundary, the U.S.-Canada Maritime Boundary, the U.S. EEZ, and 81°W longitude off the southern extent of Florida.  These templates were subsequently copied and edited, as needed by the Regulated Area spatial definitions.</stepDesc>
+				<stepDateTm>2023-04-14T15:10:53.452-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Get Definition Text] The current legal spatial definition for the Regulated Area was copied from the e-CFR website.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:33.711-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Features From Templates] The Coast-to-EEZ template shapefile was copied.  If necessary, the coordinates of the Regulated Area definition were converted to Decimal Degrees.  To generate the Regulated Area boundary in ArcGIS, the template polygon was split by connecting these points in the order specified in the spatial definition.  When the spatial definition specified that points were connected by following a straight line, rhumb lines were constructed.  As an exception, points intended to fall along the U.S.-Canada Maritime Boundary were connected by following the geodesic line that legally defines that international boundary.  When the spatial definition specified that points were connected by following the Coastline the coinciding outward extent of the template polygon was used.  After all points were appropriately connected, any portions of the template outside the defined Regulated Area were discarded.  When multiple Regulated Areas are a part of a larger grouping of related Regulated Areas, these steps were repeated to generate a unique feature for each Regulated Area and the features were then combined into a single shapefile.  The file was projected to NAD83 Mercator Projection, and the boundaries were densified with consecutive vertices spaced no more than 10 nautical miles apart to preserve rhumb line paths in other coordinate systems.  The file was projected back to the un-projected NAD83 coordinate system.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:36.696-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Add Attributes] The standardized attribute schema was applied to the shapefile, and the fields were defined.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:39.184-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Policy Review] The Regulated Area spatial definition text, shapefile geometry and attribute values were reviewed with policy staff to verify that the shapefile accurately depicted and described the intended boundaries.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:41.832-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Check Geometry] The ESRI ArcGIS Check Geometry tool was run on the shapefile to identify any geometry problems.  If problems were encountered, they were reviewed and corrected.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:44.200-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Metadata] A GARFO Regulated Area shapefile metadata template was developed using the EPA Metadata Editor v3.2.  This template was applied and customized to reflect the specific characteristics of the given shapefile.  The metadata was validated for FGDC CSDGM compliance.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:46.855-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Final Review] The shapefile was reviewed by members of the GARFO GIS Committee, policy experts from the GARFO Division responsible for the Regulated Area, and General Counsel, according to the GARFO GIS Data Distribution Policy.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:49.711-04:00</stepDateTm>
+			</prcStep>
+			<prcStep>
+				<stepDesc>[Publication] The shapefile, with accompanying metadata, was uploaded for public download on the NOAA NMFS GARFO GIS website.</stepDesc>
+				<stepDateTm>2023-04-14T15:13:52.351-04:00</stepDateTm>
+			</prcStep>
+			<dataSource>
+				<srcDesc>Spatial definitions for Regulated Area boundaries.</srcDesc>
+				<srcMedName>
+					<MedNameCd value="015"/>
+				</srcMedName>
+				<srcCitatn>
+					<resTitle>Electronic Code of Federal Regulations</resTitle>
+					<date>
+						<pubDate>2023-04-14T15:11:01.272-04:00</pubDate>
+					</date>
+				</srcCitatn>
+			</dataSource>
+			<dataSource>
+				<srcDesc>This source  marine boundary was used to generate template shapefiles, which were copied and used when Regulatory Area boundaries followed portions of the US Exclusive Economic Zone.</srcDesc>
+				<srcMedName>
+					<MedNameCd value="digital download (esri shapefile)"/>
+				</srcMedName>
+				<srcCitatn>
+					<resTitle>USMaritimeLimitsNBoundaries</resTitle>
+					<date>
+						<pubDate>2023-04-14T15:22:22.632-04:00</pubDate>
+					</date>
+				</srcCitatn>
+				<srcExt>
+					<tempEle>
+						<TempExtent>
+							<exTemp>
+								<TM_Instant>
+									<tmPosition>2011-05-01</tmPosition>
+								</TM_Instant>
+							</exTemp>
+						</TempExtent>
+					</tempEle>
+					<exDesc>publication date</exDesc>
+				</srcExt>
+			</dataSource>
+			<dataSource>
+				<srcDesc>This source shoreline was used to generate template shapefiles, which were copied and used when Regulatory Area boundaries followed portions of the US Atlantic coastline.  This data source was selected for its suitability to a broad audience, and may not be suitable for specific uses requiring higher-resolution information. Coastlines change.  Unless otherwise noted, where the NOAA Medium Resolution Shoreline is used, assume the regulatory boundary reaches the most current coastline delineation available.</srcDesc>
+				<srcMedName>
+					<MedNameCd value="digital download (esri shapefile)"/>
+				</srcMedName>
+				<srcScale>
+					<rfDenom>70000</rfDenom>
+				</srcScale>
+				<srcCitatn>
+					<resTitle>NOAA&apos;s Medium Resolution Digital Vector Shoreline (1998) for the Contiguous United States</resTitle>
+					<date>
+						<pubDate>1998</pubDate>
+					</date>
+				</srcCitatn>
+				<srcExt>
+					<tempEle>
+						<TempExtent>
+							<exTemp>
+								<TM_Period>
+									<tmBegin>1988</tmBegin>
+									<tmEnd>2023-04-14T15:22:44.225-04:00</tmEnd>
+								</TM_Period>
+							</exTemp>
+						</TempExtent>
+					</tempEle>
+					<exDesc>publication date</exDesc>
+				</srcExt>
+			</dataSource>
+		</dataLineage>
+	</dqInfo>
+	<distInfo>
+		<distTranOps>
+			<onLineSrc>
+				<linkage>http://www.greateratlantic.fisheries.noaa.gov/gis</linkage>
+			</onLineSrc>
+			<transSize>1.262</transSize>
+		</distTranOps>
+		<distFormat>
+			<formatName>Shapefile</formatName>
+		</distFormat>
+	</distInfo>
+	<spatRepInfo>
+		<VectSpatRep>
+			<topLvl>
+				<TopoLevCd value="001"/>
+			</topLvl>
+			<geometObjs Name="GOM_Cod_Protection_Closure_Areas">
+				<geoObjTyp>
+					<GeoObjTypCd value="002"/>
+				</geoObjTyp>
+				<geoObjCnt>5</geoObjCnt>
+			</geometObjs>
+		</VectSpatRep>
+	</spatRepInfo>
+	<eainfo>
+		<detailed Name="GOM_Cod_Protection_Closure_Areas">
+			<enttyp>
+				<enttypl>Regulated Area</enttypl>
+				<enttypd>NMFS Regulated Areas in Northeast and Mid-Atlantic Waters</enttypd>
+				<enttypds>GARFO</enttypds>
+				<enttypt>Feature Class</enttypt>
+				<enttypc>5</enttypc>
+			</enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Internal feature number</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>System-generated internal feature number</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Feature geometry</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>Coordinate geometry</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>GARFO_ID</attrlabl>
+				<attalias>GARFO_ID</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>9</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>AREANAME</attrlabl>
+				<attrdef>Official name of the Regulated Area, usually the area name as printed in the CFR</attrdef>
+				<attrdefs>GARFO</attrdefs>
+				<attrdomv>
+					<udom>Free text name</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>COMMNAME</attrlabl>
+				<attrdef>Most commonly used name.  May be identical to AREANAME, an abbreviation of AREANAME, or a different name altogether.</attrdef>
+				<attrdefs>GARFO</attrdefs>
+				<attrdomv>
+					<udom>Free text name</udom>
+				</attrdomv>
+			</attr>
+			<attr>
+				<attrlabl>AREAGROUP</attrlabl>
+				<attalias>AREAGROUP</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>150</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>DESCRIBE</attrlabl>
+				<attalias>DESCRIBE</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>254</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRTITLE</attrlabl>
+				<attalias>CFRTITLE</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>2</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRPT</attrlabl>
+				<attalias>CFRPT</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>3</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRPTTXT</attrlabl>
+				<attalias>CFRPTTXT</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>150</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRSUB</attrlabl>
+				<attalias>CFRSUB</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>2</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRSUBTXT</attrlabl>
+				<attalias>CFRSUBTXT</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>150</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRSXN</attrlabl>
+				<attalias>CFRSXN</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>15</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRSXNTXT</attrlabl>
+				<attalias>CFRSXNTXT</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>150</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRPARA</attrlabl>
+				<attalias>CFRPARA</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>25</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CFRPARATXT</attrlabl>
+				<attalias>CFRPARATXT</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>150</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>FRCITE</attrlabl>
+				<attalias>FRCITE</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>254</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>FRDATE</attrlabl>
+				<attalias>FRDATE</attalias>
+				<attrtype>Date</attrtype>
+				<attwidth>8</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>EFFECTDATE</attrlabl>
+				<attalias>EFFECTDATE</attalias>
+				<attrtype>Date</attrtype>
+				<attwidth>8</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>SOURCE</attrlabl>
+				<attalias>SOURCE</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>254</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>RECURST</attrlabl>
+				<attalias>RECURST</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>100</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>RECUREND</attrlabl>
+				<attalias>RECUREND</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>100</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>GISAUTHOR</attrlabl>
+				<attalias>GISAUTHOR</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>100</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>CREATED</attrlabl>
+				<attalias>CREATED</attalias>
+				<attrtype>Date</attrtype>
+				<attwidth>8</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+			<attr>
+				<attrlabl>AREANOTES</attrlabl>
+				<attalias>AREANOTES</attalias>
+				<attrtype>String</attrtype>
+				<attwidth>254</attwidth>
+				<atprecis>0</atprecis>
+				<attscale>0</attscale>
+			</attr>
+		</detailed>
+		<overview>
+			<eaover>Entity Attributes provide reference information for the Regulated Areas represented.  Attributes provide citations for the legal spatial definition and originating documents, and currentness information for each area.</eaover>
+			<eadetcit>FIELDS_Map.xlsx fully describes the Attribute Schema used for regulated area GIS data sets.  To access this document, see the Contact Information.</eadetcit>
+		</overview>
+	</eainfo>
+	<refSysInfo>
+		<RefSystem>
+			<refSysID>
+				<identCode code="4269"/>
+				<idCodeSpace>EPSG</idCodeSpace>
+				<idVersion>6.5(3.0.1)</idVersion>
+			</refSysID>
+		</RefSystem>
+	</refSysInfo>
+</metadata>

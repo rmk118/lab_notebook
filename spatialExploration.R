@@ -46,3 +46,5 @@ testGB <- testGIS %>%
   filter(GARFO_ID != "G000610" & GARFO_ID != "G000611") %>% 
   select(AREANAME, GARFO_ID, CFRPARA, FRCITE, FRDATE, SOURCE, COMMNAME, geometry) %>% 
   mutate(NAME = recode(AREANAME, "Area I Scallop Rotational Area" = "Area_I", "Area II Scallop Rotational Area" = "Area_II", "Nantucket Lightship North Scallop Rotational Area" = "NL_N","Nantucket Lightship West Scallop Rotational Area" = "NL_W"))
+
+plot(testGB["NAME"], main="GB Scallop Management Areas", key.pos=1, key.width = 0.1, key.length = 0.9)
