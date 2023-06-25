@@ -69,8 +69,8 @@ scallopCat <- dat_cat %>%
   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
   mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop"))
 
-scallopCat <- scallopCat %>% 
-  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
+# scallopCat <- scallopCat %>% 
+#   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
 
 summarise_all(scallopLen,n_distinct)
 
@@ -101,6 +101,9 @@ lenTest <- len %>%
   group_by(STRATUM) %>% 
   summarise(years=n_distinct(YEAR))
 
+scallopLenOverlap <- len %>% 
+  filter(ID %in% aCat$ID)
+
 # Predators ---------------------------------------------------------------
 
 speciesLen <- dat_len %>% 
@@ -113,42 +116,42 @@ speciesCat <- dat_cat %>%
 
 
 ########## crabs
-crabsLen <- dat_len %>% 
-  filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
-  mutate(CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         STATION = as.numeric(STATION),
-         .keep = "unused")
-
-crabsLen <- left_join(crabsLen, cruises, by="CRUISE6")
-crabsTest <- crabsLen %>% 
-  group_by(STRATUM) %>% 
-  summarise(years=n_distinct(YEAR))
-
-crabsCat <- dat_cat %>% 
-  filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
-           SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
-  mutate(CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         STATION = as.numeric(STATION),
-         .keep = "unused")
-
-crabsCat <- left_join(crabsCat, cruises, by="CRUISE6")
-crabsTest2 <- crabsCat %>% 
-  group_by(STRATUM) %>% 
-  summarise(years=n_distinct(YEAR))
+# crabsLen <- dat_len %>% 
+#   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+#            SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
+#   mutate(CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          STATION = as.numeric(STATION),
+#          .keep = "unused")
+# 
+# crabsLen <- left_join(crabsLen, cruises, by="CRUISE6")
+# crabsTest <- crabsLen %>% 
+#   group_by(STRATUM) %>% 
+#   summarise(years=n_distinct(YEAR))
+# 
+# crabsCat <- dat_cat %>% 
+#   filter(SCIENTIFIC_NAME=="Cancer borealis (Jonah crab)" | 
+#            SCIENTIFIC_NAME =="Cancer irroratus (Atlantic rock crab)") %>%
+#   mutate(CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          STATION = as.numeric(STATION),
+#          .keep = "unused")
+# 
+# crabsCat <- left_join(crabsCat, cruises, by="CRUISE6")
+# crabsTest2 <- crabsCat %>% 
+#   group_by(STRATUM) %>% 
+#   summarise(years=n_distinct(YEAR))
 
 
 ########## Astropecten
 
-astroLen <- dat_len %>% 
-  filter(SCIENTIFIC_NAME=="Astropecten" | #none
-        SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)") %>%  #none
-  mutate(CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         STATION = as.numeric(STATION),
-         .keep = "unused")
+# astroLen <- dat_len %>% 
+#   filter(SCIENTIFIC_NAME=="Astropecten" | #none
+#         SCIENTIFIC_NAME =="Astropecten articulatus (royal sea star)") %>%  #none
+#   mutate(CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          STATION = as.numeric(STATION),
+#          .keep = "unused")
 
 astroCat <- dat_cat %>% 
   filter(SCIENTIFIC_NAME=="Astropecten" |
@@ -187,6 +190,39 @@ aCat <- dat_cat %>%
          .keep = "unused")
 
 aCat <- left_join(aCat, cruises, by="CRUISE6")
+
 aTest2 <- aCat %>% 
   group_by(STRATUM, SCIENTIFIC_NAME) %>% 
   summarise(years=n_distinct(YEAR))
+
+aTest20<- aTest2 %>% 
+  filter(years > 19)
+  
+aCat <- aCat %>% 
+  filter(STRATUM %in% (aTest20$STRATUM))
+
+scallopCatchOverlap <- scallopCat %>% 
+  filter(ID %in% aCat$ID) %>% 
+  group_by(STRATUM, YEAR) %>% 
+  summarize(scallopAvg = mean(EXPCATCHNUM))
+
+asteriasOverlap <- aCat %>% 
+  filter(ID %in% scallopCat$ID) %>% 
+  group_by(STRATUM, YEAR) %>% 
+  summarize(asteriasAvg = mean(EXPCATCHNUM))
+
+scallopCatchOverlap2 <- left_join(scallopCatchOverlap, asteriasOverlap)  %>% 
+  pivot_longer(
+    cols = ends_with("Avg"),
+    names_to = "species",
+ #   names_pattern = ".Avg",
+    values_to = "avgCatch"
+  ) %>% 
+  mutate(species = recode(species, "scallopAvg" = "scallop", "asteriasAvg" = "asterias"))
+
+ggplot(scallopCatchOverlap2, aes(x=YEAR, y = avgCatch, group= STRATUM, color=STRATUM))+geom_line()+facet_wrap(~species)
+
+
+
+scallopCatchOverlap3 <- left_join(scallopCatchOverlap, asteriasOverlap)
+ggplot(scallopCatchOverlap3, aes(x=scallopAvg, y = asteriasAvg, group= STRATUM, color=STRATUM))+geom_point()
