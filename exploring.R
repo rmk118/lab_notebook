@@ -3,6 +3,7 @@
 
 library(tidyverse)
 library(lubridate)
+library(rEDM)
 
 dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
 dat_cat <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv")
@@ -226,3 +227,27 @@ ggplot(scallopCatchOverlap2, aes(x=YEAR, y = avgCatch, group= STRATUM, color=STR
 
 scallopCatchOverlap3 <- left_join(scallopCatchOverlap, asteriasOverlap)
 ggplot(scallopCatchOverlap3, aes(x=scallopAvg, y = asteriasAvg, group= STRATUM, color=STRATUM))+geom_point()
+
+
+formatScal<- scallopCatchOverlap3 %>% 
+  group_by(YEAR) %>% 
+  summarise(avg = mean(scallopAvg)) %>% 
+  ungroup()
+
+
+formatStar<- scallopCatchOverlap3 %>% 
+  group_by(YEAR) %>% 
+  summarise(avg = mean(asteriasAvg)) %>% 
+  ungroup()
+
+formatStar <- formatStar[!is.na(formatStar$avg),]
+
+
+scallop_E <- EmbedDimension(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg")
+
+scallop_theta <- PredictNonlinear(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg", E = 8)
+
+asterias_E <- EmbedDimension(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg")
+
+asterias_theta <- PredictNonlinear(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg", E = 6)
+
