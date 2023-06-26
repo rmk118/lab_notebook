@@ -41,3 +41,9 @@ data.frame(table(df_stations$STATION))
 #shows how many occurrences of each stratum are in the data (i.e. how many years that stratum was sampled)
 data.frame(table(cat$STRATUM))
 data.frame(table(len$STRATUM))
+
+scallop_E <- EmbedDimension(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg")
+scallop_theta <- PredictNonlinear(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg", E = 8)
+asterias_E <- EmbedDimension(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg")
+asterias_theta <- PredictNonlinear(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg", E = 6)
+
