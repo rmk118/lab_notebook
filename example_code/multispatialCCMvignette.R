@@ -1,8 +1,12 @@
 #Multispatial CCM package vignette
 #Ruby Krasnow
-#Last modified: 6/25/2023
+#Last modified: 6/26/2023
 
 library(multispatialCCM)
+library(patchwork)
+
+
+# Example data ------------------------------------------------------------
 
 #Simulate data to use for multispatial CCM test
 #See function for details - A is causally forced by B,
@@ -83,7 +87,7 @@ legend("topleft",
        lty=c(1,2), col=c(1,2), lwd=2, bty="n")
 
 
-# Nitrogen E001 -----------------------------------------------------------
+# Nitrogen E001 unfertilized -----------------------------------------------------------
 
 e0010<- read.csv("~/Downloads/lab_notebook/example_code/multispatialCCMexamples/e001_arssnlvl0.csv")
 
@@ -91,19 +95,127 @@ e0010test<- e0010 %>%
   group_by(FieldPlot) %>% 
   summarise(years=n_distinct(Year))
 
+#Remove the isolated 2008 years and the extra NA rows that result
 e0010 <- e0010 %>% 
   filter(is.na(Year)|Year != 2008)
-
-e0010test2 <- e0010 %>%  slice(1)
-
-for (i in 2:(nrow(e0010)-1)) {
-  if (!is.na(e0010[i,"Year"]) & !is.na(e0010[i+1,"Year"])) {
-    e0010test2 %>% add_row(e0010[i,])
-  }
-}
-
-for (i in 2:(nrow(e0010)-1)) {
+for (i in 1:(nrow(e0010)-1)) {
   if (!is.na(e0010[i,"Year"]) | !is.na(e0010[i+1,"Year"])) {
-    print(e0010[i,])
+    e0010<-e0010
+  }
+  else {
+    e0010<-e0010 %>%slice(-i)
   }
 }
+
+repens <- e0010$Agropyron.repens
+scop <- e0010$Schizachyrium.scoparium
+
+#Calculate optimal E
+maxE2<-20 #Maximum E to test
+#Matrix for storing output
+Emat2<-matrix(nrow=maxE2-1, ncol=2); colnames(Emat2)<-c("A. repens", "S. scoparium")
+
+for(E in 2:maxE2) {
+  #Uses defaults of looking forward one prediction step (predstep)
+  #And using time lag intervals of one time step (tau)
+  Emat2[E-1,"A. repens"]<-SSR_pred_boot(A=repens, E=E, predstep=1, tau=1)$rho
+  Emat2[E-1,"S. scoparium"]<-SSR_pred_boot(A=scop, E=E, predstep=1, tau=1)$rho
+}
+
+#predictive skill by embedding dimension
+matplot(2:maxE2, Emat2, type="l", col=1:2, lty=1:2,
+        xlab="E", ylab="rho", lwd=2)
+legend("bottomleft", c("A. repens", "S. scoparium"), lty=1:2, col=1:2, lwd=2, bty="n")
+
+E_repens<-5
+E_scop<-16
+
+#Check data for nonlinear signal that is not dominated by noise
+#Checks whether predictive ability of processes declines with increasing time distance
+signal_rep_out<-SSR_check_signal(A=repens, E=E_repens, tau=1,
+                               predsteplist=1:25)
+signal_scop_out<-SSR_check_signal(A=scop, E=E_scop, tau=1,
+                               predsteplist=1:25)
+
+plot(signal_rep_out$predatout, type="l")
+plot(signal_scop_out$predatout, type="l")
+
+# Nitrogen E001 fertilized -----------------------------------------------------------
+e0013<- read.csv("~/Downloads/lab_notebook/example_code/multispatialCCMexamples/e001_arssnlvl3.csv")
+
+e0013test<- e0013 %>% 
+  group_by(FieldPlot) %>% 
+  summarise(years=n_distinct(Year))
+
+e0013 <- e0013 %>% 
+  filter(is.na(Year)|Year != 2008)
+for (i in 1:(nrow(e0013)-1)) {
+  if (!is.na(e0013[i,"Year"]) | !is.na(e0013[i+1,"Year"])) {
+    e0013<-e0013
+  }
+  else {
+    e0013<-e0013 %>%slice(-i)
+  }
+}
+
+repens3 <- e0013$Agropyron.repens
+scop3 <- e0013$Schizachyrium.scoparium
+
+#Calculate optimal E
+maxE3<-20 #Maximum E to test
+#Matrix for storing output
+Emat3<-matrix(nrow=maxE3-1, ncol=2); colnames(Emat3)<-c("A. repens", "S. scoparium")
+
+for(E in 2:maxE3) {
+  #Uses defaults of looking forward one prediction step (predstep)
+  #And using time lag intervals of one time step (tau)
+  Emat3[E-1,"A. repens"]<-SSR_pred_boot(A=repens3, E=E, predstep=1, tau=1)$rho
+  Emat3[E-1,"S. scoparium"]<-SSR_pred_boot(A=scop3, E=E, predstep=1, tau=1)$rho
+}
+
+#predictive skill by embedding dimension
+matplot(2:maxE3, Emat3, type="l", col=1:2, lty=1:2,
+        xlab="E", ylab="rho", lwd=2)
+legend("bottomleft", c("A. repens", "S. scoparium"), lty=1:2, col=1:2, lwd=2, bty="n")
+
+E_repens3<-12
+E_scop3<-3
+
+#Check data for nonlinear signal that is not dominated by noise
+#Checks whether predictive ability of processes declines with increasing time distance
+signal_rep3_out<-SSR_check_signal(A=repens, E=E_repens3, tau=1,
+                                 predsteplist=1:25)
+signal_scop3_out<-SSR_check_signal(A=scop, E=E_scop3, tau=1,
+                                  predsteplist=1:25)
+
+plot(signal_rep3_out$predatout, type="l")
+plot(signal_scop_out$predatout, type="l")
+
+#Creating time-lagged plot in 2 dimensions (i.e. A. repens population this year, vs. next year)
+lagRepens <- e0013 %>%
+  mutate(lagR = 0) %>% 
+  group_by(FieldPlot) %>% 
+  select(Year, FieldPlot, Agropyron.repens, lagR) %>% 
+  na.omit()
+
+data_mod <- lagRepens %>%                           
+  group_by(FieldPlot) %>%
+  dplyr::mutate(laggedval = lag(Agropyron.repens, n = 1, default = NA))
+
+plotA<- ggplot(data_mod, aes(x=Agropyron.repens, y=laggedval, color=Year))+geom_point()+ scale_color_gradientn(colours = rainbow(30))+theme_classic()+labs(x="t0", y="t1")
+
+#Creating time-lagged plot in 2 dimensions (i.e. S. scoparium population this year, vs. next year)
+lagScop <- e0013 %>%
+  mutate(lagS = 0) %>% 
+  group_by(FieldPlot) %>% 
+  select(Year, FieldPlot, Schizachyrium.scoparium, lagS) %>% 
+  na.omit()
+
+data_modS <- lagScop %>%                           
+  group_by(FieldPlot) %>%
+  dplyr::mutate(laggedvalS = lag(Schizachyrium.scoparium, n = 1, default = NA))
+
+plotS<- ggplot(data_modS, aes(x=Schizachyrium.scoparium, y=laggedvalS, color=Year))+geom_point()+ scale_color_gradientn(colours = rainbow(30))+theme_classic()+labs(x="t0", y="t1")
+
+#Recreated figure A6!
+plotA+plotS +  plot_layout(guides = 'collect')

@@ -102,8 +102,7 @@ lenTest <- len %>%
   group_by(STRATUM) %>% 
   summarise(years=n_distinct(YEAR))
 
-scallopLenOverlap <- len %>% 
-  filter(ID %in% aCat$ID)
+
 
 # Predators ---------------------------------------------------------------
 
@@ -202,6 +201,9 @@ aTest20<- aTest2 %>%
 aCat <- aCat %>% 
   filter(STRATUM %in% (aTest20$STRATUM))
 
+scallopLenOverlap <- len %>% 
+  filter(ID %in% aCat$ID)
+
 scallopCatchOverlap <- scallopCat %>% 
   filter(ID %in% aCat$ID) %>% 
   group_by(STRATUM, YEAR) %>% 
@@ -223,17 +225,13 @@ scallopCatchOverlap2 <- left_join(scallopCatchOverlap, asteriasOverlap)  %>%
 
 ggplot(scallopCatchOverlap2, aes(x=YEAR, y = avgCatch, group= STRATUM, color=STRATUM))+geom_line()+facet_wrap(~species)
 
-
-
 scallopCatchOverlap3 <- left_join(scallopCatchOverlap, asteriasOverlap)
 ggplot(scallopCatchOverlap3, aes(x=scallopAvg, y = asteriasAvg, group= STRATUM, color=STRATUM))+geom_point()
-
 
 formatScal<- scallopCatchOverlap3 %>% 
   group_by(YEAR) %>% 
   summarise(avg = mean(scallopAvg)) %>% 
   ungroup()
-
 
 formatStar<- scallopCatchOverlap3 %>% 
   group_by(YEAR) %>% 
@@ -242,12 +240,8 @@ formatStar<- scallopCatchOverlap3 %>%
 
 formatStar <- formatStar[!is.na(formatStar$avg),]
 
-
 scallop_E <- EmbedDimension(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg")
-
 scallop_theta <- PredictNonlinear(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg", E = 8)
-
 asterias_E <- EmbedDimension(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg")
-
 asterias_theta <- PredictNonlinear(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg", E = 6)
 

@@ -33,14 +33,14 @@ plot(fish[6])
 
 # NEFSC Spatial -----------------------------------------------------------------
 library(sf)
-library(raster)
+#library(raster)
 library(NEFSCspatial)
 library(tidyverse)
 
 scallops<-NEFSCspatial::Shellfish_Strata
 plot(scallops)
 
-testGIS<-st_read("~/Downloads/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp")
+testGIS<-st_read("~/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp")
 plot(testGIS["AREANAME"], main="Scallop Management Areas")
 testGB <- testGIS %>% 
   filter(GARFO_ID != "G000610" & GARFO_ID != "G000611") %>% 

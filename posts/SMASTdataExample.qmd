@@ -1,0 +1,29 @@
+---
+title: 'SMAST Example'
+date: '2023-06-26'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+Goal: a similar file to the one below, but with time series for each cell (not averaged across years), and with data extending until 2022, or through the most recent available survey. The abundance/presence of species besides scallops and *Asterias* is not necessary, but could be interesting to incorporate.
+
+"Average (2003-2012) Presence/Abundance from SMAST Survey Northeast United States"
+
+Pulled from Northeast Ocean Data: <https://www.northeastoceandata.org/data-download/?#fish>
+
+```{r}
+library(sf)
+test <- st_read("../data/SMAST_SCALLOP/SMAST_Scallops.gdb")
+test
+```
+
+### Also as a tibble for readability
+
+```{r}
+library(dplyr)
+as_tibble(test)
+```

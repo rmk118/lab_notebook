@@ -1,0 +1,59 @@
+---
+title: 'Week 4'
+date: '2023-06-26'
+categories: ['Week 4', 'Data exploration', 'NEFMC meeting']
+description: 'My activities for the week'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+## Monday, June 26 (+ preceding weekend)
+
+1. I worked some more with the NEFSC spatial package, specifically focusing on isolating the areas that would contain the stations of interest:
+
+```{r}
+library(sf)
+library(NEFSCspatial)
+library(tidyverse)
+
+scallops<-NEFSCspatial::Shellfish_Strata
+plot(scallops)
+
+testGIS<-st_read("~/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp")
+plot(testGIS["AREANAME"], main="Scallop Management Areas")
+testGB <- testGIS %>% 
+  filter(GARFO_ID != "G000610" & GARFO_ID != "G000611") %>% 
+  select(AREANAME, GARFO_ID, CFRPARA, FRCITE, FRDATE, SOURCE, COMMNAME, geometry) %>% 
+  mutate(NAME = recode(AREANAME, "Area I Scallop Rotational Area" = "Area_I", "Area II Scallop Rotational Area" = "Area_II", "Nantucket Lightship North Scallop Rotational Area" = "NL_N","Nantucket Lightship West Scallop Rotational Area" = "NL_W"))
+
+plot(testGB["NAME"], main="Georges Bank Scallop Management Areas", key.pos=1, key.width = 0.1, key.length = 0.9)
+```
+
+2. Scallop/starfish data wrangling
+3. Multivariate CCM examples
+4. Interesting talk on applications of data science and machine learning in urban planning
+
+## Tuesday, June 27
+
+1. NEFMC meeting Day 1
+2. BRITE programming workshop: Git and Snakemake
+3. TBD
+
+## Wednesday, June 28
+
+1. NEFMC meeting Day 2
+2. BRITE workshop: managing setbacks
+3. TBD
+
+## Thursday, June 29
+
+1. NEFMC meeting Day 3
+2. TBD
+
+## Friday, June 30
+
+1. TBD

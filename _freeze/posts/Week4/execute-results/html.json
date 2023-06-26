@@ -1,0 +1,16 @@
+{
+  "hash": "ef01ac14a1148a65393aca7af1178c74",
+  "result": {
+    "markdown": "---\ntitle: 'Week 4'\ndate: '2023-06-26'\ncategories: ['Week 4', 'Data exploration', 'NEFMC meeting']\ndescription: 'My activities for the week'\nexecute: \n  message: false\n  warning: false\neditor_options: \n  chunk_output_type: console\nbibliography: references.bib\n---\n\n\n## Monday, June 26\n\n1. I worked some more with the NEFSC spatial package, specifically focusing on isolating the areas that would contain the stations of interest:\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(sf)\nlibrary(NEFSCspatial)\nlibrary(tidyverse)\n\nscallops<-NEFSCspatial::Shellfish_Strata\nplot(scallops)\n```\n\n::: {.cell-output-display}\n![](Week4_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n\n```{.r .cell-code}\ntestGIS<-st_read(\"~/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nReading layer `Scallop_Rotational_Areas_20230411' from data source \n  `/Users/rubykrasnow/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp' \n  using driver `ESRI Shapefile'\nSimple feature collection with 6 features and 23 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: -8274749 ymin: 4602998 xmax: -7333888 ymax: 5087139\nProjected CRS: WGS 84 / Pseudo-Mercator\n```\n:::\n\n```{.r .cell-code}\nplot(testGIS[\"AREANAME\"], main=\"Scallop Management Areas\")\n```\n\n::: {.cell-output-display}\n![](Week4_files/figure-html/unnamed-chunk-1-2.png){width=672}\n:::\n\n```{.r .cell-code}\ntestGB <- testGIS %>% \n  filter(GARFO_ID != \"G000610\" & GARFO_ID != \"G000611\") %>% \n  select(AREANAME, GARFO_ID, CFRPARA, FRCITE, FRDATE, SOURCE, COMMNAME, geometry) %>% \n  mutate(NAME = recode(AREANAME, \"Area I Scallop Rotational Area\" = \"Area_I\", \"Area II Scallop Rotational Area\" = \"Area_II\", \"Nantucket Lightship North Scallop Rotational Area\" = \"NL_N\",\"Nantucket Lightship West Scallop Rotational Area\" = \"NL_W\"))\n\nplot(testGB[\"NAME\"], main=\"GB Scallop Management Areas\", key.pos=1, key.width = 0.1, key.length = 0.9)\n```\n\n::: {.cell-output-display}\n![](Week4_files/figure-html/unnamed-chunk-1-3.png){width=672}\n:::\n:::\n\n\n2. Scallop/starfish data wrangling\n2. Multivariate CCM examples\n\n## Tuesday, June 27\n\n1. NEFMC meeting Day 1\n2. BRITE programming workshop: Git and Snakemake\n3. TBD\n\n## Wednesday, June 28\n\n1. NEFMC meeting Day 2\n2. BRITE workshop: managing setbacks\n3. TBD\n\n## Thursday, June 29\n\n1. NEFMC meeting Day 3\n2. TBD\n\n## Friday, June 30\n\n1. TBD",
+    "supporting": [
+      "Week4_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Ruby Krasnow">
+<meta name="dcterms.date" content="2023-06-26">
+<meta name="description" content="My activities for the week">
 
-<title>Ruby’s Lab Notebook - Summer 2023 - Ruby’s Summer 2023 Lab Notebook</title>
+<title>Ruby’s Lab Notebook - Summer 2023 - Week 4</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,25 +23,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -61,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-sidebar docked">
@@ -87,7 +124,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Ruby’s Lab Notebook - Summer 2023</a> 
+      <a href="../">Ruby’s Lab Notebook - Summer 2023</a> 
     </div>
       </div>
     <div class="sidebar-menu-container"> 
@@ -103,19 +140,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Resources/EDM.html" class="sidebar-item-text sidebar-link">
+  <a href="../Resources/EDM.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Intro to EDM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Resources/ScallopResources.html" class="sidebar-item-text sidebar-link">
+  <a href="../Resources/ScallopResources.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Scallop Links</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./exploringR.html" class="sidebar-item-text sidebar-link">
+  <a href="../exploringR.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exploring</span></a>
   </div>
 </li>
@@ -132,25 +169,25 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./posts/Week1.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Week1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Week 1 in Words</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./posts/Week2words.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Week2words.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Week 2 in Words</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./posts/Week2R.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Week2R.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Week 2 in R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./posts/Week3words.html" class="sidebar-item-text sidebar-link">
+  <a href="../posts/Week3words.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Week 3</span></a>
   </div>
 </li>
@@ -162,21 +199,53 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#monday-june-26" id="toc-monday-june-26" class="nav-link active" data-scroll-target="#monday-june-26">Monday, June 26</a></li>
+  <li><a href="#tuesday-june-27" id="toc-tuesday-june-27" class="nav-link" data-scroll-target="#tuesday-june-27">Tuesday, June 27</a></li>
+  <li><a href="#wednesday-june-28" id="toc-wednesday-june-28" class="nav-link" data-scroll-target="#wednesday-june-28">Wednesday, June 28</a></li>
+  <li><a href="#thursday-june-29" id="toc-thursday-june-29" class="nav-link" data-scroll-target="#thursday-june-29">Thursday, June 29</a></li>
+  <li><a href="#friday-june-30" id="toc-friday-june-30" class="nav-link" data-scroll-target="#friday-june-30">Friday, June 30</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Ruby’s Summer 2023 Lab Notebook</h1>
-</div>
+<h1 class="title">Week 4</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Week 4</div>
+    <div class="quarto-category">Data exploration</div>
+    <div class="quarto-category">NEFMC meeting</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    My activities for the week
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ruby Krasnow </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 26, 2023</p>
+    </div>
+  </div>
   
     
   </div>
@@ -184,20 +253,82 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<!-- ![](https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo){width="30%"} Welcome! Here I will document my work as an intern in Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible. -->
-<!-- I strongly believe in the importance of open, transparent, and accessible data science, and I hope that I can help support efforts to promote these principles within fisheries science and quantitiative marine ecology. -->
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
-<p><img src="https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-Sea-Scallop-Atlantic-NOAAFisheries.png?itok=GTO_x4Wo" class="img-fluid"></p>
+<section id="monday-june-26" class="level2">
+<h2 class="anchored" data-anchor-id="monday-june-26">Monday, June 26</h2>
+<ol type="1">
+<li>I worked some more with the NEFSC spatial package, specifically focusing on isolating the areas that would contain the stations of interest:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NEFSCspatial)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>scallops<span class="ot">&lt;-</span>NEFSCspatial<span class="sc">::</span>Shellfish_Strata</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(scallops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 66.7%;justify-content: center;">
-<p>Welcome! Here I will document my work as an intern in the Deyle Lab as part of the 2023 BRITE REU program at Boston University. This lab notebook will provide evidence of my daily work on the project and will ensure that my methods are understandable and reproducible. I strongly believe in the importance of open, transparent, and accessible data science, and I hope that I can help support efforts to promote these principles within fisheries science and quantitative marine ecology.</p>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>testGIS<span class="ot">&lt;-</span><span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `Scallop_Rotational_Areas_20230411' from data source 
+  `/Users/rubykrasnow/Downloads/lab_notebook/data/Scallop_Rotational_Areas_20230419/Scallop_Rotational_Areas_20230411.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 6 features and 23 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -8274749 ymin: 4602998 xmax: -7333888 ymax: 5087139
+Projected CRS: WGS 84 / Pseudo-Mercator</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(testGIS[<span class="st">"AREANAME"</span>], <span class="at">main=</span><span class="st">"Scallop Management Areas"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>testGB <span class="ot">&lt;-</span> testGIS <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(GARFO_ID <span class="sc">!=</span> <span class="st">"G000610"</span> <span class="sc">&amp;</span> GARFO_ID <span class="sc">!=</span> <span class="st">"G000611"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(AREANAME, GARFO_ID, CFRPARA, FRCITE, FRDATE, SOURCE, COMMNAME, geometry) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NAME =</span> <span class="fu">recode</span>(AREANAME, <span class="st">"Area I Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"Area_I"</span>, <span class="st">"Area II Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"Area_II"</span>, <span class="st">"Nantucket Lightship North Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"NL_N"</span>,<span class="st">"Nantucket Lightship West Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"NL_W"</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(testGB[<span class="st">"NAME"</span>], <span class="at">main=</span><span class="st">"GB Scallop Management Areas"</span>, <span class="at">key.pos=</span><span class="dv">1</span>, <span class="at">key.width =</span> <span class="fl">0.1</span>, <span class="at">key.length =</span> <span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</div>
+<ol start="2" type="1">
+<li>Scallop/starfish data wrangling</li>
+<li>Multivariate CCM examples</li>
+</ol>
+</section>
+<section id="tuesday-june-27" class="level2">
+<h2 class="anchored" data-anchor-id="tuesday-june-27">Tuesday, June 27</h2>
+<ol type="1">
+<li>NEFMC meeting Day 1</li>
+<li>BRITE programming workshop: Git and Snakemake</li>
+<li>TBD</li>
+</ol>
+</section>
+<section id="wednesday-june-28" class="level2">
+<h2 class="anchored" data-anchor-id="wednesday-june-28">Wednesday, June 28</h2>
+<ol type="1">
+<li>NEFMC meeting Day 2</li>
+<li>BRITE workshop: managing setbacks</li>
+<li>TBD</li>
+</ol>
+</section>
+<section id="thursday-june-29" class="level2">
+<h2 class="anchored" data-anchor-id="thursday-june-29">Thursday, June 29</h2>
+<ol type="1">
+<li>NEFMC meeting Day 3</li>
+<li>TBD</li>
+</ol>
+</section>
+<section id="friday-june-30" class="level2">
+<h2 class="anchored" data-anchor-id="friday-june-30">Friday, June 30</h2>
+<ol type="1">
+<li>TBD</li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
