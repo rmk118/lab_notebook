@@ -1,0 +1,237 @@
+<!--?php include 'header.php'; ?--><!doctype html><html><head>
+        <meta http-equiv="Content-Type" content="text/html, charset=UTF-8">
+        <title>Ecological Archives E096-105-S1</title>
+        
+        <script type="text/javascript" src="http://www.esapubs.org/templates/scripts/analytics.js"></script>
+    <style type="text/css">
+body {background-color: #FFF; font-family: Times New Roman, Times, serif;}
+
+hr {
+	height: .15em;
+	color: gray;
+	background-color: gray;
+	border-width: 0;
+}
+hr.divider {
+	width: 50em;
+	margin-top: 1.7em;
+	margin-bottom: 2em;
+	margin-left: 0;
+}
+
+p {max-width: 50em;}
+
+li {max-width: 48em;}
+
+sub, sup {font-size: .7em;}
+
+table, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+    vertical-align: top;
+}
+td {max-width: 70em; padding: .1em;}
+table, tr {
+	padding: .1em;}
+tr:first-child {font-weight: bold;}
+
+table.equation {border: none; width: 48em;}
+.equation td {border: none; text-align: left; vertical-align: middle;}
+.equation tr:first-child {font-weight: normal;}
+.equation td:last-child {text-align: right; width: 3em;}
+
+table.noFormat {border: none; text-align: inherit;}
+.noFormat td {border: none; text-align: inherit;}
+.noFormat tr:first-child {font-weight: normal;}
+
+/* Position modifiers.  Use these to alter placement of elements on the page. */
+
+.center {margin-left: auto; margin-right: auto; text-align: center;}
+.textCenter {text-align: center;}
+.textLeft  {text-align:left;}
+
+.indent {margin-left: 2em;}
+p.indent {max-width: 48em;}
+p.heading.indent {max-width: 40em;}
+.halfIndent {margin-left: 1em;}
+
+/* Font modifiers.  Use these to alter font style and type. */
+
+.courier {font-family: Courier new, Courier, mono;}
+.heading {max-width: 45em; margin-top: .7em; font-size: 1.2em; font-weight: bold;}
+.overline {text-decoration: overline;}
+.over {text-decoration: overline;}
+.roman{font-style: normal; text-decoration: none; font-weight: normal;}
+.smallcaps {font-variant: small-caps;}
+
+#links {font-size: .7em; font-family: Arial, Helvetica, sans-serif;}
+</style></head>
+    <body bgcolor="#FFFFFF" leftmargin="20em">
+        <p class="heading">Adam Thomas Clark, Hao Ye, Forest Isbell, Ethan R. Deyle, Jane Cowles, G. David Tilman, George Sugihara. 2015. Spatial convergent cross mapping to detect causal relationships from short time series. <i>Ecology</i> 96:1174–1181. <a href="http://dx.doi.org/10.1890/14-1479.1">http://dx.doi.org/10.1890/14-1479.1</a></p>
+        <hr>
+        <p class="heading">Supplement</p>
+        <p class="heading indent">
+            Data for real-world examples, and source code for the multispatialCCM R package.
+            <br><i>Ecological Archives</i> E096-105-S1.
+        </p>
+        <p style="font-weight: bold;"><a href="../../../copyright.htm">Copyright</a></p>
+        <hr>
+        <p class="heading indent">
+            <a href="#authors">Authors</a><br>
+            <a href="#filelist">File list (downloads)</a><br>
+            <a href="#desc">Description</a>
+        </p>
+        <hr>
+        <!-- Content starts here!  Don't delete anything before this! -->
+        <p id="authors" class="heading">Author(s)</p>
+        <div class="indent">
+            <p>Adam  Thomas Clark<br>
+University  of Minnesota, Dept. of Ecology, Evolution, and Behavior<br>
+1987 Upper  Buford Circle, Saint Paul, MN 55108, USA<br>
+            E-mail: <a href="mailto:adam.tclark@gmail.com">adam.tclark@gmail.com</a></p>
+          <p>Hao Ye<br>
+            Scripps Institution of Oceanography, University of California, San Diego<br>
+          9500 Gilman Drive, La Jolla, CA 92093, USA</p>
+            
+            <p>Forest Isbell<br>
+            University of Minnesota, Dept. of Ecology, Evolution, and Behavior<br>
+              1987 Upper Buford Circle, Saint Paul, MN 55108, USA<br>
+            <i>and</i><br>
+            Department of Plant Biology, University of Georgia<br>
+            2502 Miller Plant Sciences, Athens, GA 30602</p>
+            
+            <p>Ethan R. Deyle<br>
+            Scripps Institution of Oceanography, University of California, San Diego<br>
+              9500 Gilman Drive, La Jolla, CA 92093, USA</p>
+            
+          <p>Jane Cowles<br>
+            University of Minnesota, Dept. of Ecology, Evolution, and Behavior<br>
+          1987 Upper Buford Circle, Saint Paul, MN 55108, USA</p>
+            
+            <p>David Tilman<br>
+            University of Minnesota, Dept. of Ecology, Evolution, and Behavior<br>
+              1987 Upper Buford Circle, Saint Paul, MN 55108, USA<br>
+            <i>and</i><br>
+            Bren School of Environmental Science and Management, University of  California<br>
+            2400 Bren Hall, Santa Barbara, CA 93106, USA</p>
+            
+            <p>George Sugihara<br>
+            Scripps Institution of Oceanography, University of California, San Diego<br>
+              9500 Gilman Drive, La Jolla, CA 92093, USA</p>
+            
+        </div>
+        <hr>
+        <p id="filelist" class="heading">File list</p>
+        <div class="indent">
+            <p><span class="courier"><a href="e001_arssnlvl0.csv">e001_arssnlvl0.csv</a> (MD5:  75f21b9949b87c018f3499b5d2a093e7)</span></p>
+            <p><span class="courier"><a href="e001_arssnlvl3.csv">e001_arssnlvl3.csv</a> (MD5:  02cefd1cdb16fc25968f4e7d96a43378)</span></p>
+            <p><span class="courier"><a href="e026_aslit.csv">e026_aslit.csv</a> (MD5:  eea09f91f81dc7e5801d8f67ccded5c1)</span></p>
+            <p><span class="courier"><a href="e054_arssprecip.csv">e054_arssprecip.csv</a> (MD5:  1d62c9ab92a6a1fc4caa53787d2c0cf1)</span></p>
+            <p><span class="courier"><a href="e120_bmins.csv">e120_bmins.csv</a> (MD5:  e8699cfd2d2c9a11d43abd572b6f3cd8)</span></p>
+            <p><span class="courier"><a href="e120_invnit1_2.csv">e120_invnit1_2.csv</a> (MD5:  6c023c438eb4c6e2625f526fafd9c17d)</span></p>
+            <p><span class="courier"><a href="e120_invnit4_8.csv">e120_invnit4_8.csv</a> (MD5:  a304786a833b5c6e53063472b97ef93d)</span></p>
+            <p><span class="courier"><a href="e120_invnit16.csv">e120_invnit16.csv</a> (MD5:  bda824cec8f8fdc2992c8732e03aa109)</span></p>
+            <p><span class="courier"><a href="e120_nitbm.csv">e120_nitbm.csv</a> (MD5:  212637b7ab08d0cc2146f26602061b64)</span></p>
+            <p><span class="courier"><a href="find_number_of_observations.R">find_number_of_observations.R</a> (MD5:  a6a097d6633ee66b9c3531676320b929)</span></p>
+            <p><span class="courier"><a href="multispatialCCM.zip">multispatialCCM.zip</a> (MD5:  64647cc7d14d2df5398a76af9ec73e2a)</span></p>
+           
+        </div>
+        <p id="desc" class="heading">Description</p>
+        <div class="indent">
+            <p><span class="courier">e001_arssnlvl0.csv</span> is a comma-separated text file containing the data for Agroypron (Elymus) repens and Schizachyrium scoparium dynamics in unfertilized plots for experiment 001 at Cedar Creek. Column definitions are:</p>
+            
+            <blockquote>
+              <p>1."index": concatenated text including the plot, field, and year sampled</p>
+              <p>2. "Exp": Cedar Creek experiment number</p>
+              <p>3. "Year": year data was sampled</p>
+              <p>4. "Field": ID for field that was sampled</p>
+              <p>5. "Plot": plot number for sample</p>
+              <p>6. "Ntrt": categorical fertilization treatment</p>
+              <p>7. "Nadd": g nitrogen added per square meter per year for each treatment</p>
+              <p>8. "NitrAdd": g nitrate added per square meter per year for each treatment</p>
+              <p>9. "Natm.Nadd": g nitrogen added per square meter per year for each treatment, including 1  g/m2/year atmospheric deposition</p>
+              <p>10. "fg": plant functional group: C3/C4 for grasses with C3/C4 photosynthetic pathway, F for  non-legume forb, L for legume.</p>
+              <p>11. "isspecies": Binary indicator describing whether or not a row had plant species found in it  that year (should be 1 for all rows)</p>
+              <p>12. "richness": Species richness for all species found in the sample</p>
+              <p>13. "Agropyron repens": g dry aboveground biomass per meter square of A. repens</p>
+              <p>14. "Schizachyrium scoparium": g dry aboveground biomass per meter square of S. scoparium</p>
+              <p>15. "Miscellaneous litter": g dry aboveground biomass per meter square of leaf litter</p>
+              <p>16. "Ncat": Fertilization intensity category, with 1 being the lowest and 3 being the  highest</p>
+              <p>17. "FieldPlot": concatenated text including the field and plot</p>
+            </blockquote>
+            <p><span class="courier">e001_arssnlvl3.csv</span> is a comma-separated text file containing the data for Agroypron (Elymus) repens and Schizachyrium scoparium dynamics in heavily plots for experiment 001 at Cedar Creek. Column definitions are as described for <span class="courier">e001_arssnlvl0.csv</span>.</p>
+            <p><span class="courier">e026_aslit.csv</span> is a comma-separated text file containing the data for Agrostic scabra and leaf litter dynamics in plots with varying soil fertility in experiment 026 at Cedar Creek. Column definitions are:</p>
+            <blockquote>
+              <p>1. "monoculture": plant species grown in subplot (should always be A. scabra)</p>
+              <p>2. "litbiomass": g dry aboveground biomass per meter square of leaf litter</p>
+              <p>3. "year": year of sampling</p>
+              <p>4. "plot": plot sampled (soil N treatments vary among plots)</p>
+              <p>5. "subplot": subplot sampled</p>
+              <p>6. "abvbiomass": g dry aboveground biomass per meter square of A. scabra</p>
+              <p>7. "totaln": total soil nitrogen (in percent of soil by mass)</p>
+              <p>8. "exp": Cedar Creek experiment number</p>
+              <p>9. "yearest": year in which the experiment was established</p>
+              <p>10. "nlevel": categorical level for total soil nitrogen treatment</p>
+              <p>11. "plotsubplot": concatenated text including the plot and subplot</p>
+              <p>12. "Field": ID for field that was sampled</p>
+              <p>13. "FieldPlot": concatenated text including the field and plot</p>
+            </blockquote>
+            <p><span class="courier">e054_arssprecip.csv</span> is a comma-separated text file containing the data for A. repens, S. scoparium, leaf litter, and precipitation dynamics for experiment 054 at Cedar Creek. Column definitions are:</p>
+            <blockquote>
+              <p>1. "index": concatenated text including the year, field, plot, transect sampled</p>
+              <p>2. "Exp": experiment number</p>
+              <p>3. "Year": year of sample</p>
+              <p>4. "OldField": old field ID</p>
+              <p>5. "Plot": plot number for sample</p>
+              <p>6. "Transect": transect ID</p>
+              <p>7. "YearAb": Year that the field was abandoned from agricultural use</p>
+              <p>8. "Agropyron repens": g dry aboveground biomass per meter square of A. repens</p>
+              <p>9. "Schizachyrium scoparium": g dry aboveground biomass per meter square of S. scoparium</p>
+              <p>10: "Miscellaneous litter": g dry aboveground biomass per meter square of leaf litter</p>
+              <p>11: "precipmm": total summer annual precipitation (June-August) in mm</p>
+              <p>12: "FieldPlot": concatenated text including the field and plot</p>
+            </blockquote>
+            <p><span class="courier">e120_bmins.csv</span> is a comma-separated text file describing plant biomass and insect dynamics for Cedar Creek experiment 120. Column definitions are:</p>
+            <blockquote>
+              <p>1. "Exp": Cedar Creek experiment number</p>
+              <p>2. "Year": sampling year</p>
+              <p>3. "Month": sampling month</p>
+              <p>4. "Plot": plot sampled</p>
+              <p>5. "NumSp": number of species in treatment</p>
+              <p>6. "SpNum": number of species maintained in plot</p>
+              <p>7.  "AbvBioAnnProd": g plant aboveground biomass harvested per square meter per year</p>
+              <p>8. "noh020tot": mg soil nitrate per kg soil, sampled in top 20 cm of soil</p>
+              <p>9. "insectcount": number of insect individuals in sweep net sample</p>
+              <p>10. "insectsp": number of insect species in sweep net sample</p>
+              <p>11. "Field": field ID</p>
+              <p>12. "FieldPlot": concatenated text including the field and plot</p>
+            </blockquote>
+            <p><span class="courier">e120_invnit1_2.csv</span> is a comma-separated text file describing invading plant species dynamics and soil nitrate dynamics in monoculture plots for experiment 120 at Cedar Creek. Column definitions are as described for <span class="courier">e120_bmins.csv</span>, except for:</p>
+            <blockquote>
+              <p>9. “invrichness”: number of non-planted “invading” plant species</p>
+            </blockquote>
+           
+            <p><span class="courier">e120_invnit4_8.csv</span> is a comma-separated text file describing invading plant species dynamics and soil nitrate dynamics in 4 and 8 species mixture plots for experiment 120 at Cedar Creek. Column definitions are as described for e120_invnit1_2.csv.</p>
+            
+            <p><span class="courier">e120_invnit16.csv</span> is a comma-separated text file describing invading plant species dynamics and soil nitrate dynamics in 16 species mixture plots for experiment 120 at Cedar Creek. Column definitions are as described for <span class="courier">e120_invnit1_2.csv</span>.</p>
+            
+            <p><span class="courier">e120_nitbm.csv</span> is a comma-separated text file describing soil nitrate and aboveground plant biomass  dynamics. Column definitions are as described for e120_bmins.csv.</p>
+            
+            <p><span class="courier">find_number_of_observations.R</span> is an R source code file that can be used to determine the number of sequential observations in subplots for all of the data sets listed above. The data should be in the working directory of R when the R code is run.</p>
+            
+            <p><span class="courier">multispatialCCM.zip</span> is an archive containing the source code for the multispatialCCM R package. For the most recent version of the package, please see  cran.r-project.org/web/packages/multispatialCCM/index.html.</p>
+            
+        </div>
+        <!-- Content stops here!  Don't delete anything after this! -->
+        <hr>
+        <p id="links" class="center">
+            <a href="../../../../default.htm" target="_top">ESA Publications</a> |
+            <a href="../../../default.htm" target="_top">Ecological Archives</a> |
+            <a href="../../../copyright.htm" target="_top">Permissions</a> |
+            <a href="../../../citation.htm" target="_top">Citation</a> |
+            <a href="../../../default.htm" target="_top">Contacts</a>
+        </p>
+    
+
+<!--?php mysql_close($con); ?--></body></html>
