@@ -11,6 +11,7 @@ st_layers("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
 test <- st_read("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
 
 class(test)
+st_crs(test)
 attr(test, "sf_column")
 print(test[1:15], n = 3)
 test_geom <- st_geometry(test)
@@ -27,13 +28,19 @@ fish <- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
 attr(fish, "sf_column")
 st_geometry(fish)
 class(fish)
+st_crs(fish)
 
 par(mar = c(0,0,1,0))
 plot(fish[6])
 
+fish <- fish %>% 
+  filter(year_ > 1966) %>% 
+  mutate(YEAR = year_, .keep = "unused")%>% 
+  na.omit()
+
+
 # NEFSC Spatial -----------------------------------------------------------------
-library(sf)
-#library(raster)
+
 library(NEFSCspatial)
 library(tidyverse)
 
@@ -48,3 +55,20 @@ testGB <- testGIS %>%
   mutate(NAME = recode(AREANAME, "Area I Scallop Rotational Area" = "Area_I", "Area II Scallop Rotational Area" = "Area_II", "Nantucket Lightship North Scallop Rotational Area" = "NL_N","Nantucket Lightship West Scallop Rotational Area" = "NL_W"))
 
 plot(testGB["NAME"], main="GB Scallop Management Areas", key.pos=1, key.width = 0.1, key.length = 0.9)
+
+st_crs(testGB)
+testGB2 <- st_transform(testGB, crs = "EPSG:4269")
+st_crs(testGB2)
+
+
+# Map of points within polygons
+ggplot() + geom_sf(data = testGB2) + geom_sf(data = fish)
+
+# Intersection (first argument map, then points)
+inter <- st_intersects(testGB2, fish)
+
+# Add point count to each polygon
+testGB2$count <- lengths(inter)
+
+# Map of number of points within polygons
+ggplot(testGB2) + geom_sf(aes(fill = count))

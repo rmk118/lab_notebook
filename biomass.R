@@ -21,19 +21,16 @@ fish <- fish %>%
 onlyData <- fish %>% 
   na.omit()
 
-stations30 <- onlyData %>% 
-  group_by(station) %>% 
-  summarise(years=n_distinct(YEAR)) %>% 
-  filter(years >= 30) %>% 
-  ungroup()
-
-df_stations_wrangled <- onlyData %>%
-  filter(YEAR %in% 1985:2015) %>% 
-  group_by(station) %>% 
-  summarise(years=n_distinct(YEAR))
-
-stations <- onlyData %>% 
-  filter(station %in% stations30$station)
-  
-  
-plot(stations)
+# stations30 <- onlyData %>% 
+#   group_by(station) %>% 
+#   summarise(years=n_distinct(YEAR)) %>% 
+#   filter(years >= 30) %>% 
+#   ungroup()
+# 
+# df_stations_wrangled <- onlyData %>%
+#   filter(YEAR %in% 1985:2015) %>% 
+#   group_by(station) %>% 
+#   summarise(years=n_distinct(YEAR))
+# 
+# stations <- onlyData %>% 
+#   filter(station %in% stations30$station)
