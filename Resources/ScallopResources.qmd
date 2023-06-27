@@ -1,6 +1,6 @@
 ---
 title: 'Scallop Links'
-date-modified: '2023-06-21'
+date-modified: '2023-06-27'
 categories: ['Resources']
 description: 'A list of key scientific literature related to North Atlantic sea scallops, with an emphasis on the use of NMFS survey data for modeling purposes.'
 execute: 
@@ -324,6 +324,9 @@ editor:
         [here](https://www.nefmc.org/library/2024-atlantic-sea-scallop-research-track))
     -   [Atlantic Sea Scallop Management
         Overview](https://www.fisheries.noaa.gov/species/atlantic-sea-scallop#management)
+        (NOAA Fisheries)
+    -   [New England Fishery Management Council - Sea
+        Scallops](https://www.nefmc.org/management-plans/scallops)
 -   [VIMS Sea Scallop Research
     Program](https://www.vims.edu/research/units/centerspartners/map/comfish/scallop/index.php)
     -   [Reports](https://www.vims.edu/research/units/centerspartners/map/comfish/scallop/publications/finalreports/index.php)

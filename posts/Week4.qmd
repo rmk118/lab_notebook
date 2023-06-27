@@ -53,10 +53,8 @@ Interesting but non-scallop-specific links:
     -   [Management and Research Track Stock Assessment Timelines](https://d23h0vhsm26o6d.cloudfront.net/Timeline-light-2.pdf)
     -   [Description of New England and Mid-Atlantic Region Stock Assessment Process](https://d23h0vhsm26o6d.cloudfront.net/NRCC_Assessment_Process_Version-18Feb2022_508.pdf)
 
-        
-2. BRITE programming workshop: Git and Snakemake
-3. TBD
-
+2.  BRITE programming workshop: Git and Snakemake
+3.  TBD
 
 ## Wednesday, June 28
 
