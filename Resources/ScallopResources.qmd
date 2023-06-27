@@ -17,7 +17,7 @@ editor:
 ### General
 
 | Author, year        | Title                                                                                                                                                                                                                                                                                                                           | Notes                                                                                                                                |
-|-----------------|--------------------------------------|-----------------|
+|------------------|-------------------------------------|------------------|
 | Hart and Rago, 2006 | [Long-Term Dynamics of U.S. Atlantic Sea Scallop Placopecten magellanicus Populations](https://afspubs.onlinelibrary.wiley.com/doi/full/10.1577/M04-116.1)                                                                                                                                                                      | Excellent historical overview                                                                                                        |
 | Hart et al., 2013   | [To split or not to split: Assessment of Georges Bank sea scallops in the presence of marine protected areas](https://www.sciencedirect.com/science/article/pii/S0165783612003396#bib0040)                                                                                                                                      | Ran CASA model (aggregate and split by area) on real data and SAMS simulated data                                                    |
 | Lee et al., 2019    | [Resource Abundance, Fisheries Management, and Fishing Ports: The U.S. Atlantic Sea Scallop Fishery](https://www.cambridge.org/core/journals/agricultural-and-resource-economics-review/article/resource-abundance-fisheries-management-and-fishing-ports-the-us-atlantic-sea-scallop-fishery/C123D92B0821542C2185D6A2F42EB62F) | Uses inverse-distance weighted available biomass index                                                                               |
@@ -26,7 +26,7 @@ editor:
 ### Recruitment
 
 | Author, year                         | Title                                                                                                                                                                                                                                                                                                             |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | Hart, 2003                           | [Yield- and biomass-per-recruit analysis for rotational fisheries, with an application to the Atlantic sea scallop](https://www.researchgate.net/publication/279700466_Yield-_and_biomass-per-recruit_analysis_for_rotational_fisheries_with_an_application_to_the_Atlantic_sea_scallop_Placopecten_magellanicus) |
 | Truesdell, 2015                      | [Effects of spatial heterogeneity in growth and fishing effort on yield-per-recruit models: An application to the US Atlantic sea scallop fishery](http://dx.doi.org/10.1093/icesjms/fsv238)                                                                                                                      |
 | Stokesbury, 2012                     | [Stock Definition and Recruitment: Implications for the U.S. Sea Scallop (Placopecten magellanicus) Fishery from 2003 to 2011](https://www.tandfonline.com/doi/abs/10.1080/10641262.2012.695816?journalCode=brfs20)                                                                                               |
@@ -137,7 +137,7 @@ editor:
 -   [Impact of larval behaviors on dispersal and connectivity of sea
     scallop larvae over the northeast U.S.
     shelf](https://doi.org/10.1016/j.pocean.2021.102604) (Chen et al.,
-    2021)
+    2021) 
 -   [Spillover of sea scallops from rotational closures in the
     Mid-Atlantic
     Bight](https://academic.oup.com/icesjms/article/77/5/1992/5864487?login=true)
@@ -293,3 +293,37 @@ editor:
     1](https://www.sciencedirect.com/science/article/pii/S0165783622002004#bib7)
     (full-size
     [here](https://ars.els-cdn.com/content/image/1-s2.0-S0165783622002004-gr1_lrg.jpg))
+
+### Other
+
+-   Commercial Fisheries Research Foundation programs
+    -   [Piloting the Research Fleet Approach in the Atlantic Sea
+        Scallop
+        Fishery](http://www.cfrfoundation.org/sea-scallop-research-fleet-pilot-project)
+    -   [Sea Scallop Image-Based Research
+        Fleet](http://www.cfrfoundation.org/scallop-research-fleet)
+    -   [Assessing Vulnerability of the Atlantic Sea Scallop
+        Social-Ecological System in Northeast
+        Waters](http://www.cfrfoundation.org/atlantic-sea-scallop-socialecological-system)
+    -   [Piloting a Novel Dredge Type to Reduce Bycatch and Improve Fuel
+        efficiency in the Southern New England Scallop
+        Fishery](http://www.cfrfoundation.org/piloting-novel-dredge-type)
+    -   [Establishing Methods to Assess Sea Scallop Biological Condition
+        in Relation to Wind Farm
+        Development](http://www.cfrfoundation.org/sea-scallop-wind-farm-assessment)
+    -   [Engaging the Fishing Community to Understand Disease and
+        Reproductive Dynamics of Atlantic Sea
+        Scallop](http://www.cfrfoundation.org/tracking-scallops) (using
+        a scallop data collection smartphone app!)
+-   NOAA Fisheries/NEFSC & NEFMC links
+    -   [Northeast Industry-Funded Scallop
+        Observers](https://www.fisheries.noaa.gov/new-england-mid-atlantic/fisheries-observers/northeast-industry-funded-scallop-observers#:~:text=Observers%20play%20a%20vital%20role,scallop%2C%20primarily%20using%20dredge%20gear.)
+    -    [Atlantic Sea Scallop Research Track Working
+        Group](https://www.fisheries.noaa.gov/event/atlantic-sea-scallop-research-track-working-group)
+        (and
+        [here](https://www.nefmc.org/library/2024-atlantic-sea-scallop-research-track))
+    -   [Atlantic Sea Scallop Management
+        Overview](https://www.fisheries.noaa.gov/species/atlantic-sea-scallop#management)
+-   [VIMS Sea Scallop Research
+    Program](https://www.vims.edu/research/units/centerspartners/map/comfish/scallop/index.php)
+    -   [Reports](https://www.vims.edu/research/units/centerspartners/map/comfish/scallop/publications/finalreports/index.php)
