@@ -223,53 +223,53 @@ NLWbThetaVal <- NLWbTheta[which.max(NLWbTheta$rho),"Theta"] #4
 # Multispatial EDM for each area (univariate, averaged across stations)
 library(multispatialCCM)
 
-#Abundance embedding dimension plots
-Eplot1a <- ggplot(areaI_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
-Eplot2a <- ggplot(areaII_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
-Eplot3a <- ggplot(NLN_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
-Eplot4a <- ggplot(NLW_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
+# Abundance embedding dimension plots
+# Eplot1a <- ggplot(areaI_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
+# Eplot2a <- ggplot(areaII_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
+# Eplot3a <- ggplot(NLN_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
+# Eplot4a <- ggplot(NLW_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
 
-Eplot1a + Eplot2a + Eplot3a + Eplot4a
+# Eplot1a + Eplot2a + Eplot3a + Eplot4a
 
 #Biomass embedding dimension plots
-Eplot1b <- ggplot(areaIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
-Eplot2b <- ggplot(areaIIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
-Eplot3b <- ggplot(NLNbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
-Eplot4b <- ggplot(NLWbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
-
-Eplot1b + Eplot2b + Eplot3b + Eplot4b
+# Eplot1b <- ggplot(areaIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
+# Eplot2b <- ggplot(areaIIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
+# Eplot3b <- ggplot(NLNbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
+# Eplot4b <- ggplot(NLWbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
+# 
+# Eplot1b + Eplot2b + Eplot3b + Eplot4b
 
 #Abundance linearity plots
-Tplot1a <- ggplot(areaI_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
-Tplot2a <- ggplot(areaII_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
-Tplot3a <- ggplot(NLN_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
-Tplot4a <- ggplot(NLW_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
-
-Tplot1a + Tplot2a + Tplot3a + Tplot4a
+# Tplot1a <- ggplot(areaI_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
+# Tplot2a <- ggplot(areaII_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
+# Tplot3a <- ggplot(NLN_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
+# Tplot4a <- ggplot(NLW_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
+# 
+# Tplot1a + Tplot2a + Tplot3a + Tplot4a
 
 #Biomass linearity plots
-Tplot1b <- ggplot(areaIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
-Tplot2b <- ggplot(areaIIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
-Tplot3b <- ggplot(NLNbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
-Tplot4b <- ggplot(NLWbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
-  labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
-
-Tplot1b + Tplot2b + Tplot3b + Tplot4b
+# Tplot1b <- ggplot(areaIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
+# Tplot2b <- ggplot(areaIIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
+# Tplot3b <- ggplot(NLNbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
+# Tplot4b <- ggplot(NLWbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+#   labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
+# 
+# Tplot1b + Tplot2b + Tplot3b + Tplot4b
 
 # non-spatial EDM for each station individually
 # then use Bayesian model that accounts for spatial autocorrelation to compare areas
@@ -277,3 +277,27 @@ Tplot1b + Tplot2b + Tplot3b + Tplot4b
 
 # Take IDs from ScallopLenOverlap and combine with aCat, then run the same analysis on asterias as you did for scallops in the spatial.R file
 
+df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA2022.csv")
+dat_cat <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv")
+
+df_stations <- df_stations %>% 
+  mutate(STATION = as.numeric(STATION), YEAR = EST_YEAR) %>% 
+  select(c("CRUISE6","CRUISE","STRATUM", "TOW","STATION","ID","AREA","SVVESSEL","SVGEAR",
+           "BEGIN_EST_TOWDATE","YEAR","SETDEPTH", "AVGDEPTH", "BEGLAT", "BEGLON"))
+
+df_stations <- df_stations %>% 
+  mutate(BEGIN_EST_TOWDATE = lubridate::dmy(BEGIN_EST_TOWDATE)) %>% 
+  mutate(YEAR = year(BEGIN_EST_TOWDATE)) %>% 
+  mutate(TOW = as.integer(TOW))
+
+aCat <- dat_cat %>% 
+  filter(SCIENTIFIC_NAME =="Asterias") %>% 
+  # | SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+aCat <- left_join(aCat, df_stations)
+
+df_stations %>% filter(TOW == 17) %>% filter(STATION == 74)
