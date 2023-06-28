@@ -379,6 +379,11 @@ div.csl-indent {
 <td>Predicting nonlinear dynamics of short-lived penaeid shrimp species in the Gulf of Mexico</td>
 <td>(no code) Extends GP-EDM to incorporate spatial data; adds additional layer of covariance structure between manifolds estimated for each statistical zone. Also incorporates environmental variables.</td>
 </tr>
+<tr class="even">
+<td><span class="citation" data-cites="rigal2023">Rigal et al. (<a href="#ref-rigal2023" role="doc-biblioref">2023</a>)</span></td>
+<td>Farmland practices are driving bird population decline across Europe</td>
+<td>Uses multispatialCCM package and s-map (calls block_lnlp). Fig 3b is cool. Very thorough code <a href="https://github.com/StanislasRigal/Drivers_European_bird_decline_public">available on GitHub</a></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -386,11 +391,6 @@ div.csl-indent {
 <h1>Recent papers applying EDM to fisheries</h1>
 <p>Many of the notes here related to the methods used by the authors for data analysis, as I am trying to identify best practices and common approaches to provide guidance for my own data analysis.</p>
 <table class="table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 50%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Author, year</th>
@@ -419,15 +419,20 @@ div.csl-indent {
 <td>Non-parametric modeling reveals environmental effects on bluefin tuna recruitment in Atlantic, Pacific, and Southern Oceans</td>
 <td>(no code)</td>
 </tr>
+<tr class="odd">
+<td><span class="citation" data-cites="ushio2018">Ushio et al. (<a href="#ref-ushio2018" role="doc-biblioref">2018</a>)</span></td>
+<td>Fluctuating interaction network and time-varying stability of a natural fish community</td>
+<td>Used CCM, s-maps, and developed dynamic stability measure to examine the link between the time-varying interaction network and community stability. <a href="https://zenodo.org/record/1039387">Code available here</a></td>
+</tr>
 </tbody>
 </table>
 <ul>
 <li><a href="https://www.sciencedirect.com/science/article/pii/S0304380022000680#bib0007">An empirical dynamic modeling framework for missing or irregular samples</a> (Johnson and Munch, 2022)</li>
 <li><a href="https://onlinelibrary.wiley.com/doi/10.1111/faf.12037">Complex dynamics may limit prediction in marine fisheries</a> (Glaser et al., 2013)</li>
-<li><a href="https://doi.org/10.1111/faf.12304">Nonlinear dynamics and noise in fisheries recruitment: A global meta-analysis</a> (Munch, Giron-Nava, and Sugihara, 2018) - no code</li>
+<li><a href="https://doi.org/10.1111/faf.12304">Nonlinear dynamics and noise in fisheries recruitment: A global meta-analysis</a> (Munch, Giron-Nava, and Sugihara, 2018) - no code; GP-EDM</li>
 <li><a href="https://academic.oup.com/icesjms/article/77/4/1480/5531239">Model-free time series analysis detected the contributions of middle-age spawner biomass and the environment on Pacific bluefin tuna recruitment</a> (Nakayama et al., 2019) - no code</li>
-<li><a href="https://doi.org/10.1111/faf.12287">Ecosystem-based forecasts of recruitment in two menhaden species</a> (Deyle et al., 2018)</li>
-<li><a href="https://www.int-res.com/abstracts/meps/v557/p237-246/">A complex past: historical and contemporary fisheries demonstrate nonlinear dynamics and a loss of determinism</a> (Klein et al., 2016)</li>
+<li><a href="https://doi.org/10.1111/faf.12287">Ecosystem-based forecasts of recruitment in two menhaden species</a> (Deyle et al., 2018) - with (outdated) R code</li>
+<li><a href="https://www.int-res.com/abstracts/meps/v557/p237-246/">A complex past: historical and contemporary fisheries demonstrate nonlinear dynamics and a loss of determinism</a> (Klein et al., 2016) - no code</li>
 <li><a href="https://www.int-res.com/abstracts/meps/v464/p195-207/">Nonlinear dynamic features and co-predictability of the Georges Bank fish community</a> (Liu et al., 2012)</li>
 </ul>
 </section>
@@ -491,6 +496,11 @@ div.csl-indent {
 <td><span class="citation" data-cites="munch2023">Munch, Rogers, and Sugihara (<a href="#ref-munch2023" role="doc-biblioref">2023</a>)</span></td>
 <td>Recent developments in empirical dynamic modelling</td>
 <td>(no code) Good overview, including sEDM, GP-EDM, machine learning developments, etc.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -572,6 +582,9 @@ Munch, Stephan B., Tanya L. Rogers, and George Sugihara. 2023. <span>“Recent D
 <div id="ref-pierre2018" class="csl-entry" role="listitem">
 Pierre, Maud, Tristan Rouyer, Sylvain Bonhommeau, and J M Fromentin. 2018. <span>“Assessing Causal Links in Fish Stock<span></span>recruitment Relationships.”</span> <em>ICES Journal of Marine Science</em> 75 (3): 903–11. <a href="https://doi.org/10.1093/icesjms/fsx202">https://doi.org/10.1093/icesjms/fsx202</a>.
 </div>
+<div id="ref-rigal2023" class="csl-entry" role="listitem">
+Rigal, Stanislas, Vasilis Dakos, Hany Alonso, Ainārs Auniņš, Zoltán Benkő, Lluís Brotons, Tomasz Chodkiewicz, et al. 2023. <span>“Farmland Practices Are Driving Bird Population Decline Across Europe.”</span> <em>Proceedings of the National Academy of Sciences</em> 120 (21): e2216573120. <a href="https://doi.org/10.1073/pnas.2216573120">https://doi.org/10.1073/pnas.2216573120</a>.
+</div>
 <div id="ref-rogers2020" class="csl-entry" role="listitem">
 Rogers, Tanya L., and Stephan B. Munch. 2020. <span>“Hidden Similarities in the Dynamics of a Weakly Synchronous Marine Metapopulation.”</span> <em>Proceedings of the National Academy of Sciences</em> 117 (1): 479–85. <a href="https://doi.org/10.1073/pnas.1910964117">https://doi.org/10.1073/pnas.1910964117</a>.
 </div>
@@ -595,6 +608,9 @@ Tsai, Cheng-Han, Stephan B. Munch, Michelle D. Masi, and Adam G. Pollack. 2023. 
 </div>
 <div id="ref-tsonis2015" class="csl-entry" role="listitem">
 Tsonis, Anastasios A., Ethan R. Deyle, Robert M. May, George Sugihara, Kyle Swanson, Joshua D. Verbeten, and Geli Wang. 2015. <span>“Dynamical Evidence for Causality Between Galactic Cosmic Rays and Interannual Variation in Global Temperature.”</span> <em>Proceedings of the National Academy of Sciences</em> 112 (11): 3253–56. <a href="https://doi.org/10.1073/pnas.1420291112">https://doi.org/10.1073/pnas.1420291112</a>.
+</div>
+<div id="ref-ushio2018" class="csl-entry" role="listitem">
+Ushio, Masayuki, Chih-hao Hsieh, Reiji Masuda, Ethan R. Deyle, Hao Ye, Chun-Wei Chang, George Sugihara, and Michio Kondoh. 2018. <span>“Fluctuating Interaction Network and Time-Varying Stability of a Natural Fish Community.”</span> <em>Nature</em> 554 (7692): 360–63. <a href="https://doi.org/10.1038/nature25504">https://doi.org/10.1038/nature25504</a>.
 </div>
 <div id="ref-wasserman2022" class="csl-entry" role="listitem">
 Wasserman, Ben A., Tanya L. Rogers, Stephan B. Munch, and Eric P. Palkovacs. 2022. <span>“Applying Empirical Dynamic Modeling to Distinguish Abiotic and Biotic Drivers of Population Fluctuations in Sympatric Fishes.”</span> <em>Limnology and Oceanography</em> 67 (S1): S403–15. <a href="https://doi.org/10.1002/lno.12042">https://doi.org/10.1002/lno.12042</a>.
