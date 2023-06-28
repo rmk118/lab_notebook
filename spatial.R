@@ -5,6 +5,7 @@ library(sf)
 library(NEFSCspatial)
 library(tidyverse)
 library(rEDM)
+library(patchwork)
 
 # NEFSC scallop survey data - through 2015 -----------------------------------------------------------------
 
@@ -132,20 +133,20 @@ areaIa <- areaI %>%
   distinct()
 
 areaI_abundanceE <- EmbedDimension(dataFrame = areaIa, lib = "1 35", pred = "1 35", columns = "avgAbund", target = "avgAbund")
-areaI_abundanceE <- areaI_abundanceE[which.max(areaI_abundanceE$rho),"E"] #7
+areaI_abundanceEval <- areaI_abundanceE[which.max(areaI_abundanceE$rho),"E"] #7
 
-areaI_abundanceTheta <- PredictNonlinear(dataFrame = areaIa, lib = "1 35", pred = "1 35", columns = "avgAbund", target = "avgAbund", E = areaI_abundanceE, theta=0.1:50)
-areaI_abundanceTheta <- areaI_abundanceTheta[which.max(areaI_abundanceTheta$rho),"Theta"] #0.1
+areaI_abundanceTheta <- PredictNonlinear(dataFrame = areaIa, lib = "1 35", pred = "1 35", columns = "avgAbund", target = "avgAbund", E = areaI_abundanceEval, theta=0.1:50)
+areaI_abundanceThetaVal <- areaI_abundanceTheta[which.max(areaI_abundanceTheta$rho),"Theta"] #0.1
 
 areaIb <- areaI %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
 
 areaIbE <- EmbedDimension(dataFrame = areaIb, lib = "1 35", pred = "1 35", columns = "avgMeat", target = "avgMeat")
-areaIbE <- areaIbE[which.max(areaIbE$rho),"E"] #3
+areaIbEval <- areaIbE[which.max(areaIbE$rho),"E"] #3
 
-areaIbTheta <- PredictNonlinear(dataFrame = areaIIb, lib = "1 35", pred = "1 35", columns = "avgMeat", target = "avgMeat", E = areaIbE)
-areaIbTheta <- areaIbTheta[which.max(areaIbTheta$rho),"Theta"] #0.3
+areaIbTheta <- PredictNonlinear(dataFrame = areaIb, lib = "1 35", pred = "1 35", columns = "avgMeat", target = "avgMeat", E = areaIbEval)
+areaIbThetaVal <- areaIbTheta[which.max(areaIbTheta$rho),"Theta"] #0.3
 
 # AREA 2 ------------------------------------------------------------------
 
@@ -156,20 +157,20 @@ areaIIa <- areaII %>%
   distinct()
 
 areaII_abundanceE <- EmbedDimension(dataFrame = areaIIa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund")
-areaII_abundanceE <- areaII_abundanceE[which.max(areaII_abundanceE$rho),"E"] #1, but 3 is close
+areaII_abundanceEval <- areaII_abundanceE[which.max(areaII_abundanceE$rho),"E"] #1, but 3 is close
 
 areaII_abundanceTheta <- PredictNonlinear(dataFrame = areaIIa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund", E = 3, theta=0.1:20)
-areaII_abundanceTheta <- areaII_abundanceTheta[which.max(areaII_abundanceTheta$rho),"Theta"] #9.1
+areaII_abundanceThetaVal <- areaII_abundanceTheta[which.max(areaII_abundanceTheta$rho),"Theta"] #9.1
 
 areaIIb <- areaII %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
 
 areaIIbE <- EmbedDimension(dataFrame = areaIIb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat")
-areaIIbE <- areaIIbE[which.max(areaIIbE$rho),"E"] #4
+areaIIbEval <- areaIIbE[which.max(areaIIbE$rho),"E"] #4
 
-areaIIbTheta <- PredictNonlinear(dataFrame = areaIIb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat", E = areaIIbE)
-areaIIbTheta <- areaIIbTheta[which.max(areaIIbTheta$rho),"Theta"] #1
+areaIIbTheta <- PredictNonlinear(dataFrame = areaIIb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat", E = areaIIbEval)
+areaIIbThetaVal <- areaIIbTheta[which.max(areaIIbTheta$rho),"Theta"] #1
 
 # Nantucket Lightship North ------------------------------------------------------------------
 
@@ -180,20 +181,20 @@ NLNa <- NLN %>%
   distinct()
 
 NLN_abundanceE <- EmbedDimension(dataFrame = NLNa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund")
-NLN_abundanceE <- NLN_abundanceE[which.max(NLN_abundanceE$rho),"E"] #1
+NLN_abundanceEval <- NLN_abundanceE[which.max(NLN_abundanceE$rho),"E"] #1
 
-NLN_abundanceTheta <- PredictNonlinear(dataFrame = NLNa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund", E = NLN_abundanceE, theta = 1:20)
-NLN_abundanceTheta <- NLN_abundanceTheta[which.max(NLN_abundanceTheta$rho),"Theta"] #1
+NLN_abundanceTheta <- PredictNonlinear(dataFrame = NLNa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund", E = NLN_abundanceEval, theta = 1:20)
+NLN_abundanceThetaVal <- NLN_abundanceTheta[which.max(NLN_abundanceTheta$rho),"Theta"] #1
 
 NLNb <- NLN %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
 
 NLNbE <- EmbedDimension(dataFrame = NLNb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat")
-NLNbE <- NLNbE[which.max(NLNbE$rho),"E"] #1, but 8 is also reasonable
+NLNbEval <- NLNbE[which.max(NLNbE$rho),"E"] #1, but 8 is also reasonable
 
-NLNbTheta <- PredictNonlinear(dataFrame = NLNb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat", E = NLNbE)
-NLNbTheta <- NLNbTheta[which.max(NLNbTheta$rho),"Theta"] #2
+NLNbTheta <- PredictNonlinear(dataFrame = NLNb, lib = "1 36", pred = "1 36", columns = "avgMeat", target = "avgMeat", E = NLNbEval)
+NLNbThetaVal <- NLNbTheta[which.max(NLNbTheta$rho),"Theta"] #2
 
 # Nantucket Lightship West ------------------------------------------------------------------
 
@@ -204,55 +205,75 @@ NLWa <- NLW %>%
   distinct()
 
 NLW_abundanceE <- EmbedDimension(dataFrame = NLWa, lib = "1 32", pred = "1 32", columns = "avgAbund", target = "avgAbund")
-NLW_abundanceE <- NLW_abundanceE[which.max(NLW_abundanceE$rho),"E"] #1
+NLW_abundanceEval <- NLW_abundanceE[which.max(NLW_abundanceE$rho),"E"] #1
 
-NLW_abundanceTheta <- PredictNonlinear(dataFrame = NLWa, lib = "1 32", pred = "1 32", columns = "avgAbund", target = "avgAbund", E = NLW_abundanceE, theta=1:45)
-NLW_abundanceTheta <- NLW_abundanceTheta[which.max(NLW_abundanceTheta$rho),"Theta"] #3
+NLW_abundanceTheta <- PredictNonlinear(dataFrame = NLWa, lib = "1 32", pred = "1 32", columns = "avgAbund", target = "avgAbund", E = NLW_abundanceEval, theta=1:45)
+NLW_abundanceThetaVal <- NLW_abundanceTheta[which.max(NLW_abundanceTheta$rho),"Theta"] #3
 
 NLWb <- NLW %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
 
 NLWbE <- EmbedDimension(dataFrame = NLWb, lib = "1 32", pred = "1 32", columns = "avgMeat", target = "avgMeat")
-NLWbE <- NLWbE[which.max(NLWbE$rho),"E"] #3
+NLWbEval <- NLWbE[which.max(NLWbE$rho),"E"] #3
 
-NLWbTheta <- PredictNonlinear(dataFrame = NLWb, lib = "1 32", pred = "1 32", columns = "avgMeat", target = "avgMeat", E = NLWbE)
-NLWbTheta <- NLWbTheta[which.max(NLWbTheta$rho),"Theta"] #4
+NLWbTheta <- PredictNonlinear(dataFrame = NLWb, lib = "1 32", pred = "1 32", columns = "avgMeat", target = "avgMeat", E = NLWbEval)
+NLWbThetaVal <- NLWbTheta[which.max(NLWbTheta$rho),"Theta"] #4
 
 # Multispatial EDM for each area (univariate, averaged across stations)
 library(multispatialCCM)
 
-# AREA 1 ------------------------------------------------------------------
+#Abundance embedding dimension plots
+Eplot1a <- ggplot(areaI_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
+Eplot2a <- ggplot(areaII_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
+Eplot3a <- ggplot(NLN_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
+Eplot4a <- ggplot(NLW_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
 
-# AreaI_multispatial <- sf_to_df(Area_I, fill = TRUE)
-# test <- AreaI_multispatial %>% 
-#   mutate %>% 
-#   group_by(station) %>% 
-#   summarise(years=n_distinct(YEAR))
+Eplot1a + Eplot2a + Eplot3a + Eplot4a
 
+#Biomass embedding dimension plots
+Eplot1b <- ggplot(areaIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
+Eplot2b <- ggplot(areaIIbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
+Eplot3b <- ggplot(NLNbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
+Eplot4b <- ggplot(NLWbE, aes(x=E, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
 
+Eplot1b + Eplot2b + Eplot3b + Eplot4b
 
+#Abundance linearity plots
+Tplot1a <- ggplot(areaI_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 1 abundance")+ theme(text = element_text(size = 13))
+Tplot2a <- ggplot(areaII_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 2 abundance")+ theme(text = element_text(size = 13))
+Tplot3a <- ggplot(NLN_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL North abundance")+ theme(text = element_text(size = 13))
+Tplot4a <- ggplot(NLW_abundanceTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL West abundance")+ theme(text = element_text(size = 13))
 
+Tplot1a + Tplot2a + Tplot3a + Tplot4a
 
+#Biomass linearity plots
+Tplot1b <- ggplot(areaIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 1 biomass")+ theme(text = element_text(size = 13))
+Tplot2b <- ggplot(areaIIbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "Area 2 biomass")+ theme(text = element_text(size = 13))
+Tplot3b <- ggplot(NLNbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL North biomass")+ theme(text = element_text(size = 13))
+Tplot4b <- ggplot(NLWbTheta, aes(x=Theta, y=rho))+geom_line()+theme_classic()+
+  labs(title = "NL West biomass")+ theme(text = element_text(size = 13))
 
-
-
+Tplot1b + Tplot2b + Tplot3b + Tplot4b
 
 # non-spatial EDM for each station individually
 # then use Bayesian model that accounts for spatial autocorrelation to compare areas
 # using EDM results from each station as model input
 
-lengths(interID)
+# Take IDs from ScallopLenOverlap and combine with aCat, then run the same analysis on asterias as you did for scallops in the spatial.R file
 
-fish <- fish %>% 
-  mutate(area = c(0))
-
-
-
-x <- 1:50
-test<-case_when(
-  x %% 35 == 0 ~ "fizz buzz",
-  x %% 5 == 0 ~ "fizz",
-  x %% 7 == 0 ~ "buzz",
-  TRUE ~ as.character(x)
-)

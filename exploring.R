@@ -225,6 +225,8 @@ scallopCatchOverlap2 <- left_join(scallopCatchOverlap, asteriasOverlap)  %>%
 
 ggplot(scallopCatchOverlap2, aes(x=YEAR, y = avgCatch, group= STRATUM, color=STRATUM))+geom_line()+facet_wrap(~species)
 
+ggplot(scallopCatchOverlap2, aes(x=YEAR, y = avgCatch, group= species, color=species))+geom_line()+facet_wrap(~STRATUM)
+
 scallopCatchOverlap3 <- left_join(scallopCatchOverlap, asteriasOverlap)
 ggplot(scallopCatchOverlap3, aes(x=scallopAvg, y = asteriasAvg, group= STRATUM, color=STRATUM))+geom_point()
 
