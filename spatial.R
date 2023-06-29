@@ -300,10 +300,83 @@ aCat <- dat_cat %>%
 
 aCat <- left_join(aCat, df_stations)
 
-df_stations %>% filter(TOW == 17) %>% filter(STATION == 74)
+# df_stations %>% filter(TOW == 17) %>% filter(STATION == 74)
 
 cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 
 st_layers("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
 sediment<- st_read("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
 plot(sediment[1])
+
+sediment<- st_transform(sediment, crs = "EPSG:4269")
+st_crs(sediment)
+
+gbBounds <- st_as_sfc(st_bbox(testGB2))
+fishBounds <- st_as_sfc(st_bbox(fish))
+#sedimentGB <- st_contains(sediment, gbBounds)
+
+# sedimentGB <- sediment %>% 
+#  filter(withinGB == TRUE)
+
+sedimentGB <- st_intersects(gbBounds, sediment)
+sedimentFish <- st_intersects(fishBounds, sediment)
+
+sedimentGB2 <- sediment %>% 
+  filter(row_number() %in% sedimentGB[[1]]) 
+
+sedimentFish2 <- sediment %>% 
+  filter(row_number() %in% sedimentFish[[1]])
+
+plot(sedimentGB2[1])
+plot(sedimentFish2[1])
+
+ggplot(testGB2) + geom_sf() + geom_sf(data = sedimentGB2[1])
+ggplot(testGB2) + geom_sf() + geom_sf(data = sedimentFish2[1])
+
+ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = testGB2)
+ggplot(sedimentFish2[1]) + geom_sf() + geom_sf(data = testGB2)
+
+ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = fish)
+
+# Intersection (first polygons, then points)
+interCountsSed <- st_intersects(sedimentGB2, fish)
+
+# Add point count to each polygon
+sedimentGB2$count <- lengths(interCountsSed)
+
+# Map of number of points within polygons
+ggplot(sedimentGB2) + geom_sf(aes(fill = count))
+
+# Intersection (first points, then polygons)
+interIDSed <- st_intersects(fish, sedimentGB2)
+
+interIDSed[sapply(interIDSed, function(x) length(x)==0L)] <- 0
+
+fishPts <- fish %>% 
+  filter(interIDSed[row_number()] != 0)
+ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = fishPts)
+
+
+# Length ------------------------------------------------------------------
+dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
+scallopLen <- dat_len %>%
+  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
+  mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop")) #shorten for readability
+
+scallopLen <- scallopLen %>% 
+  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
+rm(dat_len)
+
+scallopLen <- scallopLen %>%
+  mutate(CRUISE6 = as.factor(CRUISE6),
+         CRUISE = as.factor(CRUISE),
+         STATION = as.numeric(STATION),
+         .keep = "unused")
+
+scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
+
+scallopLen <- scallopLen %>%
+  mutate(YEAR = as.numeric(YEAR)) %>%
+  filter(as.numeric(STRATUM) > 5999) #shellfish strata start with 6
+
+len <- left_join(scallopLen, df_stations)
