@@ -30,7 +30,7 @@ SMAST scallop data (HabCam)
 st_layers("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
 test<- st_read("data/SMAST_SCALLOP/SMAST_Scallops.gdb")
 
-# class(test)
+class(test)
 print(test[1:15], n = 3)
 
 par(mar = c(0,0,1,0))

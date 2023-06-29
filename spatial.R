@@ -301,3 +301,9 @@ aCat <- dat_cat %>%
 aCat <- left_join(aCat, df_stations)
 
 df_stations %>% filter(TOW == 17) %>% filter(STATION == 74)
+
+cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
+
+st_layers("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
+sediment<- st_read("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
+plot(sediment[1])
