@@ -293,7 +293,7 @@ cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 
 df_stations <- df_stations %>% 
   mutate(STATION = as.numeric(STATION), YEAR = EST_YEAR) %>% 
-  select(c("CRUISE6","CRUISE","STRATUM", "TOW","STATION","ID","AREA","SVVESSEL","SVGEAR",
+  dplyr::select(c("CRUISE6","CRUISE","STRATUM", "TOW","STATION","ID","AREA","SVVESSEL","SVGEAR",
            "BEGIN_EST_TOWDATE","YEAR","SETDEPTH", "AVGDEPTH", "BEGLAT", "BEGLON"))
 
 df_stations <- df_stations %>% 
@@ -339,6 +339,7 @@ ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = testGB2)
 ggplot(sedimentFish2[1]) + geom_sf() + geom_sf(data = testGB2)
 
 ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = fish)
+ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = stations)
 
 # Intersection (first polygons, then points)
 interCountsSed <- st_intersects(sedimentGB2, fish)
@@ -413,3 +414,5 @@ biomassE <- as.integer(Emat[which.max(Emat$Biomass),"E"]) #6
 
 biomassSignal<-SSR_check_signal(A=biomassMulti$avgMeat, E=biomassE, tau=1,predsteplist=1:6)
 plot(biomassSignal$predatout, type="l")
+
+
