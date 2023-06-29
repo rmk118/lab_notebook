@@ -1,14 +1,22 @@
+#Scallop EDM project
+#Ruby Krasnow
+#Last modified: 6/29/23
 
-#spatial
-
-library(sf)
-library(NEFSCspatial)
 library(tidyverse)
-library(rEDM)
 library(patchwork)
+library(lubridate)
+
+#spatial packages
+library(sf)
+library(sfheaders)
+library(NEFSCspatial)
+
+#EDM packages
+library(rEDM)
+library(multispatialCCM)
+
 
 # NEFSC scallop survey data - through 2015 -----------------------------------------------------------------
-
 st_layers("~/Downloads/Fish/Fish.gdb")
 fish<- st_read("~/Downloads/Fish/Fish.gdb", layer="ScallopBiomass")
 
@@ -42,8 +50,6 @@ testGB <- testGIS %>%
 plot(testGB["NAME"], main="Georges Bank Scallop Management Areas", key.pos=1, key.width = 0.1, key.length = 0.9)
 
 # Adjust CRS of the map of protected areas to match scallop survey CRS
-# st_crs(fish) - NAD83 (EPSG:4269)
-# st_crs(testGB) - WGS 84 / Pseudo-Mercator (EPSG: 3857)
 testGB2<- st_transform(testGB, crs = "EPSG:4269")
 st_crs(testGB2) # now they are both NAD83
 
@@ -65,12 +71,10 @@ ggplot(testGB2) + geom_sf(aes(fill = count))
 # Intersection (first points, then polygons)
 interID <- st_intersects(fish, testGB2)
 
-# stations<- fish[unlist(interCounts),] #only the stations within a protected area
-
 interID[sapply(interID, function(x) length(x)==0L)] <- 0
+
 # Adding column area with the name of
 # the areas containing the points
-
 unlistInter <- unlist(interID)
 area<-  case_when(unlistInter == 0 ~"NA",
                   unlistInter ==1 ~ "Area1",
@@ -122,11 +126,13 @@ NLW <- NL_W %>%
             avgMeat = mean(biomassMeatWeight_kg))
 
 # EDM for each area (univariate, averaged across stations - not multispatial)
-library(sfheaders)
+
 
 # AREA 1 ------------------------------------------------------------------
 
 areaI <- sf_to_df(areaI, fill=TRUE)
+
+#Abundance
 areaIa <- areaI %>% 
   mutate(avgAbund = as.integer(avgAbund)) %>% 
   select(YEAR, avgAbund) %>% 
@@ -138,6 +144,7 @@ areaI_abundanceEval <- areaI_abundanceE[which.max(areaI_abundanceE$rho),"E"] #7
 areaI_abundanceTheta <- PredictNonlinear(dataFrame = areaIa, lib = "1 35", pred = "1 35", columns = "avgAbund", target = "avgAbund", E = areaI_abundanceEval, theta=0.1:50)
 areaI_abundanceThetaVal <- areaI_abundanceTheta[which.max(areaI_abundanceTheta$rho),"Theta"] #0.1
 
+#Biomass
 areaIb <- areaI %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
@@ -149,8 +156,9 @@ areaIbTheta <- PredictNonlinear(dataFrame = areaIb, lib = "1 35", pred = "1 35",
 areaIbThetaVal <- areaIbTheta[which.max(areaIbTheta$rho),"Theta"] #0.3
 
 # AREA 2 ------------------------------------------------------------------
-
 areaII <- sf_to_df(areaII, fill=TRUE)
+
+#Abundance
 areaIIa <- areaII %>% 
   mutate(avgAbund = as.integer(avgAbund)) %>% 
   select(YEAR, avgAbund) %>% 
@@ -162,6 +170,7 @@ areaII_abundanceEval <- areaII_abundanceE[which.max(areaII_abundanceE$rho),"E"] 
 areaII_abundanceTheta <- PredictNonlinear(dataFrame = areaIIa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund", E = 3, theta=0.1:20)
 areaII_abundanceThetaVal <- areaII_abundanceTheta[which.max(areaII_abundanceTheta$rho),"Theta"] #9.1
 
+#Biomass
 areaIIb <- areaII %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
@@ -173,8 +182,9 @@ areaIIbTheta <- PredictNonlinear(dataFrame = areaIIb, lib = "1 36", pred = "1 36
 areaIIbThetaVal <- areaIIbTheta[which.max(areaIIbTheta$rho),"Theta"] #1
 
 # Nantucket Lightship North ------------------------------------------------------------------
-
 NLN <- sf_to_df(NLN, fill=TRUE)
+
+#Abundance
 NLNa <- NLN %>% 
   mutate(avgAbund = as.integer(avgAbund)) %>% 
   select(YEAR, avgAbund) %>% 
@@ -186,6 +196,7 @@ NLN_abundanceEval <- NLN_abundanceE[which.max(NLN_abundanceE$rho),"E"] #1
 NLN_abundanceTheta <- PredictNonlinear(dataFrame = NLNa, lib = "1 36", pred = "1 36", columns = "avgAbund", target = "avgAbund", E = NLN_abundanceEval, theta = 1:20)
 NLN_abundanceThetaVal <- NLN_abundanceTheta[which.max(NLN_abundanceTheta$rho),"Theta"] #1
 
+#Biomass
 NLNb <- NLN %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
@@ -197,8 +208,9 @@ NLNbTheta <- PredictNonlinear(dataFrame = NLNb, lib = "1 36", pred = "1 36", col
 NLNbThetaVal <- NLNbTheta[which.max(NLNbTheta$rho),"Theta"] #2
 
 # Nantucket Lightship West ------------------------------------------------------------------
-
 NLW <- sf_to_df(NLW, fill=TRUE)
+
+#Abundance
 NLWa <- NLW %>% 
   mutate(avgAbund = as.integer(avgAbund)) %>% 
   select(YEAR, avgAbund) %>% 
@@ -210,6 +222,7 @@ NLW_abundanceEval <- NLW_abundanceE[which.max(NLW_abundanceE$rho),"E"] #1
 NLW_abundanceTheta <- PredictNonlinear(dataFrame = NLWa, lib = "1 32", pred = "1 32", columns = "avgAbund", target = "avgAbund", E = NLW_abundanceEval, theta=1:45)
 NLW_abundanceThetaVal <- NLW_abundanceTheta[which.max(NLW_abundanceTheta$rho),"Theta"] #3
 
+#Biomass
 NLWb <- NLW %>% 
   select(YEAR, avgMeat) %>% 
   distinct()
@@ -219,9 +232,6 @@ NLWbEval <- NLWbE[which.max(NLWbE$rho),"E"] #3
 
 NLWbTheta <- PredictNonlinear(dataFrame = NLWb, lib = "1 32", pred = "1 32", columns = "avgMeat", target = "avgMeat", E = NLWbEval)
 NLWbThetaVal <- NLWbTheta[which.max(NLWbTheta$rho),"Theta"] #4
-
-# Multispatial EDM for each area (univariate, averaged across stations)
-library(multispatialCCM)
 
 # Abundance embedding dimension plots
 # Eplot1a <- ggplot(areaI_abundanceE, aes(x=E, y=rho))+geom_line()+theme_classic()+
@@ -279,6 +289,7 @@ library(multispatialCCM)
 
 df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA2022.csv")
 dat_cat <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv")
+cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 
 df_stations <- df_stations %>% 
   mutate(STATION = as.numeric(STATION), YEAR = EST_YEAR) %>% 
@@ -291,18 +302,13 @@ df_stations <- df_stations %>%
   mutate(TOW = as.integer(TOW))
 
 aCat <- dat_cat %>% 
-  filter(SCIENTIFIC_NAME =="Asterias") %>% 
-  # | SCIENTIFIC_NAME =="Asterias rubens (boreal asterias)"  ) %>%
+  filter(SCIENTIFIC_NAME =="Asterias") %>%
   mutate(CRUISE6 = as.factor(CRUISE6),
          CRUISE = as.factor(CRUISE),
          STATION = as.numeric(STATION),
          .keep = "unused")
 
 aCat <- left_join(aCat, df_stations)
-
-# df_stations %>% filter(TOW == 17) %>% filter(STATION == 74)
-
-cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
 
 st_layers("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
 sediment<- st_read("~/Downloads/Fishing_Effects_Sediment/FishingEffectsSediment.shp")
@@ -313,10 +319,6 @@ st_crs(sediment)
 
 gbBounds <- st_as_sfc(st_bbox(testGB2))
 fishBounds <- st_as_sfc(st_bbox(fish))
-#sedimentGB <- st_contains(sediment, gbBounds)
-
-# sedimentGB <- sediment %>% 
-#  filter(withinGB == TRUE)
 
 sedimentGB <- st_intersects(gbBounds, sediment)
 sedimentFish <- st_intersects(fishBounds, sediment)
@@ -358,25 +360,56 @@ ggplot(sedimentGB2[1]) + geom_sf() + geom_sf(data = fishPts)
 
 
 # Length ------------------------------------------------------------------
-dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
-scallopLen <- dat_len %>%
-  filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
-  mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop")) #shorten for readability
+# dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
+# scallopLen <- dat_len %>%
+#   filter(SCIENTIFIC_NAME == "Placopecten magellanicus (sea scallop)") %>% 
+#   mutate(NAME = recode(SCIENTIFIC_NAME, "Placopecten magellanicus (sea scallop)" = "scallop")) #shorten for readability
+# 
+# scallopLen <- scallopLen %>% 
+#   select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
+# rm(dat_len)
+# 
+# scallopLen <- scallopLen %>%
+#   mutate(CRUISE6 = as.factor(CRUISE6),
+#          CRUISE = as.factor(CRUISE),
+#          STATION = as.numeric(STATION),
+#          .keep = "unused")
+# 
+# scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
+# 
+# scallopLen <- scallopLen %>%
+#   mutate(YEAR = as.numeric(YEAR)) %>%
+#   filter(as.numeric(STRATUM) > 5999) #shellfish strata start with 6
 
-scallopLen <- scallopLen %>% 
-  select(-c("CATCHSEX", "STATUS_CODE", "SVSPP", "SCIENTIFIC_NAME"))
-rm(dat_len)
+# len <- left_join(scallopLen, df_stations)
 
-scallopLen <- scallopLen %>%
-  mutate(CRUISE6 = as.factor(CRUISE6),
-         CRUISE = as.factor(CRUISE),
-         STATION = as.numeric(STATION),
-         .keep = "unused")
+# Multispatial EDM for the stock (biomass)
 
-scallopLen <- left_join(scallopLen, cruises, by="CRUISE6")
+areaIb[nrow(areaIb) + 1 , ] <- NA
+areaIIb[nrow(areaIIb) + 1 , ] <- NA
+NLNb[nrow(NLNb) + 1 , ] <- NA
 
-scallopLen <- scallopLen %>%
-  mutate(YEAR = as.numeric(YEAR)) %>%
-  filter(as.numeric(STRATUM) > 5999) #shellfish strata start with 6
+biomassMulti <- bind_rows("Area1" = areaIb, "Area2" = areaIIb, "NLN" = NLNb, "NLW" = NLWb, .id = "Area")
+biomassMulti<- biomassMulti %>% 
+  mutate(Area = replace(Area, is.na(avgMeat), NA))
 
-len <- left_join(scallopLen, df_stations)
+biomassMulti <- bind_rows(areaIb, areaIIb, NLNb, NLWb)
+#Calculate optimal E
+maxE<-15 #Maximum E to test
+#Matrix for storing output
+Emat<-matrix(nrow=maxE-1, ncol=2); colnames(Emat)<-c("Biomass", "E")
+
+for(E in 2:maxE) {
+  #Uses defaults of looking forward one prediction step (predstep)
+  #And using time lag intervals of one time step (tau)
+  Emat[E-1,"Biomass"]<-SSR_pred_boot(A=biomassMulti$avgMeat, E=E, predstep=1, tau=1)$rho
+  Emat[E-1, "E"]<-E
+}
+Emat<-as_tibble(Emat)
+
+ggplot(Emat, aes(x=E, y=Biomass))+geom_line()+labs(x="E", y="rho")+theme_classic()
+
+biomassE <- as.integer(Emat[which.max(Emat$Biomass),"E"]) #6
+
+biomassSignal<-SSR_check_signal(A=biomassMulti$avgMeat, E=biomassE, tau=1,predsteplist=1:6)
+plot(biomassSignal$predatout, type="l")
