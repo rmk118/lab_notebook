@@ -1,16 +1,16 @@
 #Summary of data analysis thus far
-#Last updated: June 23, 2023
+#Last updated: June 30, 2023
 
 library(tidyverse)
 library(lubridate)
 library(rEDM)
 
-dat_len<- read.csv("data/22564_UNION_FSCS_SVLEN2022.csv")
-dat_cat <- read.csv("data/22564_UNION_FSCS_SVCAT2022.csv")
-dat_bio <- read.csv("data/22564_UNION_FSCS_SVBIO2022.csv", quote = "")
-cruises <- read.csv("data/22564_SVDBS_CRUISES2022.csv")
-df_stations <- read.csv("data/22564_UNION_FSCS_SVSTA2022.csv")
-df_strata <- read.csv("data/newSVDBS_SVMSTRATA.csv")
+dat_len<- read.csv("data/NEFSC_scallopsurvey/22564_UNION_FSCS_SVLEN2022.csv")
+dat_cat <- read.csv("data/NEFSC_scallopsurvey/22564_UNION_FSCS_SVCAT2022.csv")
+dat_bio <- read.csv("data/NEFSC_scallopsurvey/22564_UNION_FSCS_SVBIO2022.csv", quote = "")
+cruises <- read.csv("data/NEFSC_scallopsurvey/22564_SVDBS_CRUISES2022.csv")
+df_stations <- read.csv("data/NEFSC_scallopsurvey/22564_UNION_FSCS_SVSTA2022.csv")
+df_strata <- read.csv("data/NEFSC_scallopsurvey/newSVDBS_SVMSTRATA.csv")
 
 # Cruises & stations ---------------------------------------------------- 
 
