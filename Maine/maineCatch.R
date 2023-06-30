@@ -148,8 +148,17 @@ aE1<- EmbedDimension(dataFrame = scalLogCatchFall_1a, lib = "1 23", pred = "1 23
 PredictNonlinear(dataFrame = scalLogCatchFall_1a, lib = "1 23", pred = "1 23",
                  columns = "logCatch",target = "logCatch", E = 2, theta=1:15) #thetaMax = 6
 
-ScalLogCatchFallE <-data.frame(matrix(ncol = 4, nrow = 5))
-colnames(ScalLogCatchFallE) <- c('Stratum A', 'Stratum B', 'Stratum C', 'Stratum D')
+#ScalLogCatchFallE <-data.frame(matrix(ncol = 4, nrow = 5))
+#colnames(ScalLogCatchFallE) <- c('Stratum A', 'Stratum B', 'Stratum C', 'Stratum D')
+
+numRegions = 5
+numStrata = 4
+EmatScalFall <- data.frame(matrix(ncol = numStrata, nrow = numRegions))
+
+findScallopE <- function(df) {
+  
+  
+}
 
 smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
 err <- ComputeError( smplx$Observations, smplx$Predictions )
