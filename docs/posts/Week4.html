@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ruby Krasnow">
-<meta name="dcterms.date" content="2023-06-26">
+<meta name="dcterms.date" content="2023-07-02">
 <meta name="description" content="My activities for the week">
 
 <title>Ruby’s Lab Notebook - Summer 2023 - Week 4</title>
@@ -110,9 +110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      Ruby's Lab Notebook - Summer 2023
-      </li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../posts/Week1.html">Project Updates</a></li><li class="breadcrumb-item"><a href="../posts/Week4.html">Week 4</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -191,6 +189,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Week 3</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../posts/Week4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Week 4</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -203,11 +207,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#monday-june-26" id="toc-monday-june-26" class="nav-link active" data-scroll-target="#monday-june-26">Monday, June 26</a></li>
+  <li><a href="#monday-june-26-preceding-weekend" id="toc-monday-june-26-preceding-weekend" class="nav-link active" data-scroll-target="#monday-june-26-preceding-weekend">Monday, June 26 (+ preceding weekend)</a></li>
   <li><a href="#tuesday-june-27" id="toc-tuesday-june-27" class="nav-link" data-scroll-target="#tuesday-june-27">Tuesday, June 27</a></li>
   <li><a href="#wednesday-june-28" id="toc-wednesday-june-28" class="nav-link" data-scroll-target="#wednesday-june-28">Wednesday, June 28</a></li>
   <li><a href="#thursday-june-29" id="toc-thursday-june-29" class="nav-link" data-scroll-target="#thursday-june-29">Thursday, June 29</a></li>
   <li><a href="#friday-june-30" id="toc-friday-june-30" class="nav-link" data-scroll-target="#friday-june-30">Friday, June 30</a></li>
+  <li><a href="#multispatial-ccm-practice" id="toc-multispatial-ccm-practice" class="nav-link" data-scroll-target="#multispatial-ccm-practice">Multispatial CCM practice</a></li>
   </ul>
 </nav>
     </div>
@@ -243,7 +248,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 26, 2023</p>
+      <p class="date">July 2, 2023</p>
     </div>
   </div>
   
@@ -253,8 +258,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="monday-june-26" class="level2">
-<h2 class="anchored" data-anchor-id="monday-june-26">Monday, June 26</h2>
+<section id="monday-june-26-preceding-weekend" class="level2">
+<h2 class="anchored" data-anchor-id="monday-june-26-preceding-weekend">Monday, June 26 (+ preceding weekend)</h2>
 <ol type="1">
 <li>I worked some more with the NEFSC spatial package, specifically focusing on isolating the areas that would contain the stations of interest:</li>
 </ol>
@@ -288,44 +293,318 @@ Projected CRS: WGS 84 / Pseudo-Mercator</code></pre>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(AREANAME, GARFO_ID, CFRPARA, FRCITE, FRDATE, SOURCE, COMMNAME, geometry) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NAME =</span> <span class="fu">recode</span>(AREANAME, <span class="st">"Area I Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"Area_I"</span>, <span class="st">"Area II Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"Area_II"</span>, <span class="st">"Nantucket Lightship North Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"NL_N"</span>,<span class="st">"Nantucket Lightship West Scallop Rotational Area"</span> <span class="ot">=</span> <span class="st">"NL_W"</span>))</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(testGB[<span class="st">"NAME"</span>], <span class="at">main=</span><span class="st">"GB Scallop Management Areas"</span>, <span class="at">key.pos=</span><span class="dv">1</span>, <span class="at">key.width =</span> <span class="fl">0.1</span>, <span class="at">key.length =</span> <span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(testGB[<span class="st">"NAME"</span>], <span class="at">main=</span><span class="st">"Georges Bank Scallop Management Areas"</span>, <span class="at">key.pos=</span><span class="dv">1</span>, <span class="at">key.width =</span> <span class="fl">0.1</span>, <span class="at">key.length =</span> <span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Week4_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <ol start="2" type="1">
 <li>Scallop/starfish data wrangling</li>
-<li>Multivariate CCM examples</li>
+<li>Multivariate CCM examples (see below)</li>
+<li>Dr.&nbsp;Deyle invited Josue and I to attend an interesting talk by a professor from Princeton on applications of data science and machine learning in urban planning.</li>
 </ol>
 </section>
 <section id="tuesday-june-27" class="level2">
 <h2 class="anchored" data-anchor-id="tuesday-june-27">Tuesday, June 27</h2>
 <ol type="1">
-<li>NEFMC meeting Day 1</li>
-<li>BRITE programming workshop: Git and Snakemake</li>
-<li>TBD</li>
+<li>NEFMC Meeting Day 1</li>
 </ol>
+<p>Interesting but non-scallop-specific links:</p>
+<ul>
+<li><a href="https://d23h0vhsm26o6d.cloudfront.net/5b_NOAA_NE_MidA_SP.Update.pdf">New England and Mid-Atlantic Geographic Strategic Plan 2020-2023</a></li>
+<li><a href="https://d23h0vhsm26o6d.cloudfront.net/5a_Final-NATIONAL-DATA-BUOY-CENTER-Pr.pdf">National Data Buoy Presentation</a></li>
+<li><a href="https://d23h0vhsm26o6d.cloudfront.net/3_2023SpringMeetingSummary.pdf">Atlantic States Marine Fisheries Commission 2023 Spring Meeting Summary</a></li>
+<li><a href="https://d23h0vhsm26o6d.cloudfront.net/1B_Prog_Rev_Tracking_NEFMC_June_Mtg_Working_2023-06-20-130743_wazt.pdf">NEFMC Program Review Recommendations Tracking Sheet</a></li>
+<li><a href="https://www.arcgis.com/home/item.html?id=0f5946eb61be4d899b88ac3916bb7691">U.S. Fishery Management and Conservation Areas web map</a></li>
+<li><a href="https://www.nefmc.org/library/june-2023-national-standard-1-technical-guidance-for-reference-points-and-status-determinations">National Standard 1 Technical Guidance for Reference Points and Status Determinations</a></li>
+<li>About the stock assessment process
+<ul>
+<li><p><a href="https://d23h0vhsm26o6d.cloudfront.net/Timeline-light-2.pdf">Management and Research Track Stock Assessment Timelines</a></p></li>
+<li><p><a href="https://d23h0vhsm26o6d.cloudfront.net/NRCC_Assessment_Process_Version-18Feb2022_508.pdf">Description of New England and Mid-Atlantic Region Stock Assessment Process</a></p></li>
+</ul></li>
+</ul>
+<ol start="2" type="1">
+<li>BRITE programming workshop: Git and Snakemake</li>
+<li>Continued organizing and visualizing the scallop and predator data</li>
+</ol>
+<ul>
+<li>R packages I am using frequently for all of my data exploration, analysis, and visualization include: tidyverse (dplyr, ggplot2, tibble, purrr, stringr, forcats, readr, and tidyr), ggplotify, patchwork, lubridate, mgcv, rEDM, multispatialEDM, nlme, sf, sfheaders, and the NEFSC packages I mentioned earlier.</li>
+</ul>
 </section>
 <section id="wednesday-june-28" class="level2">
 <h2 class="anchored" data-anchor-id="wednesday-june-28">Wednesday, June 28</h2>
 <ol type="1">
-<li>NEFMC meeting Day 2</li>
-<li>BRITE workshop: managing setbacks</li>
-<li>TBD</li>
+<li>NEFMC Meeting Day 2
+<ol type="1">
+<li>Most of the day had a heavy focus on <a href="https://www.nefmc.org/library/june-2023-groundfish-committee-report">groundfish</a> (haddock, cod), but interesting discussions regarding setting Acceptable Biological Catch limits (ABCs), determining FMSY, how to consider Canadian catch limits and fishing pressure on the stock, etc.</li>
+<li>Interesting <a href="https://d23h0vhsm26o6d.cloudfront.net/11a_ECSP-Potential-Action-Menu-16-June-2023.pdf">Potential Action Menu</a> and <a href="https://d23h0vhsm26o6d.cloudfront.net/11b_ECSPSummitReport_April2023.pdf">Summit Report</a> from the East Coast Climate Change Scenario Planning Initiative</li>
+</ol></li>
+<li>BRITE workshop: Managing setbacks and redefining success</li>
+<li>Spatial analysis of Georges Bank scallop data (see the <a href="https://github.com/rmk118/lab_notebook/blob/main/exploring.R">exploring.R</a> and <a href="https://github.com/rmk118/lab_notebook/blob/main/spatial.R">spatial.R</a> files stored on my GitHub)</li>
 </ol>
 </section>
 <section id="thursday-june-29" class="level2">
 <h2 class="anchored" data-anchor-id="thursday-june-29">Thursday, June 29</h2>
 <ol type="1">
-<li>NEFMC meeting Day 3</li>
-<li>TBD</li>
+<li>NEFMC Meeting Day 3 - EBFM (Ecosystem-Based Fisheries Management) and Scallop Presentations</li>
+<li>Continued spatial analysis of Georges Bank scallop data</li>
+<li>Meeting with Dr.&nbsp;Dvora Hart, Operations Research Analyst at the Northeast Fisheries Science Center (and lead assessment scientist for Atlantic sea scallops fishery). Dr.&nbsp;Deyle and Dr.&nbsp;Kaufman also attended. We had an excellent discussion about both the broad direction of my project and technical details relating to how to best develop accurate models of the system. She will send me more data documenting scallop and scallop predator (starfish and crab) abundances, with instructions on how to process the data so it is suitable for quantitative analysis.</li>
 </ol>
 </section>
 <section id="friday-june-30" class="level2">
 <h2 class="anchored" data-anchor-id="friday-june-30">Friday, June 30</h2>
-<ol type="1">
-<li>TBD</li>
-</ol>
+<p>Today I worked with the Maine inshore trawl survey data that I got access to yesterday afternoon. On the GitHub page for my lab notebook, you can find the raw data in the folder “data/Maine_inshore_trawl”, and the R scripts containing the most up-to-date version of my data exploration/analysis are in the “Maine” folder.</p>
+</section>
+<section id="multispatial-ccm-practice" class="level2">
+<h2 class="anchored" data-anchor-id="multispatial-ccm-practice">Multispatial CCM practice</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Multispatial CCM package vignette</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Ruby Krasnow</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Last modified: 6/26/2023</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(multispatialCCM)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Example data ------------------------------------------------------------</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Simulate data to use for multispatial CCM test</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#See function for details - A is causally forced by B,</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#but the reverse is not true.</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>ccm_data_out<span class="ot">&lt;-</span><span class="fu">make_ccm_data</span>()</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>Accm<span class="ot">&lt;-</span>ccm_data_out<span class="sc">$</span>Accm</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>Bccm<span class="ot">&lt;-</span>ccm_data_out<span class="sc">$</span>Bccm</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#Calculate optimal E</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>maxE<span class="ot">&lt;-</span><span class="dv">5</span> <span class="co">#Maximum E to test</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#Matrix for storing output</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>Emat<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="at">nrow=</span>maxE<span class="dv">-1</span>, <span class="at">ncol=</span><span class="dv">2</span>); <span class="fu">colnames</span>(Emat)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#Loop over potential E values and calculate predictive ability</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#of each process for its own dynamics</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(E <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>maxE) {</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Uses defaults of looking forward one prediction step (predstep)</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">#And using time lag intervals of one time step (tau)</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  Emat[E<span class="dv">-1</span>,<span class="st">"A"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>Accm, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  Emat[E<span class="dv">-1</span>,<span class="st">"B"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>Bccm, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#Look at plots to find E for each process at which</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#predictive ability rho is maximized</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(<span class="dv">2</span><span class="sc">:</span>maxE, Emat, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">"E"</span>, <span class="at">ylab=</span><span class="st">"rho"</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">bty=</span><span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>E_A<span class="ot">&lt;-</span><span class="dv">2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>E_B<span class="ot">&lt;-</span><span class="dv">3</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Check data for nonlinear signal that is not dominated by noise</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Checks whether predictive ability of processes declines with</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#increasing time distance</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#See manuscript and R code for details</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>signal_A_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>Accm, <span class="at">E=</span>E_A, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>signal_B_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>Bccm, <span class="at">E=</span>E_B, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(signal_A_out<span class="sc">$</span>predatout)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Run the CCM test</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#E_A and E_B are the embedding dimensions for A and B.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#tau is the length of time steps used (default is 1)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#iterations is the number of bootstrap iterations (default 100)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Does A "cause" B?</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Note - increase iterations to 100 for consistent results</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>CCM_boot_A<span class="ot">&lt;-</span><span class="fu">CCM_boot</span>(Accm, Bccm, E_A, <span class="at">tau=</span><span class="dv">1</span>, <span class="at">iterations=</span><span class="dv">10</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Does B "cause" A?</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>CCM_boot_B<span class="ot">&lt;-</span><span class="fu">CCM_boot</span>(Bccm, Accm, E_B, <span class="at">tau=</span><span class="dv">1</span>, <span class="at">iterations=</span><span class="dv">10</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Test for significant causal signal</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#See R function for details</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>(CCM_significance_test<span class="ot">&lt;-</span><span class="fu">ccmtest</span>(CCM_boot_A,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                                CCM_boot_B))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>pval_a_cause_b pval_b_cause_a 
+           0.3            0.0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot results</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plotxlimits<span class="ot">&lt;-</span><span class="fu">range</span>(<span class="fu">c</span>(CCM_boot_A<span class="sc">$</span>Lobs, CCM_boot_B<span class="sc">$</span>Lobs))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot "A causes B"</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(CCM_boot_A<span class="sc">$</span>Lobs, CCM_boot_A<span class="sc">$</span>rho, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd=</span><span class="dv">2</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim=</span><span class="fu">c</span>(plotxlimits[<span class="dv">1</span>], plotxlimits[<span class="dv">2</span>]), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">"L"</span>, <span class="at">ylab=</span><span class="st">"rho"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Add +/- 1 standard error</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">matlines</span>(CCM_boot_A<span class="sc">$</span>Lobs,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="fu">cbind</span>(CCM_boot_A<span class="sc">$</span>rho<span class="sc">-</span>CCM_boot_A<span class="sc">$</span>sdevrho,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>               CCM_boot_A<span class="sc">$</span>rho<span class="sc">+</span>CCM_boot_A<span class="sc">$</span>sdevrho),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">lty=</span><span class="dv">3</span>, <span class="at">col=</span><span class="dv">1</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot "B causes A"</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(CCM_boot_B<span class="sc">$</span>Lobs, CCM_boot_B<span class="sc">$</span>rho, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">col=</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Add +/- 1 standard error</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="fu">matlines</span>(CCM_boot_B<span class="sc">$</span>Lobs,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>         <span class="fu">cbind</span>(CCM_boot_B<span class="sc">$</span>rho<span class="sc">-</span>CCM_boot_B<span class="sc">$</span>sdevrho,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>               CCM_boot_B<span class="sc">$</span>rho<span class="sc">+</span>CCM_boot_B<span class="sc">$</span>sdevrho),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">lty=</span><span class="dv">3</span>, <span class="at">col=</span><span class="dv">2</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">"A causes B"</span>, <span class="st">"B causes A"</span>),</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">bty=</span><span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nitrogen E001 unfertilized -----------------------------------------------------------</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>e0010<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/example_code/multispatialCCMexamples/e001_arssnlvl0.csv"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>e0010test<span class="ot">&lt;-</span> e0010 <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(Year))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove the isolated 2008 years and the extra NA rows that result</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>e0010 <span class="ot">&lt;-</span> e0010 <span class="sc">%&gt;%</span> </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Year)<span class="sc">|</span>Year <span class="sc">!=</span> <span class="dv">2008</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(<span class="fu">nrow</span>(e0010)<span class="sc">-</span><span class="dv">1</span>)) {</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(e0010[i,<span class="st">"Year"</span>]) <span class="sc">|</span> <span class="sc">!</span><span class="fu">is.na</span>(e0010[i<span class="sc">+</span><span class="dv">1</span>,<span class="st">"Year"</span>])) {</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    e0010<span class="ot">&lt;-</span>e0010</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    e0010<span class="ot">&lt;-</span>e0010 <span class="sc">%&gt;%</span><span class="fu">slice</span>(<span class="sc">-</span>i)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>repens <span class="ot">&lt;-</span> e0010<span class="sc">$</span>Agropyron.repens</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>scop <span class="ot">&lt;-</span> e0010<span class="sc">$</span>Schizachyrium.scoparium</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#Calculate optimal E</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>maxE2<span class="ot">&lt;-</span><span class="dv">20</span> <span class="co">#Maximum E to test</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#Matrix for storing output</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>Emat2<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="at">nrow=</span>maxE2<span class="dv">-1</span>, <span class="at">ncol=</span><span class="dv">2</span>); <span class="fu">colnames</span>(Emat2)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"A. repens"</span>, <span class="st">"S. scoparium"</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(E <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>maxE2) {</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Uses defaults of looking forward one prediction step (predstep)</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="co">#And using time lag intervals of one time step (tau)</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  Emat2[E<span class="dv">-1</span>,<span class="st">"A. repens"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>repens, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>  Emat2[E<span class="dv">-1</span>,<span class="st">"S. scoparium"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>scop, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">#predictive skill by embedding dimension</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(<span class="dv">2</span><span class="sc">:</span>maxE2, Emat2, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">"E"</span>, <span class="at">ylab=</span><span class="st">"rho"</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"A. repens"</span>, <span class="st">"S. scoparium"</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">bty=</span><span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>E_repens<span class="ot">&lt;-</span><span class="dv">5</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>E_scop<span class="ot">&lt;-</span><span class="dv">16</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Check data for nonlinear signal that is not dominated by noise</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Checks whether predictive ability of processes declines with increasing time distance</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>signal_rep_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>repens, <span class="at">E=</span>E_repens, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>signal_scop_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>scop, <span class="at">E=</span>E_scop, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(signal_rep_out<span class="sc">$</span>predatout, <span class="at">type=</span><span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(signal_scop_out<span class="sc">$</span>predatout, <span class="at">type=</span><span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nitrogen E001 fertilized -----------------------------------------------------------</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>e0013<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/example_code/multispatialCCMexamples/e001_arssnlvl3.csv"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>e0013test<span class="ot">&lt;-</span> e0013 <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">years=</span><span class="fu">n_distinct</span>(Year))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>e0013 <span class="ot">&lt;-</span> e0013 <span class="sc">%&gt;%</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Year)<span class="sc">|</span>Year <span class="sc">!=</span> <span class="dv">2008</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(<span class="fu">nrow</span>(e0013)<span class="sc">-</span><span class="dv">1</span>)) {</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(e0013[i,<span class="st">"Year"</span>]) <span class="sc">|</span> <span class="sc">!</span><span class="fu">is.na</span>(e0013[i<span class="sc">+</span><span class="dv">1</span>,<span class="st">"Year"</span>])) {</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    e0013<span class="ot">&lt;-</span>e0013</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    e0013<span class="ot">&lt;-</span>e0013 <span class="sc">%&gt;%</span><span class="fu">slice</span>(<span class="sc">-</span>i)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>repens3 <span class="ot">&lt;-</span> e0013<span class="sc">$</span>Agropyron.repens</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>scop3 <span class="ot">&lt;-</span> e0013<span class="sc">$</span>Schizachyrium.scoparium</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#Calculate optimal E</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>maxE3<span class="ot">&lt;-</span><span class="dv">20</span> <span class="co">#Maximum E to test</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#Matrix for storing output</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>Emat3<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="at">nrow=</span>maxE3<span class="dv">-1</span>, <span class="at">ncol=</span><span class="dv">2</span>); <span class="fu">colnames</span>(Emat3)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"A. repens"</span>, <span class="st">"S. scoparium"</span>)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(E <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>maxE3) {</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Uses defaults of looking forward one prediction step (predstep)</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">#And using time lag intervals of one time step (tau)</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  Emat3[E<span class="dv">-1</span>,<span class="st">"A. repens"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>repens3, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  Emat3[E<span class="dv">-1</span>,<span class="st">"S. scoparium"</span>]<span class="ot">&lt;-</span><span class="fu">SSR_pred_boot</span>(<span class="at">A=</span>scop3, <span class="at">E=</span>E, <span class="at">predstep=</span><span class="dv">1</span>, <span class="at">tau=</span><span class="dv">1</span>)<span class="sc">$</span>rho</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="co">#predictive skill by embedding dimension</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(<span class="dv">2</span><span class="sc">:</span>maxE3, Emat3, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">"E"</span>, <span class="at">ylab=</span><span class="st">"rho"</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"A. repens"</span>, <span class="st">"S. scoparium"</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">bty=</span><span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-7.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>E_repens3<span class="ot">&lt;-</span><span class="dv">12</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>E_scop3<span class="ot">&lt;-</span><span class="dv">3</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Check data for nonlinear signal that is not dominated by noise</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Checks whether predictive ability of processes declines with increasing time distance</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>signal_rep3_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>repens, <span class="at">E=</span>E_repens3, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>signal_scop3_out<span class="ot">&lt;-</span><span class="fu">SSR_check_signal</span>(<span class="at">A=</span>scop, <span class="at">E=</span>E_scop3, <span class="at">tau=</span><span class="dv">1</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">predsteplist=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(signal_rep3_out<span class="sc">$</span>predatout, <span class="at">type=</span><span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-8.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(signal_scop_out<span class="sc">$</span>predatout, <span class="at">type=</span><span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-9.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating time-lagged plot in 2 dimensions (i.e. A. repens population this year, vs. next year)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lagRepens <span class="ot">&lt;-</span> e0013 <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lagR =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Year, FieldPlot, Agropyron.repens, lagR) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>data_mod <span class="ot">&lt;-</span> lagRepens <span class="sc">%&gt;%</span>                           </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">laggedval =</span> <span class="fu">lag</span>(Agropyron.repens, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">default =</span> <span class="cn">NA</span>))</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>plotA<span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data_mod, <span class="fu">aes</span>(<span class="at">x=</span>Agropyron.repens, <span class="at">y=</span>laggedval, <span class="at">color=</span>Year))<span class="sc">+</span><span class="fu">geom_point</span>()<span class="sc">+</span> <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> <span class="fu">rainbow</span>(<span class="dv">30</span>))<span class="sc">+</span><span class="fu">theme_classic</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">x=</span><span class="st">"t0"</span>, <span class="at">y=</span><span class="st">"t1"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating time-lagged plot in 2 dimensions (i.e. S. scoparium population this year, vs. next year)</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>lagScop <span class="ot">&lt;-</span> e0013 <span class="sc">%&gt;%</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lagS =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Year, FieldPlot, Schizachyrium.scoparium, lagS) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>data_modS <span class="ot">&lt;-</span> lagScop <span class="sc">%&gt;%</span>                           </span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(FieldPlot) <span class="sc">%&gt;%</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">laggedvalS =</span> <span class="fu">lag</span>(Schizachyrium.scoparium, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">default =</span> <span class="cn">NA</span>))</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>plotS<span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data_modS, <span class="fu">aes</span>(<span class="at">x=</span>Schizachyrium.scoparium, <span class="at">y=</span>laggedvalS, <span class="at">color=</span>Year))<span class="sc">+</span><span class="fu">geom_point</span>()<span class="sc">+</span> <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> <span class="fu">rainbow</span>(<span class="dv">30</span>))<span class="sc">+</span><span class="fu">theme_classic</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">x=</span><span class="st">"t0"</span>, <span class="at">y=</span><span class="st">"t1"</span>)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co">#Recreated figure A6!</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>plotA<span class="sc">+</span>plotS <span class="sc">+</span>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">'collect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Week4_files/figure-html/unnamed-chunk-2-10.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
 </section>

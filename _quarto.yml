@@ -23,6 +23,7 @@ website:
         - posts/Week2words.qmd
         - posts/Week2R.qmd
         - posts/Week3words.qmd
+        - posts/Week4.qmd
 
 format:
   html:

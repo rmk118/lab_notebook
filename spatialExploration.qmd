@@ -104,7 +104,7 @@ ggplot(testGB2) + geom_sf(aes(fill = count))
 ```
 
 Identifying polygons containing points:
-```{r}
+```{r, eval=FALSE}
 # Intersection (first points, then polygons)
 interID <- st_intersects(fish, testGB2)
 

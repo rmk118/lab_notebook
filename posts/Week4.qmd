@@ -1,6 +1,6 @@
 ---
 title: 'Week 4'
-date: '2023-06-26'
+date: '2023-07-02'
 categories: ['Week 4', 'Data exploration', 'NEFMC meeting']
 description: 'My activities for the week'
 execute: 
@@ -35,7 +35,7 @@ plot(testGB["NAME"], main="Georges Bank Scallop Management Areas", key.pos=1, ke
 
 2.  Scallop/starfish data wrangling
 3.  Multivariate CCM examples (see below)
-4.  Interesting talk on applications of data science and machine learning in urban planning
+4.  Dr. Deyle invited Josue and I to attend an interesting talk by a professor from Princeton on applications of data science and machine learning in urban planning.
 
 ## Tuesday, June 27
 
@@ -50,29 +50,31 @@ Interesting but non-scallop-specific links:
 -   [U.S. Fishery Management and Conservation Areas web map](https://www.arcgis.com/home/item.html?id=0f5946eb61be4d899b88ac3916bb7691)
 -   [National Standard 1 Technical Guidance for Reference Points and Status Determinations](https://www.nefmc.org/library/june-2023-national-standard-1-technical-guidance-for-reference-points-and-status-determinations)
 -   About the stock assessment process
-    -   [Management and Research Track Stock Assessment Timelines](https://d23h0vhsm26o6d.cloudfront.net/Timeline-light-2.pdf)
-    -   [Description of New England and Mid-Atlantic Region Stock Assessment Process](https://d23h0vhsm26o6d.cloudfront.net/NRCC_Assessment_Process_Version-18Feb2022_508.pdf)
+    -  [Management and Research Track Stock Assessment Timelines](https://d23h0vhsm26o6d.cloudfront.net/Timeline-light-2.pdf)
 
-2.  BRITE programming workshop: Git and Snakemake
-3.  TBD
+    -  [Description of New England and Mid-Atlantic Region Stock Assessment Process](https://d23h0vhsm26o6d.cloudfront.net/NRCC_Assessment_Process_Version-18Feb2022_508.pdf)
+
+2.    BRITE programming workshop: Git and Snakemake
+3.    Continued organizing and visualizing the scallop and predator data
+  -   R packages I am using frequently for all of my data exploration, analysis, and visualization include: tidyverse (dplyr, ggplot2, tibble, purrr, stringr, forcats, readr, and tidyr), ggplotify, patchwork, lubridate, mgcv, rEDM, multispatialEDM, nlme, sf, sfheaders, and the NEFSC packages I mentioned earlier. 
 
 ## Wednesday, June 28
 
 1.  NEFMC Meeting Day 2
     1.  Most of the day had a heavy focus on [groundfish](https://www.nefmc.org/library/june-2023-groundfish-committee-report) (haddock, cod), but interesting discussions regarding setting Acceptable Biological Catch limits (ABCs), determining FMSY, how to consider Canadian catch limits and fishing pressure on the stock, etc.
     2.  Interesting [Potential Action Menu](https://d23h0vhsm26o6d.cloudfront.net/11a_ECSP-Potential-Action-Menu-16-June-2023.pdf) and [Summit Report](https://d23h0vhsm26o6d.cloudfront.net/11b_ECSPSummitReport_April2023.pdf) from the East Coast Climate Change Scenario Planning Initiative
-2.  BRITE workshop: managing setbacks
-3.  Spatial analysis
+2.  BRITE workshop: Managing setbacks and redefining success
+3.  Spatial analysis of Georges Bank scallop data (see the [exploring.R](https://github.com/rmk118/lab_notebook/blob/main/exploring.R) and [spatial.R](https://github.com/rmk118/lab_notebook/blob/main/spatial.R) files stored on my GitHub)
 
 ## Thursday, June 29
 
-1.    NEFMC Meeting Day 3 - EBFM and Scallops
-2.    Spatial analysis
-3.    Meeting with Dr. Hart
+1.  NEFMC Meeting Day 3 - EBFM (Ecosystem-Based Fisheries Management) and Scallop Presentations
+2.  Continued spatial analysis of Georges Bank scallop data
+3.  Meeting with Dr. Dvora Hart, Operations Research Analyst at the Northeast Fisheries Science Center (and lead assessment scientist for Atlantic sea scallops fishery). Dr. Deyle and Dr. Kaufman also attended. We had an excellent discussion about both the broad direction of my project and technical details relating to how to best develop accurate models of the system. She will send me more data documenting scallop and scallop predator (starfish and crab) abundances, with instructions on how to process the data so it is suitable for quantitative analysis.
 
 ## Friday, June 30
 
-1.  TBD
+Today I worked with the Maine inshore trawl survey data that I got access to yesterday afternoon. On the GitHub page for my lab notebook, you can find the raw data in the folder "data/Maine_inshore_trawl", and the R scripts containing the most up-to-date version of my data exploration/analysis are in the "Maine" folder.
 
 ## Multispatial CCM practice
 
