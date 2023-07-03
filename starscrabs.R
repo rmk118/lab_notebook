@@ -24,18 +24,24 @@ df_data<- df_data_unordered %>% select(all_of(colOrder)) %>%
 # Manually identified all stations that had a comment in the catchcomment or stacomment column
 # that mentioned stars and/or crabs
 df_data_flagged_comment <- df_data %>% 
-   filter((year == 2010 & (station %in% c(430,495))) |
+   filter((year == 2003 & station == 238) |
+          (year == 2010 & (station %in% c(430,495))) |
           (year == 2011 & (station %in% c(196,266))) |
           (year == 2012 & (station %in% c(43,73))) |
           (year == 2013 & (station %in% c(63, 68, 83, 107, 165, 166))) |
           (year == 2015 & (station %in% c(40, 49, 61, 77, 114, 129, 137, 139, 
                                           157, 164, 166, 175, 179, 186, 191, 194))) |
           (year == 2016 & (station %in% c(10, 24, 39, 52, 54, 56, 61, 63, 66) )) |
-          (year == 2018 & (station %in% c(121, 153))) |
-          (year == 2019 ) | (year == 2021 ) | (year == 2022 ))  #2019-2022
+          (year == 2018 & (station %in% c(92, 107, 111, 121, 153))))
+          # (year == 2019 ) | (year == 2021 ) | (year == 2022 ))  #2019-2022
+
+#confirm no instances were missed
+# test2<- df_data %>% filter(year < 2019) %>% 
+#   filter(str_detect(catchcomment, "star[^t]|crab") | str_detect(stacomment, "star[^t]|crab"))
+# anti_join(test2, df_data_flagged_comment)
 
 
-# Identifying runs of >=3 consecutive stations
+# Identifying runs of >=3 consecutive stations ----------------------------
 
 ##### Method 1
 stationsList <- df_data$station #length = 3077 stations
@@ -88,8 +94,8 @@ finalConsecutive <- finalConsecutive %>% ungroup() %>%
 
 tibble(finalConsecutive)
 
-# Data table with the stations that were flagged based on the catchcomment or stacomment columns
-#2015 station 137 says "no stars and crabs sampled at this station", others just say "no stars/crabs"
+# Data table with the stations 2003-2018 that were flagged based on a mention of 
+# the presence or absence of stars and/or crabs in the catchcomment or stacomment columns
 tibble(df_data_flagged_comment)
 
 
