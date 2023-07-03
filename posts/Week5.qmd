@@ -1,6 +1,6 @@
 ---
 title: 'Week 5'
-date: '2023-07-02'
+date: '2023-07-03'
 categories: ['Week 5']
 description: 'My activities for the week'
 execute: 
@@ -13,8 +13,8 @@ bibliography: references.bib
 
 ## Monday, July 3 (+ preceding weekend)
 
-1. I went through the scallop data that Dr. Hart emailed me on Friday...
-2. TBD
+1. I spent most of the day working with the scallop data that Dr. Hart emailed me on Friday. As she requested, I created an R script that turns the data file she gave me into two data frames with lists of 3 or more consecutive stations that have been labeled as star/crab samples not taken. I also manually read the catch comment for each station to evaluate the possibility that crabs/starfish might have been sampled at that station and the catch photo needs to be checked.
+2. I worked through the SCC+Bash BRITE Workshop materials that Michael emailed us so I will be prepared for the workshop on Thursday. I learned a great deal of new syntax and practiced creating and running basic bash scripts on the SCC.
 
 ## Tuesday, July 4
 
