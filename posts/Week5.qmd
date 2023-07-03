@@ -1,0 +1,36 @@
+---
+title: 'Week 5'
+date: '2023-07-02'
+categories: ['Week 5']
+description: 'My activities for the week'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+## Monday, July 3 (+ preceding weekend)
+
+1. I went through the scallop data that Dr. Hart emailed me on Friday...
+2. TBD
+
+## Tuesday, July 4
+
+Today was technically a holiday...
+
+## Wednesday, July 5
+
+1. I went through the scallop data that Dr. Hart emailed me on Friday...
+2. TBD
+
+## Thursday, July 6
+
+1. BRITE Programming Workshop: Bash/Linux
+2. TBD
+
+## Friday, July 7
+
+1. BRITE Programming Workshop: Bash/Linux
+2. TBD
