@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+    <idinfo>
+        <citation>
+            <citeinfo>
+                <title>Trawl_Survey_Grid2</title>
+                <geoform>vector digital data</geoform>
+            </citeinfo>
+        </citation>
+        <descript>
+            <abstract>This dataset is one part of a multi-layer dataset representing data collected by the Maine-New Hampshire Inshore Trawl Survey. For more information on the Maine-New Hampshire Inshore Trawl Survey, please see: https://www.maine.gov/dmr/science-research/projects/trawlsurvey/index.htmlThe layers included are:Tows (polyline)Catch (table)Strata (polygon)Regions (lines)Grid (polygon)&amp;quot;Grid&amp;quot; contains the grid cells utilized by the survey.Description of fields:grid_id - Unique grid cell ID.depth_stratum - Depth stratum the grid cell occurs within. See the strata layer for more information.region_id - Region the grid cell occurs within. See the region layer for more information.surveys - Hypen-delimited string of all the surveys that have occurred within the grid cell, sorted by survey date ascending. This is based on any part of a survey tow occurring within the grid cell.last_survey - The last survey that occurred within the grid cell.area_nm - The area of the grid cell in square nautical miles.</abstract>
+            <purpose>Grid used by the Maine-New Hampshire Inshore Trawl Survey.</purpose>
+        </descript>
+        <spdom>
+            <bounding>
+                <westbc>-70.812884</westbc>
+                <eastbc>-66.888218</eastbc>
+                <northbc>44.813155</northbc>
+                <southbc>42.864656</southbc>
+            </bounding>
+        </spdom>
+        <keywords>
+            <theme>
+                <themekt>None</themekt>
+                <themekey>mainedmr</themekey>
+                <themekey>trawl survey</themekey>
+                <themekey>open data</themekey>
+                <themekey>fisheries</themekey>
+                <themekey>oceans</themekey>
+                <themekey>groundfish</themekey>
+                <themekey>ocean</themekey>
+                <themekey>spatial</themekey>
+            </theme>
+        </keywords>
+        <accconst>None</accconst>
+        <useconst/>
+        <datacred/>
+        <native>Esri ArcGIS 12.3.2.15850</native>
+    </idinfo>
+    <spdoinfo>
+        <direct>Vector</direct>
+        <ptvctinf>
+            <sdtsterm>
+                <sdtstype>GT-polygon composed of chains</sdtstype>
+                <ptvctcnt>3698</ptvctcnt>
+            </sdtsterm>
+        </ptvctinf>
+    </spdoinfo>
+    <eainfo>
+        <detailed>
+            <enttyp>
+                <enttypl>Trawl_Survey_Grid2</enttypl>
+            </enttyp>
+            <attr>
+                <attrlabl>OBJECTID</attrlabl>
+                <attrdef>Internal feature number.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                    
+                    <udom>Sequential unique whole numbers that are automatically generated.</udom>
+                    
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>Shape</attrlabl>
+                <attrdef>Feature geometry.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                    
+                    <udom>Coordinates defining the features.</udom>
+                    
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>depth_stratum</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>grid_id</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>last_survey</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>region_id</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>area_nm</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>surveys</attrlabl>
+            </attr>
+            <attr>
+                <attrlabl>Shape_Length</attrlabl>
+                <attrdef>Length of feature in internal units.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                    
+                    <udom>Positive real numbers that are automatically generated.</udom>
+                    
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>Shape_Area</attrlabl>
+                <attrdef>Area of feature in internal units squared.</attrdef>
+                <attrdefs>Esri</attrdefs>
+                <attrdomv>
+                    
+                    <udom>Positive real numbers that are automatically generated.</udom>
+                    
+                </attrdomv>
+            </attr>
+        </detailed>
+    </eainfo>
+    <metainfo>
+        <metd>20190730</metd>
+        <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+        <metstdv>FGDC-STD-001-1998</metstdv>
+        <mettc>local time</mettc>
+    </metainfo>
+</metadata>

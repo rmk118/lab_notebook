@@ -115,13 +115,13 @@ ggplot(logWtFall, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic(
 
 # Scallops ----------------------------------------------------------------
 
-scallopsTidy <- catchTidy %>% filter(Species=="scallop" & Type=="logCatch")
+scallopsTidy <- catchTidy %>% filter(Species=="scallop") #%>% filter(Type=="logCatch")
 
-ggplot(scallopsTidy, aes(x=Year,y=value, color=Season))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
+# ggplot(scallopsTidy, aes(x=Year,y=value, color=Season))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
 
 #Set up functions
-numRegions = 5
-numStrata = 3
+# numRegions = 5
+# numStrata = 4
 
 
 
@@ -140,13 +140,13 @@ scalLogCatchFall_1.1 <- scalLogCatchFall %>%
 
 E1.1<- EmbedDimension(dataFrame = scalLogCatchFall_1.1, lib = "1 23", pred = "1 23", columns = "value",target = "value")
 
-findE_df <- function(df) {
-  lib_vec <- paste(1,nrow(df))
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value")
-  E_out<-rho_E[which.max(rho_E$rho),"E"][1]
-  return(E_out)
-}
-findEtest_df<- findE_df(scalLogCatchFall_1.1)
+# findE_df <- function(df) {
+#   lib_vec <- paste(1,nrow(df))
+#   rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value")
+#   E_out<-rho_E[which.max(rho_E$rho),"E"][1]
+#   return(E_out)
+# }
+# findEtest_df<- findE_df(scalLogCatchFall_1.1)
 
 findE_v <- function(v) {
   lib_vec <- paste(1, length(v))
@@ -199,30 +199,28 @@ findScallopErho_v <- function(df, season, type) {
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
 findScallopE(scallopsTidy, season="Fall", type="logCatch")
 
-par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
+
+a<-findScallopE(scallopsTidy, season="Fall", type="logWt")
+
+
 findScallopErho_v(scallopsTidy, season="Fall", type="logCatch")
 
 
+findScallopErho_v(scallopsTidy, season="Fall", type="logWt")
+
 
 ############## Spring
-scalLogCatchSpring <- scallopsTidy %>% 
-  filter(Type=="logCatch", Season=="Spring") %>% 
-  select(-c('name', 'Species', 'Type')) %>% 
-  mutate(logCatch = value, .keep = "unused")
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
+findScallopE(scallopsTidy, season="Spring", type="logCatch")
+
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
+findScallopErho_v(scallopsTidy, season="Spring", type="logCatch")
 
 
 
 # log weight --------------------------------------------------------------
 
-scalLogWtFall <- scallopsTidy %>% 
-  filter(Type=="logWt", Season=="Fall") %>% 
-  select(-c('name', 'Species', 'Type')) %>% 
-  mutate(logWeight = value, .keep = "unused")
 
-scalLogWtSpring <- scallopsTidy %>% 
-  filter(Type=="logWt", Season=="Spring") %>% 
-  select(-c('name', 'Species', 'Type')) %>% 
-  mutate(logWeight = value, .keep = "unused")
 
 
 # ggplot(scalLogWtFall, aes(x=Year, y=logWeight, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
