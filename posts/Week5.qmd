@@ -1,6 +1,6 @@
 ---
 title: 'Week 5'
-date: '2023-07-03'
+date: '2023-07-04'
 categories: ['Week 5']
 description: 'My activities for the week'
 execute: 
@@ -18,11 +18,13 @@ bibliography: references.bib
 
 ## Tuesday, July 4
 
-Today was technically a holiday...
+Today was technically a holiday, and also I had food poisoning...
+1. Worked through athlete survey/sensor repository Dr. Deyle shared with me
+2. Based on clarification provided by Dr. Hart, I created a list of the stations with a comment mentioning "stars and crabs" (affirmative). I also made an updated version of the csv file I sent previously that lists the first stations in runs of 3+ consecutive stations with "starsample = FALSE". The new version excludes five such runs that would not exist if the stations with a "stars and crabs" comment were all changed to "starsample = TRUE".
 
 ## Wednesday, July 5
 
-1. I went through the scallop data that Dr. Hart emailed me on Friday...
+1. I went through the scallop dredge survey data...
 2. TBD
 
 ## Thursday, July 6
@@ -32,5 +34,4 @@ Today was technically a holiday...
 
 ## Friday, July 7
 
-1. BRITE Programming Workshop: Bash/Linux
-2. TBD
+1. TBD

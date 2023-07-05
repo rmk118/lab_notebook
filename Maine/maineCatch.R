@@ -62,14 +62,6 @@ j_cat <- summaryCatch(j_catFull)
 r_cat <- summaryCatch(r_catFull)
 s_cat <- summaryCatch(s_catFull)
 
-# ggplot(j_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
-# ggplot(r_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
-# ggplot(s_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
-#
-# ggplot(j_cat, aes(x=Survey, y=avgCatch, group=Stratum, color=Stratum))+geom_line()+facet_wrap(~Region)
-# ggplot(r_cat, aes(x=Survey, y=avgCatch, group=Stratum, color=Stratum))+geom_line()+facet_wrap(~Region)
-# ggplot(s_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
-
 catch <- s_cat %>% left_join(j_cat, by=c("Season", "Region", "Stratum", "Year"), suffix = c("_s", "_j"))
 catch <- catch %>% left_join(r_cat, by=c("Season", "Region", "Stratum", "Year")) %>%
           mutate(avgCatch_r = avgCatch, avgWt_r = avgWt, .keep="unused")
@@ -82,10 +74,10 @@ catch$logJ_wt <- log(catch$avgWt_j+1)
 catch$logR_wt <- log(catch$avgWt_r+1)
 catch$logS_wt <- log(catch$avgWt_s+1)
 
-ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="jonah crabs") #+ scale_color_gradientn(colours = rainbow(30))
-ggplot(catch, aes(x=logS_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="rock crabs")
-ggplot(catch, aes(x=logJ_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="jonah crabs", y="rock crabs")
-ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="jonah crabs")+facet_wrap(~Stratum)
+# ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+geom_smooth(method = "lm")+labs(x="scallops", y="jonah crabs")+facet_grid(Region~Stratum) #+ scale_color_gradientn(colours = rainbow(30))
+# ggplot(catch, aes(x=logS_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="rock crabs")+geom_smooth(method = "lm")+facet_grid(Region~Stratum)
+# ggplot(catch, aes(x=logJ_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="jonah crabs", y="rock crabs")
+# ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="jonah crabs")+facet_wrap(~Stratum)
 
 catchTidy <- pivot_longer(catch, 
         cols = 5:16) %>% 
@@ -99,10 +91,9 @@ catchTidy <- pivot_longer(catch,
     startsWith(name, "logR") | endsWith(name, "r") ~"rock",
     startsWith(name, "logJ") | endsWith(name, "j") ~"jonah"))
 
-catchTidy <- catchTidy %>% mutate(Species = as.factor(Species),
-                                  Season = as.factor(Season),
-                                  Region = as.factor(Region),
-                                  Stratum = as.factor(Stratum))
+catchTidy <- catchTidy %>% mutate(Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
+          select(-name) #%>% 
+  #mutate(value = format(value, scientific = FALSE))
 
 avgCatchFall <- catchTidy %>% filter(Type == "avgCatch") %>% filter(Season == "Fall")
 avgWtFall <- catchTidy %>% filter(Type == "avgWt") %>% filter(Season == "Fall")
@@ -114,14 +105,19 @@ logCatchSpring <- catchTidy %>% filter(Type == "logCatch") %>% filter(Season == 
 avgWtSpring <- catchTidy %>% filter(Type == "avgWt") %>% filter(Season == "Spring")
 logWtSpring <- catchTidy %>% filter(Type == "logWt") %>% filter(Season == "Spring")
 
-ggplot(avgCatchSpring, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
+ggplot(logCatchSpring, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
+
+ggplot(logCatchFall, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
 
 ggplot(logWtSpring, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic()+labs(x="Time", y="Log weight")+facet_grid(Region~Stratum)
 
+ggplot(logWtFall, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic()+labs(x="Time", y="Log weight")+facet_grid(Region~Stratum)
 
 # Scallops ----------------------------------------------------------------
 
-scallopsTidy <- catchTidy %>% filter(Species=="scallop")
+scallopsTidy <- catchTidy %>% filter(Species=="scallop" & Type=="logCatch")
+
+ggplot(scallopsTidy, aes(x=Year,y=value, color=Season))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
 
 
 # log catch ---------------------------------------------------------------
@@ -160,8 +156,8 @@ findScallopE <- function(df) {
   
 }
 
-smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
-err <- ComputeError( smplx$Observations, smplx$Predictions )
+# smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
+# err <- ComputeError( smplx$Observations, smplx$Predictions )
 
 ############## Spring
 scalLogCatchSpring <- scallopsTidy %>% 

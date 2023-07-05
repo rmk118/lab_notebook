@@ -23,7 +23,8 @@ df_j_len <- df_j_len %>% mutate(Common_Name = "Jonah crab") #note shell height i
 
 df_s_len <- df_s_len %>% 
   filter(Common_Name == "Scallop Sea") %>% 
-  mutate(Length = replace(Length, Unit_of_Length == "CM", Length*10)) 
+  mutate(Length = replace(Length, Unit_of_Length == "CM", Length*10)) %>% 
+  mutate(Unit_of_Length = recode(Unit_of_Length, "CM"="MM"))
 #shell height was measured in cm until 2005, then switched to MM
 
 df_j_len <- df_j_len %>% 

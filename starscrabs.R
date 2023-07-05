@@ -1,6 +1,6 @@
 #Dredge data sorting 2000-2022
 #Ruby Krasnow
-#Last updated: July 3, 2023
+#Last updated: July 4, 2023
 
 library(tidyverse)
 
@@ -28,12 +28,15 @@ df_data_flagged_comment <- df_data %>%
           (year == 2010 & (station %in% c(430,495))) |
           (year == 2011 & (station %in% c(196,266))) |
           (year == 2012 & (station %in% c(43,73))) |
-          (year == 2013 & (station %in% c(63, 68, 83, 107, 165, 166))) |
-          (year == 2015 & (station %in% c(40, 49, 61, 77, 114, 129, 137, 139, 
-                                          157, 164, 166, 175, 179, 186, 191, 194))) |
-          (year == 2016 & (station %in% c(10, 24, 39, 52, 54, 56, 61, 63, 66) )) |
-          (year == 2018 & (station %in% c(92, 107, 111, 121, 153))))
-          # (year == 2019 ) | (year == 2021 ) | (year == 2022 ))  #2019-2022
+          (year == 2013 & (station %in% c(63, 68, 107, 165, 166))) | # No stars/crabs 2013: 83
+          (year == 2015 & (station %in% c(114, 139, 186))) | 
+            #No stars/crabs 2015: 40, 49, 61, 77, 129, 137,157, 164, 166, 175, 179, 191, 194
+          (year == 2016 & station == 52) |
+            #No stars/crabs 2016: 10, 24, 39, 54, 56, 61, 63, 66
+          (year == 2018 & (station %in% c(107, 111, 153))) |
+          #No stars/crabs 2018: 92, 121
+            (year == 2019 & station ==50) |
+            (year == 2022 & (station %in% c(99, 127))))
 
 #confirm no instances were missed
 # test2<- df_data %>% filter(year < 2019) %>% 
@@ -99,3 +102,33 @@ tibble(finalConsecutive)
 tibble(df_data_flagged_comment)
 
 
+
+# Updating consecutive table to account for flagged stations (no comment = NC) --------------
+
+
+dataNC<- anti_join(df_data, df_data_flagged_comment)
+
+stationsListNC <- dataNC$station #length = 3055 stations
+
+diffsNC<- c(diff(stationsListNC),0)
+diffsTableNC <- data.frame(dataNC$year, stationsListNC, diffsNC)
+diffsTableNC$diffsOne <- (diffsTableNC$diffsNC ==1)
+
+indicesNC = c()
+for (i in 1:(length(diffsTableNC$diffsNC)-3)) {
+  if (diffsTableNC$diffsOne[i]==TRUE & diffsTableNC$diffsOne[i+1]==TRUE & diffsTableNC$diffsOne[i+2]==TRUE) {
+    indicesNC<- append(indicesNC, i) 
+  }
+}
+#If you only want runs of >3 consecutive stations, add & diffsTable$diffsOne[i+3]==TRUE
+
+diffsTableNC$flag = NA
+diffsTableNC <- diffsTableNC %>% mutate(flag = row_number() %in% indicesNC)
+
+df_data_consecutiveNC <- diffsTableNC %>% 
+  filter(flag == TRUE) #A df with 95 rows
+
+finalConsecutiveNC <- df_data_consecutiveNC %>%  
+  group_by(dataNC.year) %>%  
+  filter(!(stationsListNC %in% (stationsListNC+1))) %>% ungroup() %>% 
+  mutate(year = dataNC.year, firstStation_updated = stationsListNC, .keep="none")
