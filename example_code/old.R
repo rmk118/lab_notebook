@@ -101,3 +101,16 @@ onlyData <- fish %>%
 # ggplot(j_cat, aes(x=Survey, y=avgCatch, group=Stratum, color=Stratum))+geom_line()+facet_wrap(~Region)
 # ggplot(r_cat, aes(x=Survey, y=avgCatch, group=Stratum, color=Stratum))+geom_line()+facet_wrap(~Region)
 # ggplot(s_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
+
+# scalLogCatchFall_1.2 <- scalLogCatchFall %>% 
+#   filter(Region==1, Stratum==2) %>% 
+#   ungroup() %>% 
+#   select(Year, logCatch)
+# 
+# scalLogCatchFall_1ab <- left_join(scalLogCatchFall_1a, scalLogCatchFall_1b, by="Year", suffix=c("_a","_b"))
+
+#EmatScalFall <- data.frame(matrix(ncol = numStrata, nrow = numRegions))
+#colnames(EmatScalFall) <- c("Stratum 1", "Stratum 2", "Stratum 3", "Stratum 4")
+
+# smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
+# err <- ComputeError( smplx$Observations, smplx$Predictions )

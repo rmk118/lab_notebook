@@ -119,45 +119,90 @@ scallopsTidy <- catchTidy %>% filter(Species=="scallop" & Type=="logCatch")
 
 ggplot(scallopsTidy, aes(x=Year,y=value, color=Season))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
 
+#Set up functions
+numRegions = 5
+numStrata = 3
+
+
 
 # log catch ---------------------------------------------------------------
+
 ############## Fall
 scalLogCatchFall <- scallopsTidy %>% 
   filter(Type=="logCatch", Season=="Fall") %>% 
-  select(-c('name', 'Species', 'Type')) %>% 
-  mutate(logCatch = value, .keep = "unused")
+  select(-c('Species', 'Type'))
 
-scalLogCatchFall_1a <- scalLogCatchFall %>% 
+scalLogCatchFall_1.1 <- scalLogCatchFall %>% 
   filter(Region==1, Stratum==1) %>% 
   ungroup() %>% 
-  select(Year, logCatch)
+  select(Year, value)
 
-scalLogCatchFall_1b <- scalLogCatchFall %>% 
-  filter(Region==1, Stratum==2) %>% 
-  ungroup() %>% 
-  select(Year, logCatch)
 
-scalLogCatchFall_1ab <- left_join(scalLogCatchFall_1a, scalLogCatchFall_1b, by="Year", suffix=c("_a","_b"))
+E1.1<- EmbedDimension(dataFrame = scalLogCatchFall_1.1, lib = "1 23", pred = "1 23", columns = "value",target = "value")
 
-aE1<- EmbedDimension(dataFrame = scalLogCatchFall_1a, lib = "1 23", pred = "1 23", columns = "logCatch",target = "logCatch")
+findE_df <- function(df) {
+  lib_vec <- paste(1,nrow(df))
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value")
+  E_out<-rho_E[which.max(rho_E$rho),"E"][1]
+  return(E_out)
+}
+findEtest_df<- findE_df(scalLogCatchFall_1.1)
 
-PredictNonlinear(dataFrame = scalLogCatchFall_1a, lib = "1 23", pred = "1 23",
-                 columns = "logCatch",target = "logCatch", E = 2, theta=1:15) #thetaMax = 6
-
-#ScalLogCatchFallE <-data.frame(matrix(ncol = 4, nrow = 5))
-#colnames(ScalLogCatchFallE) <- c('Stratum A', 'Stratum B', 'Stratum C', 'Stratum D')
-
-numRegions = 5
-numStrata = 4
-EmatScalFall <- data.frame(matrix(ncol = numStrata, nrow = numRegions))
-
-findScallopE <- function(df) {
-  
-  
+findE_v <- function(v) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  #print(df)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 6)
+  E_out<-rho_E[which.max(rho_E$rho),"E"][1]
+  return(E_out)
 }
 
-# smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
-# err <- ComputeError( smplx$Observations, smplx$Predictions )
+findErho_v <- function(v) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  #print(df)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 6)
+  rho_out<-rho_E[which.max(rho_E$rho),"rho"][1]
+  return(rho_out)
+}
+findEtest_v<- findE_v(scalLogCatchFall_1.1$value)
+findErhotest_v<- findErho_v(scalLogCatchFall_1.1$value)
+
+findScallopE <- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(E_opt = findE_v(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+
+findScallopErho_v <- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(E_opt_rho = findErho_v(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = E_opt_rho) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
+findScallopE(scallopsTidy, season="Fall", type="logCatch")
+
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
+findScallopErho_v(scallopsTidy, season="Fall", type="logCatch")
+
+
 
 ############## Spring
 scalLogCatchSpring <- scallopsTidy %>% 
@@ -184,4 +229,24 @@ scalLogWtSpring <- scallopsTidy %>%
 # ggplot(scalLogWtSpring, aes(x=Year, y=logWeight, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchSpring, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchFall, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
+
+
+
+
+
+findScallopMean<- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    #ungroup() %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(avg = mean(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = avg) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+
+findScallopMean(scallopsTidy, season="Fall", type="logCatch")
+
 
