@@ -1,8 +1,6 @@
 #Maine spatial analysis
 #Ruby Krasnow
-#Last modified: July 5, 2023
-
-library(tidyverse)
+#Last modified: July 6, 2023
 
 #spatial packages
 library(sf)
@@ -24,8 +22,9 @@ cleanCatch <- function(x) {
 }
 
 #grid_id starts again at 1 for each region
-# st_layers("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid")
+#st_layers("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid")
 surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid")
+#CRS: WGS 84/EPSG 4326
 
 surveyGrid <- surveyGrid %>% 
   mutate(Region = region_id,
@@ -38,9 +37,7 @@ surveyGrid$stratum_region <- paste(surveyGrid$Stratum, surveyGrid$Region)
 #plot(surveyGrid["OBJECTID"], main="Object ID")
 # plot(surveyGrid["Region"], main="Region")
 # plot(surveyGrid["Stratum"], main="Depth Stratum")
-
 #plot(surveyGrid["stratum_region"], main="Study Area")
-
 
 surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(Grid))
 
@@ -60,14 +57,18 @@ s_cat_Spatial <- cleanCatch(df_s_cat) %>%
   mutate(area = paste(Region, Stratum),.before= Survey)
 
 s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Latitude", "Start_Longitude"))
-#plot(s_cat_sf["Stratum"])
+#crs=4326
+#crs=4269
+#crs=4267
+head(s_cat_sf)
+plot(s_cat_sf["Stratum"])
 
 
-spatial2015 <- s_cat_sf %>% filter(Year==2015)
+#spatial2015 <- s_cat_sf %>% filter(Year==2015)
 #plot(spatial2015["area"])
 
-st_surveyed <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
-sf.sgbp.surveyed <- st_surveyed(surveyed)
+st_queen <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
+sf.sgbp.surveyed <- st_queen(surveyed)
 
 as.nb.sgbp <- function(x, ...) {
   attrs <- attributes(x)
@@ -78,3 +79,28 @@ as.nb.sgbp <- function(x, ...) {
 }
 sf.nb.surveyed <- as.nb.sgbp(sf.sgbp.surveyed)
 summary(sf.nb.surveyed)
+
+test <- st_centroid(surveyed)
+head(test) #CRS: WGS 84/EPSG 4326
+
+longitude <- map_dbl(surveyed$geometry, ~st_centroid(.x)[[1]])
+latitude <- map_dbl(surveyed$geometry, ~st_centroid(.x)[[2]])
+coords <- cbind(longitude, latitude)
+head(coords)
+plot(sf.nb.surveyed, coords, lwd=.2, col="blue", cex = .5)
+
+surveyed.card <- card(sf.nb.surveyed)
+max(surveyed.card)
+ggplot() +
+  geom_histogram(aes(x=surveyed.card), breaks = seq(0,9, by = 1)) +
+  xlab("number of neighbors")
+
+surveyedNoGeom <- st_drop_geometry(surveyed) %>% select(c("OBJECTID", "stratum_region"))
+
+neighbors_df<-data.frame(sf.sgbp.surveyed)
+neighbors_df<- neighbors_df %>% 
+  mutate(OBJECTID = surveyedNoGeom[row.id, "OBJECTID"], .keep="unused") %>% 
+  mutate(neighborID = surveyedNoGeom[col.id, "OBJECTID"], .keep="unused") 
+
+neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% rename(objectRegion = stratum_region, objectID = OBJECTID)
+neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID")) %>% rename(neighborRegion = stratum_region)
