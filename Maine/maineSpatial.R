@@ -8,6 +8,7 @@ library(sfheaders)
 library(plotly)
 library(spdep)
 library(tidyverse)
+library(lubridate)
 
 
 cleanCatch <- function(x) {
@@ -29,23 +30,23 @@ surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Su
 surveyGrid <- surveyGrid %>% 
   mutate(Region = region_id,
          Stratum = depth_stra,
-         Grid = grid_id, .keep="unused", .before=last_surve)
+         GridID = grid_id, .keep="unused", .before=last_surve)
 
 surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 
-#plot(surveyGrid["Grid"], main="Grid ID")
+#plot(surveyGrid["GridID"], main="Grid ID")
 #plot(surveyGrid["OBJECTID"], main="Object ID")
-# plot(surveyGrid["Region"], main="Region")
-# plot(surveyGrid["Stratum"], main="Depth Stratum")
-plot(surveyGrid["region_stratum"], main="Study Area")
+#plot(surveyGrid["Region"], main="Region")
+#plot(surveyGrid["Stratum"], main="Depth Stratum")
+#plot(surveyGrid["region_stratum"], main="Study Area")
 
-surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(Grid))
+surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 
 surveyed <- surveyGrid %>% filter(!is.na(surveys))
 plot(surveyed["region_stratum"], main="Study Area")
 plot(surveyed["Region"], main="Region")
 
-sumTemp <- surveyed %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(Grid))
+sumTemp <- surveyed %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 mean(sumTemp$num)
 
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
@@ -56,16 +57,13 @@ s_cat_Spatial <- cleanCatch(df_s_cat) %>%
   select(-c("End_Latitude","End_Longitude")) %>% 
   mutate(area = paste(Region, Stratum),.before= Survey)
 
-s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Latitude", "Start_Longitude"))
-#crs=4326
-#crs=4269
-#crs=4267
+s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+
+# Map of all points over grid
+#ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
+
 head(s_cat_sf)
-plot(s_cat_sf["Stratum"])
-
-
-#spatial2015 <- s_cat_sf %>% filter(Year==2015)
-#plot(spatial2015["area"])
+#ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 
 st_queen <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
 sf.sgbp.surveyed <- st_queen(surveyed)
@@ -103,27 +101,41 @@ neighbors_df<- neighbors_df %>%
   mutate(neighborID = surveyedNoGeom[col.id, "OBJECTID"], .keep="unused") 
 
 neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% rename(objectRegion = region_stratum, objectID = OBJECTID)
-neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID")) 
-#%>% rename(neighborRegion = region_stratum)
+neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID"))
 
 
 
 # Region 1, Stratum 1 -----------------------------------------------------
-newMatrix<- data.frame(matrix(nrow=5, ncol=4))
+# newMatrix<- data.frame(matrix(nrow=5, ncol=4))
+# 
+# for (i in 1:5) {
+#   for (j in 1:4) {
+# tempArea <- neighbors_df_test %>% 
+#   group_by(objectID) %>% 
+#   filter(neighborRegion == paste(i,j)) %>% 
+#   filter(objectRegion != paste(i,j))
+# 
+# newMatrix[i,j]<-nrow(tempArea)
+# print(paste(i,j))
+# print(nrow(tempArea))
+# }
+# }
+# 
+# tempMat <- neighbors_df_test %>% 
+#   group_by(objectID) %>% 
+#   filter(neighborRegion == "3 4")
 
-for (i in 1:5) {
-  for (j in 1:4) {
-tempArea <- neighbors_df_test %>% 
-  group_by(objectID) %>% 
-  filter(neighborRegion == paste(i,j)) %>% 
-  filter(objectRegion != paste(i,j))
 
-newMatrix[i,j]<-nrow(tempArea)
-print(paste(i,j))
-print(nrow(tempArea))
-}
-}
+# Combine geometries
+ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
 
-tempMat <- neighbors_df_test %>% 
-  group_by(objectID) %>% 
-  filter(neighborRegion == "3 4")
+region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE)
+ggplot()+ geom_sf(data=region1.1)+geom_sf(data = s_cat_sf %>% filter(area=="1 1"))
+
+#find all points not in region 1.1
+region1.1points <- s_cat_sf %>% filter(area=="1 1")
+not1.1points <- s_cat_sf %>% filter(area!="1 1")
+# find all of those points within 2 tows length buffer of region 1.1 
+ggplot()+geom_sf(data=st_union(surveyGrid, by_feature = FALSE))+geom_sf(data = st_intersection(not1.1points, st_buffer(region1.1points, 1000)))
+
+

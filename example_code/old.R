@@ -114,3 +114,10 @@ onlyData <- fish %>%
 
 # smplx<- Simplex(dataFrame = scalLogCatchFall_1ab, lib = "1 23", pred = "1 23", columns = "logCatch_a", target = "logCatch_b", E = 2, showPlot = TRUE)
 # err <- ComputeError( smplx$Observations, smplx$Predictions )
+
+
+########### The "last surve and surveys" columns have not been updated since 2019, so they cannot be used to filter which grids have actually been surveyed and when
+
+#crs=4326
+#crs=4269
+#crs=4267
