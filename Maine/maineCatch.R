@@ -1,6 +1,6 @@
 #ME-NH Inshore Trawl Survey - Catch/Weight Analysis
 #Ruby Krasnow
-#Last modified: June 30, 2023
+#Last modified: July 6, 2023
 
 library(tidyverse)
 library(patchwork)
@@ -220,17 +220,10 @@ findScallopErho_v(scallopsTidy, season="Spring", type="logCatch")
 
 # log weight --------------------------------------------------------------
 
-
-
-
 # ggplot(scalLogWtFall, aes(x=Year, y=logWeight, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogWtSpring, aes(x=Year, y=logWeight, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchSpring, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchFall, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
-
-
-
-
 
 findScallopMean<- function(df, season, type) {
   df_out <- df %>% 

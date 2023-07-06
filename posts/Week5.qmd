@@ -24,13 +24,13 @@ Today was technically a holiday, and also I had food poisoning...
 
 ## Wednesday, July 5
 
-1. I went through the scallop dredge survey data...
-2. TBD
+1. Maine data: grid overlays
+2. Function to do EDM on Maine-formatted input file
 
 ## Thursday, July 6
 
 1. BRITE Programming Workshop: Bash/Linux
-2. TBD
+2. Working on identifying nearest neighbors
 
 ## Friday, July 7
 

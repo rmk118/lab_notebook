@@ -31,18 +31,18 @@ surveyGrid <- surveyGrid %>%
          Stratum = depth_stra,
          Grid = grid_id, .keep="unused", .before=last_surve)
 
-surveyGrid$stratum_region <- paste(surveyGrid$Stratum, surveyGrid$Region)
+surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 
 #plot(surveyGrid["Grid"], main="Grid ID")
 #plot(surveyGrid["OBJECTID"], main="Object ID")
 # plot(surveyGrid["Region"], main="Region")
 # plot(surveyGrid["Stratum"], main="Depth Stratum")
-#plot(surveyGrid["stratum_region"], main="Study Area")
+plot(surveyGrid["region_stratum"], main="Study Area")
 
 surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(Grid))
 
 surveyed <- surveyGrid %>% filter(!is.na(surveys))
-plot(surveyed["stratum_region"], main="Study Area")
+plot(surveyed["region_stratum"], main="Study Area")
 plot(surveyed["Region"], main="Region")
 
 sumTemp <- surveyed %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(Grid))
@@ -95,12 +95,35 @@ ggplot() +
   geom_histogram(aes(x=surveyed.card), breaks = seq(0,9, by = 1)) +
   xlab("number of neighbors")
 
-surveyedNoGeom <- st_drop_geometry(surveyed) %>% select(c("OBJECTID", "stratum_region"))
+surveyedNoGeom <- st_drop_geometry(surveyed) %>% select(c("OBJECTID", "region_stratum"))
 
 neighbors_df<-data.frame(sf.sgbp.surveyed)
 neighbors_df<- neighbors_df %>% 
   mutate(OBJECTID = surveyedNoGeom[row.id, "OBJECTID"], .keep="unused") %>% 
   mutate(neighborID = surveyedNoGeom[col.id, "OBJECTID"], .keep="unused") 
 
-neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% rename(objectRegion = stratum_region, objectID = OBJECTID)
-neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID")) %>% rename(neighborRegion = stratum_region)
+neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% rename(objectRegion = region_stratum, objectID = OBJECTID)
+neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID")) 
+#%>% rename(neighborRegion = region_stratum)
+
+
+
+# Region 1, Stratum 1 -----------------------------------------------------
+newMatrix<- data.frame(matrix(nrow=5, ncol=4))
+
+for (i in 1:5) {
+  for (j in 1:4) {
+tempArea <- neighbors_df_test %>% 
+  group_by(objectID) %>% 
+  filter(neighborRegion == paste(i,j)) %>% 
+  filter(objectRegion != paste(i,j))
+
+newMatrix[i,j]<-nrow(tempArea)
+print(paste(i,j))
+print(nrow(tempArea))
+}
+}
+
+tempMat <- neighbors_df_test %>% 
+  group_by(objectID) %>% 
+  filter(neighborRegion == "3 4")
