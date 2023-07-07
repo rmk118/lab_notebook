@@ -10,17 +10,9 @@ library(spdep)
 library(tidyverse)
 library(lubridate)
 
-
-cleanCatch <- function(x) {
-  full_join(x, df_tows) %>%
-    arrange(Survey, Tow_Number) %>% 
-    select(-c("Stratum", "Subsample_Weight_kg_2", "Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "Air_Temp", "Tow_Time")) %>%
-    mutate(Number_Caught = replace_na(Number_Caught,0),
-           Weight_kg = replace_na(Weight_kg,0),
-           Expanded_Catch = replace_na(Expanded_Catch,0),
-           Expanded_Weight_kg = replace_na(Expanded_Weight_kg,0)) %>% 
-    mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused")
-}
+#import help functions and tow data
+source('~/Downloads/lab_notebook/Maine/helpFunctionsMaine.R')
+df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 
 #grid_id starts again at 1 for each region
 #st_layers("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid")
@@ -38,7 +30,7 @@ surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 #plot(surveyGrid["OBJECTID"], main="Object ID")
 #plot(surveyGrid["Region"], main="Region")
 #plot(surveyGrid["Stratum"], main="Depth Stratum")
-plot(surveyGrid["region_stratum"], main="Study Area")
+#plot(surveyGrid["region_stratum"], main="Study Area")
 
 surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 
@@ -46,9 +38,6 @@ surveyed <- surveyGrid %>% filter(!is.na(surveys))
 plot(surveyed["region_stratum"], main="Study Area")
 plot(surveyed["Region"], main="Region")
 
-# calculate the average number of tows per area over the whole time series
-sumTemp <- s_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number()))
-summary(sumTemp$num) #Min is 123, max is 265, mean and median are both ~190
 
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -58,11 +47,17 @@ s_cat_Spatial <- cleanCatch(df_s_cat) %>%
   select(-c("End_Latitude","End_Longitude")) %>% 
   mutate(area = paste(Region, Stratum),.before= Survey)
 
-s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+# calculate the average number of tows per area over the whole time series
+summary((s_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number())))$num)
+
+s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326) %>% 
+  mutate(area = paste(Region, Stratum),.before= Season)
 
 # Map of all points over grid
 #ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 
+#s_cat_sf <- summaryCatch(s_cat_sf) %>% 
+  #mutate(area = paste(Region, Stratum),.before= Season)
 head(s_cat_sf)
 ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 
@@ -101,7 +96,8 @@ neighbors_df<- neighbors_df %>%
   mutate(OBJECTID = surveyedNoGeom[row.id, "OBJECTID"], .keep="unused") %>% 
   mutate(neighborID = surveyedNoGeom[col.id, "OBJECTID"], .keep="unused") 
 
-neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% rename(objectRegion = region_stratum, objectID = OBJECTID)
+neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% 
+  rename(objectRegion = region_stratum, objectID = OBJECTID)
 neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID"))
 
 
@@ -144,8 +140,52 @@ nrow(neighbors_1.1) #207
 
 # Start with 10 iterations (10 random samples of 90 neighbors), ideally would do 100
 
-firstStrata <- sample_n(neighbors_1.1, 90, replace = FALSE) %>% mutate(trial = 1, .before=area)
+trialStrat <- sample_n(neighbors_1.1, 90, replace = FALSE)
+trialStrat <- bind_rows(region1.1points, trialStrat) %>% mutate(trial = 1, .before=area)
 for (i in 2:10) {
-  tempStrata <- sample_n(neighbors_1.1, 90, replace = FALSE) %>% mutate(trial = i, .before=area)
-  firstStrata<- bind_rows(firstStrata, tempStrata)
+  tempStrat <- sample_n(neighbors_1.1, 90, replace = FALSE)
+  tempStrat <- bind_rows(region1.1points, tempStrat) %>% mutate(trial = i, .before=area)
+  trialStrat<- bind_rows(trialStrat, tempStrat)
 }
+
+
+meanTest <- trialStrat %>% group_by(trial, area) %>% 
+  summarise(avgCatch = mean(Expanded_Catch),
+            avgWt = mean(Expanded_Weight_kg))
+
+summaryCatchTrial <- function(df) {
+  df %>% group_by(trial, Season, Year) %>%
+    summarise(avgCatch = mean(Expanded_Catch),
+              avgWt = mean(Expanded_Weight_kg))
+}
+
+#implementation
+meanTestInput <- summaryCatchTrial(trialStrat)
+meanTestInput$logCatch <- log(meanTestInput$avgCatch+1)
+meanTestInput$logWt <- log(meanTestInput$avgWt+1)
+
+
+colOrderTrials<-c("trial", "Season", "Year", "geometry", "avgCatch", "avgWt", "logCatch", "logWt")
+meanTestInput <- meanTestInput %>% select(all_of(colOrderTrials))
+            
+meanTestInputTidy <- pivot_longer(meanTestInput, cols = 5:ncol(meanTestInput)) %>% 
+  mutate(Type = case_when(
+    name== "avgCatch" ~"avgCatch",
+    name=="avgWt" ~"avgWt",
+    name=="logWt" ~"logWt",
+    name=="logCatch" ~"logCatch")) %>% 
+  mutate(Species = "scallop")
+
+
+meanTestInputTidy <- meanTestInputTidy %>% 
+  mutate(Species = as.factor(Species),
+         Season = as.factor(Season),
+         trial = as.factor(trial)) %>% 
+  select(-name)
+
+
+meanTestInputTidy %>% 
+    filter(Type == "logCatch", Season == "Fall") %>% 
+    group_by(trial) %>% 
+    select(Year, value) %>%
+    summarise(avg = mean(value))

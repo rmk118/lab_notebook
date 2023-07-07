@@ -49,14 +49,15 @@ s_cat$logS_wt <- log(s_cat$avgWt+1)
 s_catchTidy <- pivot_longer(s_cat, 
                           cols = 5:ncol(s_cat)) %>% 
   mutate(Type = case_when(
-    startsWith(name, "avgCatch_") ~"avgCatch",
-    startsWith(name,"avgWt_") ~"avgWt",
+    startsWith(name, "avgCatch") ~"avgCatch",
+    startsWith(name,"avgWt") ~"avgWt",
     endsWith(name,"_wt") ~"logWt",
     endsWith(name,"_catch") ~"logCatch")) %>% 
-  mutate(Species = case_when(
-    startsWith(name, "logS") | endsWith(name, "s") ~"scallop",
-    startsWith(name, "logR") | endsWith(name, "r") ~"rock",
-    startsWith(name, "logJ") | endsWith(name, "j") ~"jonah"))
+  mutate(Species = "scallop")
+  # mutate(Species = case_when(
+  #   startsWith(name, "logS") | endsWith(name, "s") ~"scallop",
+  #   startsWith(name, "logR") | endsWith(name, "r") ~"rock",
+  #   startsWith(name, "logJ") | endsWith(name, "j") ~"jonah"))
 
 s_catchTidy <- s_catchTidy %>% 
   mutate(Species = as.factor(Species),
