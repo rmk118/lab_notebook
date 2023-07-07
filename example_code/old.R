@@ -140,3 +140,45 @@ onlyData <- fish %>%
 # tempMat <- neighbors_df_test %>% 
 #   group_by(objectID) %>% 
 #   filter(neighborRegion == "3 4")
+
+
+# stuff with the surveyed grid and nearest neighboring grids --------------
+
+st_queen <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
+sf.sgbp.surveyed <- st_queen(surveyed)
+
+as.nb.sgbp <- function(x, ...) {
+  attrs <- attributes(x)
+  x <- lapply(x, function(i) { if(length(i) == 0L) 0L else i } )
+  attributes(x) <- attrs
+  class(x) <- "nb"
+  x
+}
+sf.nb.surveyed <- as.nb.sgbp(sf.sgbp.surveyed)
+summary(sf.nb.surveyed)
+
+test <- st_centroid(surveyed)
+head(test) #CRS: WGS 84/EPSG 4326
+
+longitude <- map_dbl(surveyed$geometry, ~st_centroid(.x)[[1]])
+latitude <- map_dbl(surveyed$geometry, ~st_centroid(.x)[[2]])
+coords <- cbind(longitude, latitude)
+head(coords)
+plot(sf.nb.surveyed, coords, lwd=.2, col="blue", cex = .5)
+
+surveyed.card <- card(sf.nb.surveyed)
+max(surveyed.card)
+ggplot() +
+  geom_histogram(aes(x=surveyed.card), breaks = seq(0,9, by = 1)) +
+  xlab("number of neighbors")
+
+surveyedNoGeom <- st_drop_geometry(surveyed) %>% select(c("OBJECTID", "region_stratum"))
+
+neighbors_df<-data.frame(sf.sgbp.surveyed)
+neighbors_df<- neighbors_df %>% 
+  mutate(OBJECTID = surveyedNoGeom[row.id, "OBJECTID"], .keep="unused") %>% 
+  mutate(neighborID = surveyedNoGeom[col.id, "OBJECTID"], .keep="unused") 
+
+neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% 
+  rename(objectRegion = region_stratum, objectID = OBJECTID)
+neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID"))

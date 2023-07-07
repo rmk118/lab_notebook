@@ -203,7 +203,7 @@ par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
 findScallopE(scallopsTidy, season="Spring", type="logCatch")
 
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
-findScallopErho_v(scallopsTidy, season="Spring", type="logCatch")
+findSpeciesErho(scallopsTidy, season="Spring", type="logCatch")
 
 
 
