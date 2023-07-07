@@ -1,6 +1,6 @@
 #Maine spatial analysis
 #Ruby Krasnow
-#Last modified: July 6, 2023
+#Last modified: July 7, 2023
 
 #spatial packages
 library(sf)
@@ -38,7 +38,7 @@ surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 #plot(surveyGrid["OBJECTID"], main="Object ID")
 #plot(surveyGrid["Region"], main="Region")
 #plot(surveyGrid["Stratum"], main="Depth Stratum")
-#plot(surveyGrid["region_stratum"], main="Study Area")
+plot(surveyGrid["region_stratum"], main="Study Area")
 
 surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 
@@ -46,8 +46,9 @@ surveyed <- surveyGrid %>% filter(!is.na(surveys))
 plot(surveyed["region_stratum"], main="Study Area")
 plot(surveyed["Region"], main="Region")
 
-sumTemp <- surveyed %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
-mean(sumTemp$num)
+# calculate the average number of tows per area over the whole time series
+sumTemp <- s_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number()))
+summary(sumTemp$num) #Min is 123, max is 265, mean and median are both ~190
 
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -63,7 +64,7 @@ s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude
 #ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 
 head(s_cat_sf)
-#ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
+ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 
 st_queen <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
 sf.sgbp.surveyed <- st_queen(surveyed)
@@ -106,36 +107,45 @@ neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighb
 
 
 # Region 1, Stratum 1 -----------------------------------------------------
-# newMatrix<- data.frame(matrix(nrow=5, ncol=4))
-# 
-# for (i in 1:5) {
-#   for (j in 1:4) {
-# tempArea <- neighbors_df_test %>% 
-#   group_by(objectID) %>% 
-#   filter(neighborRegion == paste(i,j)) %>% 
-#   filter(objectRegion != paste(i,j))
-# 
-# newMatrix[i,j]<-nrow(tempArea)
-# print(paste(i,j))
-# print(nrow(tempArea))
-# }
-# }
-# 
-# tempMat <- neighbors_df_test %>% 
-#   group_by(objectID) %>% 
-#   filter(neighborRegion == "3 4")
 
-
-# Combine geometries
+#all grids merged together
 ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
 
-region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE)
-ggplot()+ geom_sf(data=region1.1)+geom_sf(data = s_cat_sf %>% filter(area=="1 1"))
+#find the grids and points in region 1.1
+region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE) #merged together
+region1.1points <- s_cat_sf %>% filter(area=="1 1")
 
 #find all points not in region 1.1
-region1.1points <- s_cat_sf %>% filter(area=="1 1")
 not1.1points <- s_cat_sf %>% filter(area!="1 1")
-# find all of those points within 2 tows length buffer of region 1.1 
-ggplot()+geom_sf(data=st_union(surveyGrid, by_feature = FALSE))+geom_sf(data = st_intersection(not1.1points, st_buffer(region1.1points, 1000)))
 
+# This plot shows all points not in 1.1 over the entire grid (all areas)
+# ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = not1.1points)
 
+# This plot shows all points marked as being in 1.1 over the region of merged 1.1 grids
+# ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = region1.1points)
+
+# Use st_length(surveyGrid) and st_length(s_cat_sf) to check that units are m
+# This plot adds a 1000m buffer around each point
+# ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = st_buffer(region1.1points, 1000)) 
+
+# find all of points NOT marked as being in region 1.1 that are located within 2 tows length 
+# (2 nautical miles = 3704 meters) of region 1.1 
+neighbors_1.1 <- st_intersection(not1.1points, st_buffer(region1.1grid, 3704))
+
+# This plot shows the neighboring points in the context of the entire study region
+# ggplot()+geom_sf(data=st_union(surveyGrid, by_feature = FALSE))+geom_sf(data = neighbors_1.1)
+
+# This plot shows the neighboring points over region 1.1 (with grid boundaries) and the buffer around 1.1 - best visual
+ggplot()+geom_sf(data = st_buffer(region1.1grid, 3704))+ 
+  geom_sf(data=surveyGrid %>% filter(region_stratum=="1 1"))+ 
+  geom_sf(data = neighbors_1.1)
+
+nrow(neighbors_1.1) #207
+
+# Start with 10 iterations (10 random samples of 90 neighbors), ideally would do 100
+
+firstStrata <- sample_n(neighbors_1.1, 90, replace = FALSE) %>% mutate(trial = 1, .before=area)
+for (i in 2:10) {
+  tempStrata <- sample_n(neighbors_1.1, 90, replace = FALSE) %>% mutate(trial = i, .before=area)
+  firstStrata<- bind_rows(firstStrata, tempStrata)
+}

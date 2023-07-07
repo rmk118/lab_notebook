@@ -1,6 +1,6 @@
 #ME-NH Inshore Trawl Survey - Catch/Weight Analysis
 #Ruby Krasnow
-#Last modified: July 6, 2023
+#Last modified: July 7, 2023
 
 library(tidyverse)
 library(patchwork)
@@ -50,8 +50,6 @@ j_catFull <- j_catFull %>% select(all_of(colOrder))
 r_catFull <- r_catFull %>% select(all_of(colOrder))
 s_catFull <- s_catFull %>% select(all_of(colOrder))
 
-# n_distinct(j_catFull$Tow_Number)
-
 summaryCatch <- function(df) {
   df %>% group_by(Season, Year, Region,Stratum) %>%
   summarise(avgCatch = mean(Expanded_Catch),
@@ -92,8 +90,7 @@ catchTidy <- pivot_longer(catch,
     startsWith(name, "logJ") | endsWith(name, "j") ~"jonah"))
 
 catchTidy <- catchTidy %>% mutate(Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
-          select(-name) #%>% 
-  #mutate(value = format(value, scientific = FALSE))
+          select(-name)
 
 avgCatchFall <- catchTidy %>% filter(Type == "avgCatch") %>% filter(Season == "Fall")
 avgWtFall <- catchTidy %>% filter(Type == "avgWt") %>% filter(Season == "Fall")
@@ -115,7 +112,7 @@ ggplot(logWtFall, aes(x=Year,y=value, color=Species))+geom_line()+theme_classic(
 
 # Scallops ----------------------------------------------------------------
 
-scallopsTidy <- catchTidy %>% filter(Species=="scallop") #%>% filter(Type=="logCatch")
+scallopsTidy <- catchTidy %>% filter(Species=="scallop")
 
 # ggplot(scallopsTidy, aes(x=Year,y=value, color=Season))+geom_line()+theme_classic()+labs(x="Time", y="Log catch")+facet_grid(Region~Stratum)
 
@@ -139,14 +136,6 @@ scalLogCatchFall_1.1 <- scalLogCatchFall %>%
 
 
 E1.1<- EmbedDimension(dataFrame = scalLogCatchFall_1.1, lib = "1 23", pred = "1 23", columns = "value",target = "value")
-
-# findE_df <- function(df) {
-#   lib_vec <- paste(1,nrow(df))
-#   rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value")
-#   E_out<-rho_E[which.max(rho_E$rho),"E"][1]
-#   return(E_out)
-# }
-# findEtest_df<- findE_df(scalLogCatchFall_1.1)
 
 findE_v <- function(v) {
   lib_vec <- paste(1, length(v))
@@ -225,19 +214,8 @@ findScallopErho_v(scallopsTidy, season="Spring", type="logCatch")
 # ggplot(scalLogCatchSpring, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchFall, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 
-findScallopMean<- function(df, season, type) {
-  df_out <- df %>% 
-    filter(Type == type, Season == season) %>% 
-    #ungroup() %>% 
-    group_by(Region, Stratum) %>% 
-    select(Year, value) %>%
-    summarise(avg = mean(value)) %>%
-    pivot_wider(names_from = Stratum, values_from = avg) %>% 
-    ungroup() %>% 
-    select(-Region)
-  return(df_out)
-}
 
-findScallopMean(scallopsTidy, season="Fall", type="logCatch")
+
+
 
 

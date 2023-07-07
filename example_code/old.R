@@ -121,3 +121,22 @@ onlyData <- fish %>%
 #crs=4326
 #crs=4269
 #crs=4267
+
+# newMatrix<- data.frame(matrix(nrow=5, ncol=4))
+# 
+# for (i in 1:5) {
+#   for (j in 1:4) {
+# tempArea <- neighbors_df_test %>% 
+#   group_by(objectID) %>% 
+#   filter(neighborRegion == paste(i,j)) %>% 
+#   filter(objectRegion != paste(i,j))
+# 
+# newMatrix[i,j]<-nrow(tempArea)
+# print(paste(i,j))
+# print(nrow(tempArea))
+# }
+# }
+# 
+# tempMat <- neighbors_df_test %>% 
+#   group_by(objectID) %>% 
+#   filter(neighborRegion == "3 4")
