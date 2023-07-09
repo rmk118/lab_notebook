@@ -39,6 +39,8 @@ plot(surveyed["region_stratum"], main="Study Area")
 plot(surveyed["Region"], main="Region")
 
 
+
+
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
 df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
 df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
@@ -70,7 +72,7 @@ r_cat_sf<- st_as_sf(r_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude
 j_cat_sf<- st_as_sf(j_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 
 # Map of all points over grid
-#ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
+ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 
 # ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 
@@ -79,6 +81,9 @@ j_cat_sf<- st_as_sf(j_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude
 
 #all grids merged together
 ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
+
+regionsGrid <- surveyGrid %>% group_by(region_stratum) %>% summarise(num = n_distinct(GridID))
+plot(regionsGrid)
 
 #find the grids and points in region 1.1
 region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE) #merged together
@@ -133,26 +138,24 @@ for (i in 2:20) {
 summaryCatchTrial <- function(df) {
   df %>% group_by(trial,Year) %>%
     summarise(avgCatch = mean(Expanded_Catch),
-              avgWt = mean(Expanded_Weight_kg))
+              avgWt = mean(Expanded_Weight_kg)) %>% 
+    mutate(logCatch = log(avgCatch + 1),
+           logWt = log(avgWt + 1))
 }
 
 
 eTest <- summaryCatchTrial(trialStrat)
-eTest$logCatch <- log(eTest$avgCatch+1)
-eTest$logWt <- log(eTest$avgWt+1)
 
-
-colOrderTrials<-c("trial", "Season", "Year", "geometry", "avgCatch", "avgWt", "logCatch", "logWt")
+colOrderTrials<-c("trial", "Year", "geometry", "avgCatch", "avgWt", "logCatch", "logWt")
 eTest <- eTest %>% select(all_of(colOrderTrials))
             
-eTest <- pivot_longer(eTest, cols = 5:ncol(eTest)) %>%
+eTest <- pivot_longer(eTest, cols = 4:ncol(eTest)) %>%
   mutate(Type = case_when(
     name== "avgCatch" ~"avgCatch",
     name=="avgWt" ~"avgWt",
     name=="logWt" ~"logWt",
     name=="logCatch" ~"logCatch")) %>%
   mutate(Species = as.factor("scallop"),
-          Season = as.factor(Season),
           trial = as.factor(trial)) %>% 
    select(-name)
 

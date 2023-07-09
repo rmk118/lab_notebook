@@ -1,0 +1,189 @@
+#Practicing spatial data science
+#Ruby Krasnow
+#Last modified: July 9, 2023
+
+#Install packages
+
+library(sf)
+library(spdep)
+library(tidyverse)
+library(Hmisc)
+library(robustHD)
+library(deldir)
+library(gap)
+library(gridExtra)
+library(geodaData)
+library(spData)
+library(mapview)
+library(tmap)
+
+# 
+# map <- st_read(system.file("shapes/boston_tracts.shp",
+#                            package = "spData"))
+# map$vble <- map$MEDV
+# mapview(map, zcol = "vble")
+# 
+# # Neighbors
+# nb <- poly2nb(map, queen = TRUE) # queen shares point or border
+# nbw <- nb2listw(nb, style = "W")
+# 
+# # Global Moran's I
+# gmoran <- moran.test(map$vble, nbw,
+#                      alternative = "greater")
+# gmoran
+
+# 
+
+# moran.plot(map$vble, nbw)
+# 
+# lmoran <- localmoran(map$vble, nbw, alternative = "greater")
+# head(lmoran)
+# 
+
+
+# #load data
+#  clev.points <- st_transform(geodaData::clev_pts, crs = "EPSG:3734")
+# env <- st_bbox(clev.points)
+# 
+# voronoi <- clev.points %>%
+#   st_geometry() %>% # to get sfc from sf
+#   st_union() %>% # to get a sfc of MULTIPOINT type
+#   st_voronoi() %>% #
+#   st_collection_extract(type = "POLYGON") %>% # a list of polygons
+#   st_sf() %>% # from list to sf object
+#  # st_intersection(state) %>% # cut to shape of NC state
+#   st_join(clev.points) # put names back
+
+ggplot() +
+  geom_sf(data = voronoi, alpha = .5) +
+ # geom_sf(data = state, lwd = .75, fill = NA) + 
+  geom_sf(data = clev.points, color = "red", pch = 19, size = 2)
+
+mergedGrid <- st_union(surveyGrid, by_feature = FALSE) %>% st_sf()
+mergedGridBuffer <- st_buffer(mergedGrid, 9000)
+ggplot(mergedGridBuffer)+geom_sf()
+
+voronoiScal <- s_cat_sf %>%
+  st_geometry() %>% # to get sfc from sf
+  st_union() %>% # to get a sfc of MULTIPOINT type
+  st_voronoi() %>% #
+  st_collection_extract(type = "POLYGON") %>% # a list of polygons
+  st_sf() %>% # from list to sf object
+  st_intersection(mergedGridBuffer) %>%
+  st_join(s_cat_sf)  # put names back
+ #envelope = st_geometry(mergedGrid)
+
+class(voronoiScal)
+plot(voronoiScal$geometry)
+voronoiScal$logCatch <- log(voronoiScal$Expanded_Catch+1)
+mapview(voronoiScal, zcol = "logCatch")
+
+# Neighbors
+nb <- poly2nb(voronoiScal, queen = TRUE) # queen shares point or border
+nbw <- nb2listw(nb, style = "W")
+
+# Global Moran's I
+gmoranScal <- moran.test(voronoiScal$logCatch, nbw,alternative = "greater")
+gmoranScal
+
+moran.plot(voronoiScal$logCatch, nbw)
+# Global Moran's I
+# gmoran <- moran.test(map$vble, nbw,
+#                      alternative = "greater")
+
+lmoran <- localmoran(voronoiScal$logCatch, nbw, alternative = "greater")
+head(lmoran)
+# gmoran
+
+ggplot() +
+  geom_sf(data = voronoiScal, alpha = .5) +
+  # geom_sf(data = state, lwd = .75, fill = NA) + 
+  geom_sf(data = s_cat_sf, color = "red", pch = 19, size = 0.5)
+
+
+tmap_mode("view")
+
+
+voronoiScal$lmI <- lmoran[, "Ii"] # local Moran's I
+voronoiScal$lmZ <- lmoran[, "Z.Ii"] # z-scores
+# p-values corresponding to alternative greater
+voronoiScal$lmp <- lmoran[, "Pr(z > E(Ii))"]
+
+p1 <- tm_shape(voronoiScal) +
+  tm_polygons(col = "logCatch", title = "logCatch", style = "quantile") +
+  tm_layout(legend.outside = TRUE)
+
+p2 <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmI", title = "Local Moran's I",
+              style = "quantile") +
+  tm_layout(legend.outside = TRUE)
+
+p3 <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmZ", title = "Z-score",
+              breaks = c(-Inf, 1.65, Inf)) +
+  tm_layout(legend.outside = TRUE)
+
+p4 <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmp", title = "p-value",
+              breaks = c(-Inf, 0.05, Inf)) +
+  tm_layout(legend.outside = TRUE)
+
+tmap_arrange(p1, p2, p3, p4)
+mapview(voronoiScal, zcol="logCatch")
+mapview(voronoiScal, zcol="lmI")
+
+
+gmoranMC <- moran.mc(voronoiScal$logCatch, nbw, nsim = 999)
+gmoranMC
+
+
+hist(gmoranMC$res)
+abline(v = gmoranMC$statistic, col = "red")
+# # plot(clev.points["unique_id"])
+# 
+# # vtess <- deldir(clev.points$x, clev.points$y)
+# # voronoipolygons = function(thiess) {
+# #   w = tile.list(thiess)
+# #   polys = vector(mode='list', length=length(w))
+# #   for (i in seq(along=polys)) {
+# #     pcrds = cbind(w[[i]]$x, w[[i]]$y)
+# #     pcrds = rbind(pcrds, pcrds[1,])
+# #     polys[[i]] = Polygons(list(Polygon(pcrds)), ID=as.character(i))
+# #   }
+# #   SP = SpatialPolygons(polys)
+# #   voronoi = SpatialPolygonsDataFrame(SP, data=data.frame(dummy = seq(length(SP)), row.names=sapply(slot(SP, 'polygons'), 
+# #                                                                                                    function(x) slot(x, 'ID'))))
+# # }
+# # 
+# # v <- voronoipolygons(vtess)
+# plot(v)
+
+
+
+# Intersection (first points, then grid squares)
+interGrid <- st_intersects(s_cat_sf, surveyGrid)
+
+# Intersection (first polygons, then points)
+interCounts2 <- st_intersects(surveyGrid, s_cat_sf)
+#interCounts2[sapply(interCounts2, function(x) length(x)==0L)] <- 0
+# Add point count to each polygon
+surveyGrid$count <- lengths(interCounts2)
+
+# Map of number of points within polygons
+ggplot(surveyGrid) + geom_sf(aes(fill = count))
+ggplot(surveyGrid %>% filter(count > 0)) + geom_sf(aes(fill = count))
+
+interGrid[sapply(interGrid, function(x) length(x)==0L)] <- 0
+
+# Adding column area with the name of
+# the areas containing the points
+unlistInterGrid <- unlist(interGrid)
+pointsInGrid <- s_cat_sf %>% mutate(gridRow = unlistInterGrid, .before=Tow_Number)
+
+pointsInGrid %>% group_by(gridRow) %>% summarise(num = n())
+
+ggplot(s_cat_sf) +geom_sf(aes(color=area))
+
+weird <- voronoiScal[997,]
+
+ggplot() +geom_sf(data=surveyGrid)+geom_sf(data=weird, color="red")
