@@ -192,7 +192,7 @@ summary(v)
 sd(v)
 
 
-# Generalizing to all areas - only Scallops -----------------------------------------------
+# Generalizing to all areas - only Scallops 10 trials-----------------------------------------------
 
 numRegions = 5
 numStrata = 4
@@ -270,5 +270,133 @@ for (i in 1:numRegions) {
 allAreasE
 allAreasRho
 
+noBoot<- findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
+rhoDifference<- allAreasRho-noBoot
+mean(as.matrix(noBoot))
+sd(as.matrix(noBoot))
+mean(as.matrix(allAreasRho))
+sd(as.matrix(allAreasRho))
+
+boxplot(c(as.matrix(noBoot)), c(as.matrix(allAreasRho)))
+t.test(c(as.matrix(noBoot)), c(as.matrix(allAreasRho)), paired = TRUE, alternative = "less")
+
+mean(as.matrix(rhoDifference))
+
+shapiro.test(c(as.matrix(rhoDifference)))
+boxplot(c(as.matrix(rhoDifference)))
+hist(c(as.matrix(rhoDifference)), breaks=7)
+
+noBootVals<- c(as.matrix(noBoot))
+allAreasVals <- c(as.matrix(allAreasRho))
+wilcox.test(noBootVals, allAreasVals, alternative = "less")
 
 
+# 20 trials-----------------------------------------------
+
+allAreasE_20 <- data.frame(matrix(nrow = 5, ncol=4))
+allAreasRho_20 <-data.frame(matrix(nrow = 5, ncol=4))
+
+allAreasE_50 <- data.frame(matrix(nrow = 5, ncol=4))
+allAreasRho_50 <-data.frame(matrix(nrow = 5, ncol=4))
+
+for (i in 1:numRegions) {
+  for (j in 1:numStrata) {
+    
+    baseArea <- paste(i, j)
+    
+    areaGrid<- surveyGrid %>% filter(region_stratum==baseArea) %>% st_union(by_feature = FALSE) #merged together
+    areaPoints <- s_cat_sf %>% filter(area==baseArea)
+    
+    #find all points not in the base area
+    notAreaPoints <- s_cat_sf %>% filter(area!=baseArea)
+    
+    #which of those points are close to the base area
+    neighborsArea <- st_intersection(notAreaPoints, st_buffer(areaGrid, 3704))
+    
+    #how many neighboring points are there
+    print(baseArea)
+    print(nrow(neighborsArea))
+    
+    #how many neighbors will be used in the bootstrapping
+    nNeighbors <- round(0.5*(numTows %>% filter(area==baseArea) %>% pull(num)))
+    #print(numTows %>% filter(area==baseArea) %>% pull(num))
+    #print(nNeighbors)
+    
+    #trial 1 - so we aren't binding rows to an empty dataframe
+    trialStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
+    trialStrat <- bind_rows(areaPoints, trialStrat) %>% mutate(trial = 1, .before=area)
+    #trials 2 through 10
+    for (k in 2:50) {
+      tempStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
+      tempStrat <- bind_rows(areaPoints, tempStrat) %>% mutate(trial = k, .before=area)
+      trialStrat<- bind_rows(trialStrat, tempStrat)
+    }
+    
+    trialSum <- summaryCatchTrial(trialStrat) %>% select(all_of(colOrderTrials))
+    
+    trialSum <- pivot_longer(trialSum, cols = 4:ncol(trialSum)) %>%
+      mutate(Type = case_when(
+        name== "avgCatch" ~"avgCatch",
+        name=="avgWt" ~"avgWt",
+        name=="avgLogWt" ~"avgLogWt",
+        name=="avgLogCatch" ~"avgLogCatch")) %>%
+      mutate(Species = as.factor("scallop")) %>% 
+      # trial = as.factor(trial)) %>% 
+      select(-name)
+    
+    v <- c()
+    r <- c()
+    
+    for (x in 1:50) {
+      df <- as.data.frame(trialSum %>% filter(Type=="avgLogWt", trial == x) %>% 
+                            st_drop_geometry() %>% 
+                            select(Year, value))
+      lib_pred_vec <- paste(1,nrow(df))
+      rho_E<- EmbedDimension(dataFrame = df, lib = lib_pred_vec, pred = lib_pred_vec, columns = "value",target = "value", maxE = 10)
+      v<-append(v,(rho_E[which.max(rho_E$rho),"E"][1]))
+      r<-append(r,(rho_E[which.max(rho_E$rho),"rho"][1]))
+    }
+    
+    print(round(mean(v)))
+    print(mean(r))
+    
+    allAreasE_50[i, j]<- round(mean(v))
+    allAreasRho_50[i,j]<- mean(r)
+    
+  }
+}
+
+allAreasE_20
+allAreasRho_20
+
+allAreasE_50
+allAreasRho_50
+
+allAreasE
+allAreasRho
+
+noBoot<- findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
+rhoDifference<- allAreasRho-noBoot
+mean(as.matrix(noBoot))
+sd(as.matrix(noBoot))
+mean(as.matrix(allAreasRho))
+sd(as.matrix(allAreasRho))
+
+boxplot(c(as.matrix(noBoot)), c(as.matrix(allAreasRho)))
+t.test(c(as.matrix(noBoot)), c(as.matrix(allAreasRho)), paired = TRUE, alternative = "less")
+
+mean(as.matrix(rhoDifference))
+
+shapiro.test(c(as.matrix(rhoDifference)))
+boxplot(c(as.matrix(rhoDifference)))
+hist(c(as.matrix(rhoDifference)), breaks=7)
+
+noBootVals<- c(as.matrix(noBoot))
+allAreasVals <- c(as.matrix(allAreasRho))
+wilcox.test(noBootVals, allAreasVals, alternative = "less")
+
+mean(as.matrix(allAreasRho_20-noBoot))
+mean(as.matrix(allAreasRho_50-noBoot))
+
+shapiro.test(c(as.matrix(allAreasRho_20-noBoot)))
+t.test(c(as.matrix(noBoot)), c(as.matrix(allAreasRho_20)), paired = TRUE, alternative = "less")
