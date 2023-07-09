@@ -1,8 +1,8 @@
 ---
-title: 'Week 5'
-date: '2023-07-04'
-categories: ['Week 5']
-description: 'My activities for the week'
+title: 'Weeks 5 & 6'
+date: '2023-07-09'
+categories: ['Week 5', 'Week 6']
+description: 'A flurry of activity'
 execute: 
   message: false
   warning: false
@@ -36,3 +36,28 @@ Although today was technically a holiday, today I...
 
 1. Writing functions to bootstrap samples
 2. Meeting with Dr. Deyle, Josue, and Dr. Suchi Gopal
+
+## Monday, July 10 (+ preceding weekend)
+
+1. Rotjan lab meeting
+2. Voronoi polygons and Moran's I - assessing spatial autocorrelation
+3. Working on loop to find avg E, rho using bootstrapped/Frankenstein strata
+
+## Tuesday, July 11
+
+1. Start exploration of crab data
+2. Using E from the loop I developed yesterday to do CCM with the crab data
+
+## Wednesday, July 12
+
+1. Continuing to work on CCM functions, graphing results
+
+## Thursday, July 6
+
+1. BRITE Programming Workshop: Data visualization
+2. Bioinfo Challenge Project Presentations
+
+## Friday, July 7
+
+1. Meeting with Dr. Deyle?
+2. TBD

@@ -17,48 +17,6 @@ library(spData)
 library(mapview)
 library(tmap)
 
-# 
-# map <- st_read(system.file("shapes/boston_tracts.shp",
-#                            package = "spData"))
-# map$vble <- map$MEDV
-# mapview(map, zcol = "vble")
-# 
-# # Neighbors
-# nb <- poly2nb(map, queen = TRUE) # queen shares point or border
-# nbw <- nb2listw(nb, style = "W")
-# 
-# # Global Moran's I
-# gmoran <- moran.test(map$vble, nbw,
-#                      alternative = "greater")
-# gmoran
-
-# 
-
-# moran.plot(map$vble, nbw)
-# 
-# lmoran <- localmoran(map$vble, nbw, alternative = "greater")
-# head(lmoran)
-# 
-
-
-# #load data
-#  clev.points <- st_transform(geodaData::clev_pts, crs = "EPSG:3734")
-# env <- st_bbox(clev.points)
-# 
-# voronoi <- clev.points %>%
-#   st_geometry() %>% # to get sfc from sf
-#   st_union() %>% # to get a sfc of MULTIPOINT type
-#   st_voronoi() %>% #
-#   st_collection_extract(type = "POLYGON") %>% # a list of polygons
-#   st_sf() %>% # from list to sf object
-#  # st_intersection(state) %>% # cut to shape of NC state
-#   st_join(clev.points) # put names back
-
-ggplot() +
-  geom_sf(data = voronoi, alpha = .5) +
- # geom_sf(data = state, lwd = .75, fill = NA) + 
-  geom_sf(data = clev.points, color = "red", pch = 19, size = 2)
-
 mergedGrid <- st_union(surveyGrid, by_feature = FALSE) %>% st_sf()
 mergedGridBuffer <- st_buffer(mergedGrid, 9000)
 ggplot(mergedGridBuffer)+geom_sf()
@@ -103,7 +61,6 @@ ggplot() +
 
 tmap_mode("view")
 
-
 voronoiScal$lmI <- lmoran[, "Ii"] # local Moran's I
 voronoiScal$lmZ <- lmoran[, "Z.Ii"] # z-scores
 # p-values corresponding to alternative greater
@@ -139,29 +96,10 @@ gmoranMC
 
 hist(gmoranMC$res)
 abline(v = gmoranMC$statistic, col = "red")
-# # plot(clev.points["unique_id"])
-# 
-# # vtess <- deldir(clev.points$x, clev.points$y)
-# # voronoipolygons = function(thiess) {
-# #   w = tile.list(thiess)
-# #   polys = vector(mode='list', length=length(w))
-# #   for (i in seq(along=polys)) {
-# #     pcrds = cbind(w[[i]]$x, w[[i]]$y)
-# #     pcrds = rbind(pcrds, pcrds[1,])
-# #     polys[[i]] = Polygons(list(Polygon(pcrds)), ID=as.character(i))
-# #   }
-# #   SP = SpatialPolygons(polys)
-# #   voronoi = SpatialPolygonsDataFrame(SP, data=data.frame(dummy = seq(length(SP)), row.names=sapply(slot(SP, 'polygons'), 
-# #                                                                                                    function(x) slot(x, 'ID'))))
-# # }
-# # 
-# # v <- voronoipolygons(vtess)
-# plot(v)
-
 
 
 # Intersection (first points, then grid squares)
-interGrid <- st_intersects(s_cat_sf, surveyGrid)
+# interGrid <- st_intersects(s_cat_sf, surveyGrid)
 
 # Intersection (first polygons, then points)
 interCounts2 <- st_intersects(surveyGrid, s_cat_sf)

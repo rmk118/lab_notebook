@@ -1,6 +1,6 @@
 #EDM help functions for analyzing the Maine inshore trawl survey data
 #Ruby Krasnow
-#Last modified: July 7, 2023
+#Last modified: July 9, 2023
 
 library(tidyverse)
 library(lubridate)
@@ -23,7 +23,9 @@ cleanCatch <- function(x) {
 
 #implementation
 s_catFull <- cleanCatch(df_s_cat) %>% 
-  mutate(Common_Name = "Scallop")
+  mutate(Common_Name = "Scallop") %>% 
+  mutate(logCatch = log(Expanded_Catch + 1),
+         logWt = log(Expanded_Weight_kg + 1))
 
 
 ########## summaryCatch ------------------------------------------------------------
@@ -31,7 +33,9 @@ s_catFull <- cleanCatch(df_s_cat) %>%
 summaryCatch <- function(df) {
   df %>% group_by(Season, Year, Region,Stratum) %>%
     summarise(avgCatch = mean(Expanded_Catch),
-              avgWt = mean(Expanded_Weight_kg))
+              avgWt = mean(Expanded_Weight_kg),
+              avgLogCatch = mean(logCatch),
+              avgLogWt = mean(logWt)) 
 }
 
 #implementation
@@ -42,17 +46,13 @@ s_cat <- summaryCatch(s_catFull)
 
 #returns a tibble with the mean catch (avg across years) for each region/stratum combination
 
-# prepare the dataframe by adding log catch and log weight columns, then making it tidy
-s_cat$logS_catch <- log(s_cat$avgCatch+1)
-s_cat$logS_wt <- log(s_cat$avgWt+1)
-
 s_catchTidy <- pivot_longer(s_cat, 
                           cols = 5:ncol(s_cat)) %>% 
   mutate(Type = case_when(
-    startsWith(name, "avgCatch") ~"avgCatch",
-    startsWith(name,"avgWt") ~"avgWt",
-    endsWith(name,"_wt") ~"logWt",
-    endsWith(name,"_catch") ~"logCatch")) %>% 
+    name== "avgCatch" ~"avgCatch",
+    name=="avgWt" ~"avgWt",
+    name=="avgLogWt" ~"avgLogWt",
+    name=="avgLogCatch" ~"avgLogCatch")) %>% 
   mutate(Species = "scallop")
   # mutate(Species = case_when(
   #   startsWith(name, "logS") | endsWith(name, "s") ~"scallop",
@@ -80,7 +80,7 @@ findSpeciesMean<- function(df, season, type) {
 }
 
 #implementation
-findSpeciesMean(s_catchTidy, season="Fall", type="logCatch")
+findSpeciesMean(s_catchTidy, season="Fall", type="avgLogCatch")
 
 ############ Find E - df input -------------------------------------------------------
 
@@ -93,7 +93,7 @@ findE_df <- function(df) {
 
 #implementation example
 scalLogCatchFall_1.1 <- s_catchTidy %>% 
-  filter(Type=="logCatch", Season=="Fall") %>% 
+  filter(Type=="avgLogCatch", Season=="Fall") %>% 
   select(-c('Species', 'Type')) %>% 
   filter(Region==1, Stratum==1) %>% 
   ungroup() %>% 
@@ -109,7 +109,7 @@ findE_v <- function(v) {
   df <- data.frame(indices,v)
   colnames(df)<-c("index", "value")
   #print(df)
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 6)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 10)
   E_out<-rho_E[which.max(rho_E$rho),"E"][1]
   return(E_out)
 }
@@ -120,7 +120,7 @@ findErho_v <- function(v) {
   df <- data.frame(indices,v)
   colnames(df)<-c("index", "value")
   #print(df)
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 6)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 10)
   rho_out<-rho_E[which.max(rho_E$rho),"rho"][1]
   return(rho_out)
 }
@@ -129,7 +129,7 @@ findErho_v <- function(v) {
 findE_v(scalLogCatchFall_1.1$value)
 findErho_v(scalLogCatchFall_1.1$value)
 
-############ findSpeciesE -------------------------------------------------------
+############ findSpeciesE & findSpeciesErho -------------------------------------------------------
 
 #returns a tibble with the optimal embedding dimension for time series from each region/stratum combination
 #Same idea as the findSpeciesMean function, but finding the optimal embedding dimension instead of the mean
@@ -160,5 +160,10 @@ findSpeciesErho <- function(df, season, type) {
 
 #Implementation examples
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
-findSpeciesE(s_catchTidy, season="Fall", type="logCatch")
-findSpeciesErho(s_catchTidy, season="Fall", type="logCatch")
+findSpeciesE(s_catchTidy, season="Fall", type="avgLogCatch")
+findSpeciesErho(s_catchTidy, season="Fall", type="avgLogCatch")
+
+#Implementation examples
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
+findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt")
+findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")

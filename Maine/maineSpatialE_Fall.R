@@ -1,6 +1,6 @@
 #Maine spatial analysis - Fall
 #Ruby Krasnow
-#Last modified: July 7, 2023
+#Last modified: July 9, 2023
 
 #spatial packages
 library(sf)
@@ -9,6 +9,7 @@ library(plotly)
 library(spdep)
 library(tidyverse)
 library(lubridate)
+library(patchwork)
 
 #import help functions and tow data
 source('~/Downloads/lab_notebook/Maine/helpFunctionsMaine.R')
@@ -30,42 +31,46 @@ surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 #plot(surveyGrid["OBJECTID"], main="Object ID")
 #plot(surveyGrid["Region"], main="Region")
 #plot(surveyGrid["Stratum"], main="Depth Stratum")
-plot(surveyGrid["region_stratum"], main="Study Area")
+#plot(surveyGrid["region_stratum"], main="Study Area")
 
 surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 
-surveyed <- surveyGrid %>% filter(!is.na(surveys))
-plot(surveyed["region_stratum"], main="Study Area")
-plot(surveyed["Region"], main="Region")
-
-
-
+# surveyed <- surveyGrid %>% filter(!is.na(surveys))
+# plot(surveyed["region_stratum"], main="Study Area")
+# plot(surveyed["Region"], main="Region")
 
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
 df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
 df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
-df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 
 s_cat_Spatial <- cleanCatch(df_s_cat) %>% 
   mutate(Common_Name = "Scallop") %>% 
   select(-c("End_Latitude","End_Longitude")) %>% 
   mutate(area = paste(Region, Stratum),.before= Survey) %>% 
-  filter(Season == "Fall")
+  filter(Season == "Fall") %>% 
+  mutate(logCatch = log(Expanded_Catch + 1),
+         logWt = log(Expanded_Weight_kg + 1))
 
 r_cat_Spatial <- cleanCatch(df_r_cat) %>% 
   mutate(Common_Name = "Rock") %>% 
   select(-c("End_Latitude","End_Longitude")) %>% 
   mutate(area = paste(Region, Stratum),.before= Survey) %>% 
-  filter(Season == "Fall")
+  filter(Season == "Fall") %>% 
+  mutate(logCatch = log(Expanded_Catch + 1),
+         logWt = log(Expanded_Weight_kg + 1))
 
 j_cat_Spatial <- cleanCatch(df_j_cat) %>% 
   mutate(Common_Name = "Jonah") %>% 
   select(-c("End_Latitude","End_Longitude")) %>% 
   mutate(area = paste(Region, Stratum),.before= Survey) %>% 
-  filter(Season == "Fall")
+  filter(Season == "Fall") %>% 
+  mutate(logCatch = log(Expanded_Catch + 1),
+         logWt = log(Expanded_Weight_kg + 1))
 
 # calculate the average number of tows per area over the whole time series
 numTows<- (s_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+# calculate the average number of tows per area per year
+numTowsYearly<- (s_cat_Spatial %>% group_by(area, Year) %>% summarise(num = n_distinct(row_number())))
 
 s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 r_cat_sf<- st_as_sf(r_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
@@ -83,7 +88,7 @@ ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
 
 regionsGrid <- surveyGrid %>% group_by(region_stratum) %>% summarise(num = n_distinct(GridID))
-plot(regionsGrid)
+#plot(regionsGrid)
 
 #find the grids and points in region 1.1
 region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE) #merged together
@@ -96,7 +101,11 @@ not1.1points <- s_cat_sf %>% filter(area!="1 1")
 ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = not1.1points)
 
 # This plot shows all points marked as being in 1.1 over the region of merged 1.1 grids
-ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = region1.1points)
+marked<- ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = region1.1points)+ggtitle("Labeled as 1.1")
+
+inside<- ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data=st_intersection(region1.1grid, s_cat_sf))+ggtitle("Start coords within 1.1")
+
+marked+inside
 
 # Use st_length(surveyGrid) and st_length(s_cat_sf) to check that units are m
 # This plot adds a 1000m buffer around each point
@@ -120,11 +129,14 @@ nrow(neighbors_1.1) #102
 #how many neighbors will be used in the bootstrapping
 nNeighbors <- round(0.5*(numTows %>% filter(area=="1 1") %>% pull(num)))
 
-# Start with 10 iterations (10 random samples of n neighbors), ideally would do 100 iterations
+# Start with 20 iterations (20 random samples of n neighbors), ideally would do 100 iterations
 # where n is 0.5*(tows completed in that area over the time series)
 
-trialStrat <- sample_n(neighbors_1.1, nNeighbors, replace = FALSE)
-trialStrat <- bind_rows(region1.1points, trialStrat) %>% mutate(trial = 1, .before=area)
+#trial 1 - so we're not binding to an empty df
+trialStrat <- sample_n(neighbors_1.1, nNeighbors, replace = FALSE) #randomly sample n points from the neighbors
+trialStrat <- bind_rows(region1.1points, trialStrat) %>% mutate(trial = 1, .before=area) #create "Frankenstein stratum" by combining base stratum with the random sample of neighbors
+
+#trials 2-20
 for (i in 2:20) {
   tempStrat <- sample_n(neighbors_1.1, nNeighbors, replace = FALSE)
   tempStrat <- bind_rows(region1.1points, tempStrat) %>% mutate(trial = i, .before=area)
@@ -135,44 +147,45 @@ for (i in 2:20) {
 #   summarise(avgCatch = mean(Expanded_Catch),
 #             avgWt = mean(Expanded_Weight_kg))
 
+#
 summaryCatchTrial <- function(df) {
   df %>% group_by(trial,Year) %>%
     summarise(avgCatch = mean(Expanded_Catch),
-              avgWt = mean(Expanded_Weight_kg)) %>% 
-    mutate(logCatch = log(avgCatch + 1),
-           logWt = log(avgWt + 1))
+              avgWt = mean(Expanded_Weight_kg),
+              avgLogCatch = mean(logCatch),
+              avgLogWt = mean(logWt)) 
 }
 
 
 eTest <- summaryCatchTrial(trialStrat)
 
-colOrderTrials<-c("trial", "Year", "geometry", "avgCatch", "avgWt", "logCatch", "logWt")
+colOrderTrials<-c("trial", "Year", "geometry", "avgCatch", "avgWt", "avgLogCatch", "avgLogWt")
 eTest <- eTest %>% select(all_of(colOrderTrials))
             
 eTest <- pivot_longer(eTest, cols = 4:ncol(eTest)) %>%
   mutate(Type = case_when(
     name== "avgCatch" ~"avgCatch",
     name=="avgWt" ~"avgWt",
-    name=="logWt" ~"logWt",
-    name=="logCatch" ~"logCatch")) %>%
+    name=="avgLogWt" ~"avgLogWt",
+    name=="avgLogCatch" ~"avgLogCatch")) %>%
   mutate(Species = as.factor("scallop"),
           trial = as.factor(trial)) %>% 
    select(-name)
 
-findE_v(eTest %>% filter(Type=="logCatch", trial==1) %>% pull(value))
+#findE_v(eTest %>% filter(Type=="avgLogCatch", trial==1) %>% pull(value))
 
 v <- c()
 r <- c()
 
-#par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
+par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.5))
 
 for (i in 1:20) {
-  rho_E<- EmbedDimension(dataFrame = (eTest %>% filter(Type=="logCatch", trial==i) %>% st_drop_geometry() %>% select(Year, value)), lib = "1 23", pred = "1 23", columns = "value",target = "value", maxE = 6)
+  rho_E<- EmbedDimension(dataFrame = (eTest %>% filter(Type=="avgLogWt", trial==i) %>% st_drop_geometry() %>% select(Year, value)), lib = "1 23", pred = "1 23", columns = "value",target = "value", maxE = 10)
   v<-append(v,(rho_E[which.max(rho_E$rho),"E"][1]))
   r<-append(r,(rho_E[which.max(rho_E$rho),"rho"][1]))
   }
 
-round(mean(v))
+print(round(mean(v)))
 print(r)
 summary(r)
 summary(v)
@@ -181,42 +194,81 @@ sd(v)
 
 # Generalizing to all areas - only Scallops -----------------------------------------------
 
-# numRegions = 5
-# numStrata = 4
-# 
-# for (i in 1:numRegions) {
-#   for (j in 1:numStrata) {
-#     
-#     baseArea <- paste(i, j)
-#     
-#     areaGrid<- surveyGrid %>% filter(region_stratum==baseArea) %>% st_union(by_feature = FALSE) #merged together
-#     areaPoints <- s_cat_sf %>% filter(area==baseArea)
-#     
-#     #find all points not in the base area
-#     notAreaPoints <- s_cat_sf %>% filter(area!=baseArea)
-#     
-#     #which of those points are close to the base area
-#     neighborsArea <- st_intersection(notAreaPoints, st_buffer(areaGrid, 3704))
-#     
-#     #how many neighboring points are there
-#     print(baseArea)
-#     print(nrow(neighborsArea))
-#     
-#     #how many neighbors will be used in the bootstrapping
-#     nNeighbors <- round(0.5*(numTows %>% filter(area==baseArea) %>% pull(num)))
-#     #print(numTows %>% filter(area==baseArea) %>% pull(num))
-#     #print(nNeighbors)
-#     
-#     # #trial 1 - so we aren't binding rows to an empty dataframe
-#     # trialStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
-#     # trialStrat <- bind_rows(areaPoints, trialStrat) %>% mutate(trial = 1, .before=area)
-#     # #trials 2 through 10
-#     # for (k in 2:10) {
-#     #   tempStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
-#     #   tempStrat <- bind_rows(areaPoints, tempStrat) %>% mutate(trial = k, .before=area)
-#     #   trialStrat<- bind_rows(trialStrat, tempStrat)
-#     # }
-#   }
-# }
-# 
-# 
+numRegions = 5
+numStrata = 4
+
+allAreasE <- data.frame(matrix(nrow = 5, ncol=4))
+allAreasRho <-data.frame(matrix(nrow = 5, ncol=4))
+
+for (i in 1:numRegions) {
+  for (j in 1:numStrata) {
+
+    baseArea <- paste(i, j)
+
+    areaGrid<- surveyGrid %>% filter(region_stratum==baseArea) %>% st_union(by_feature = FALSE) #merged together
+    areaPoints <- s_cat_sf %>% filter(area==baseArea)
+
+    #find all points not in the base area
+    notAreaPoints <- s_cat_sf %>% filter(area!=baseArea)
+
+    #which of those points are close to the base area
+    neighborsArea <- st_intersection(notAreaPoints, st_buffer(areaGrid, 3704))
+
+    #how many neighboring points are there
+    print(baseArea)
+    print(nrow(neighborsArea))
+
+    #how many neighbors will be used in the bootstrapping
+    nNeighbors <- round(0.5*(numTows %>% filter(area==baseArea) %>% pull(num)))
+    #print(numTows %>% filter(area==baseArea) %>% pull(num))
+    #print(nNeighbors)
+
+    #trial 1 - so we aren't binding rows to an empty dataframe
+    trialStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
+    trialStrat <- bind_rows(areaPoints, trialStrat) %>% mutate(trial = 1, .before=area)
+    #trials 2 through 10
+    for (k in 2:10) {
+      tempStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
+      tempStrat <- bind_rows(areaPoints, tempStrat) %>% mutate(trial = k, .before=area)
+      trialStrat<- bind_rows(trialStrat, tempStrat)
+    }
+    
+    trialSum <- summaryCatchTrial(trialStrat) %>% select(all_of(colOrderTrials))
+    
+    trialSum <- pivot_longer(trialSum, cols = 4:ncol(trialSum)) %>%
+      mutate(Type = case_when(
+        name== "avgCatch" ~"avgCatch",
+        name=="avgWt" ~"avgWt",
+        name=="avgLogWt" ~"avgLogWt",
+        name=="avgLogCatch" ~"avgLogCatch")) %>%
+      mutate(Species = as.factor("scallop")) %>% 
+            # trial = as.factor(trial)) %>% 
+      select(-name)
+    
+    v <- c()
+    r <- c()
+    
+    for (x in 1:10) {
+      df <- as.data.frame(trialSum %>% filter(Type=="avgLogWt", trial == x) %>% 
+                           st_drop_geometry() %>% 
+                          select(Year, value))
+      lib_pred_vec <- paste(1,nrow(df))
+      rho_E<- EmbedDimension(dataFrame = df, lib = lib_pred_vec, pred = lib_pred_vec, columns = "value",target = "value", maxE = 10)
+      v<-append(v,(rho_E[which.max(rho_E$rho),"E"][1]))
+      r<-append(r,(rho_E[which.max(rho_E$rho),"rho"][1]))
+    }
+    
+    print(round(mean(v)))
+    print(mean(r))
+    
+    allAreasE[i, j]<- round(mean(v))
+    allAreasRho[i,j]<- mean(r)
+    
+  }
+}
+
+allAreasE
+allAreasRho
+
+
+
