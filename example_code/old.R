@@ -182,3 +182,9 @@ neighbors_df<- neighbors_df %>%
 neighbors_df_test<- left_join(neighbors_df, surveyedNoGeom) %>% 
   rename(objectRegion = region_stratum, objectID = OBJECTID)
 neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighborID"="OBJECTID"))
+
+#grid_id starts again at 1 for each region
+#st_layers("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid")
+
+# This plot adds a 1000m buffer around each point
+#ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = st_buffer(region1.1points, 1000)) 

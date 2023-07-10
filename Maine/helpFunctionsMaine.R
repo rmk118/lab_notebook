@@ -18,14 +18,14 @@ cleanCatch <- function(x) {
            Weight_kg = replace_na(Weight_kg,0),
            Expanded_Catch = replace_na(Expanded_Catch,0),
            Expanded_Weight_kg = replace_na(Expanded_Weight_kg,0)) %>% 
-    mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused")
+    mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused") %>% 
+    mutate(logCatch = log(Expanded_Catch + 1),
+           logWt = log(Expanded_Weight_kg + 1))
 }
 
 #implementation
 s_catFull <- cleanCatch(df_s_cat) %>% 
-  mutate(Common_Name = "Scallop") %>% 
-  mutate(logCatch = log(Expanded_Catch + 1),
-         logWt = log(Expanded_Weight_kg + 1))
+  mutate(Common_Name = "Scallop")
 
 
 ########## summaryCatch ------------------------------------------------------------
