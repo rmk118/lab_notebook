@@ -167,3 +167,172 @@ findSpeciesErho(s_catchTidy, season="Fall", type="avgLogCatch")
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
 findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
+
+# Function 1: delay -------------------------------------------------------
+
+delay <- function(x,n){
+  if(n>=0) 
+    lead(x,n) 
+  else 
+    lag(x,abs(n))}
+
+
+# Function 2: make_xmap_block ---------------------------------------------
+
+make_xmap_block <- function(df,predictor,target,ID_col,E_max,cause_lag){
+  
+  v_delays <- 0:-(E_max-1)
+  
+  df_ccm <- df %>%
+    select({{ID_col}},{{target}}) %>%
+    group_by({{ID_col}}) %>%
+    transmute(target=delay({{target}},cause_lag))
+  
+  df_lags <- map_dfc(v_delays,function(d_i){
+    df %>%
+      group_by({{ID_col}}) %>%
+      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
+      ungroup({{ID_col}}) %>% select(-{{ID_col}})
+  })
+  
+  df_out <- bind_cols(df_ccm,df_lags) %>% 
+    ungroup() %>%
+    mutate(index=row_number()) %>%
+    select(index,everything())
+  
+  return(df_out)
+  
+}
+
+
+
+# Function 3: do_xmap_once ------------------------------------------------
+
+do_xmap_once <- function(df,predictor,target,ID_col=NULL,E_max,tp,keep_preds=FALSE){
+  
+  df_2 <- make_xmap_block(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
+                          E_max,cause_lag=tp) %>% ungroup()
+  
+  ## for selecting the optimal E, we discard rows that do not have a full set of lags so that the prediction set is consistent for the comparison.
+  
+  df_1 <- df_2 %>% group_by(!!sym(ID_col)) %>%
+    mutate(target=lag(target,1)) %>% 
+    ungroup() %>%
+    filter(complete.cases(.))
+  
+  df_2 <- df_2 %>%
+    filter(complete.cases(.))
+  
+  lib_1 <- paste(1,nrow(df_1))
+  lib_2 <- paste(1,nrow(df_2))
+  
+  
+  out_1 <- map_df(1:E_max,function(E_i){
+    
+    columns_i <- names(df_1)[4:(E_i+3)]
+    out_i <- Simplex(dataFrame=df_1,
+                     lib=lib_1,pred=lib_1,Tp=0, # The target has already been "manually" lagged
+                     target="target",
+                     columns=columns_i,
+                     embedded=TRUE,
+                     parameterList = TRUE,
+                     E=E_i)
+    
+    params_i <- out_i$parameters
+    out_i <- out_i$predictions %>% filter(complete.cases(.))
+    
+    stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
+    
+    return(bind_cols(data.frame(E=E_i),stats_i))
+    
+  })
+  
+  E_star <- out_1 %>% top_n(1,rho) %>% pull(E)
+  
+  columns_star <- names(df_1)[4:(E_star+3)]
+  
+  out <- Simplex(dataFrame=df_2,
+                 lib=lib_2,pred=lib_2,Tp=0, # The target has already been "manually" lagged
+                 target="target",
+                 columns=columns_star,
+                 embedded=TRUE,
+                 parameterList = TRUE,
+                 E=E_star)
+  
+  fit_linear <- lm(as.formula(paste0("target ~ ",columns_star[1])),data=df_2)
+  out_linear_predictions <- predict(fit_linear)
+  
+  params <- out$parameters
+  out <- out$predictions %>% filter(complete.cases(.))
+  
+  stats <- compute_stats(out$Observations,out$Predictions)
+  
+  stats_linear <- compute_stats(out$Observations,out_linear_predictions)
+  names(stats_linear) <- paste0(names(stats_linear),"_linear")
+  
+  if(keep_preds){
+    return(list(
+      stats=bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear),
+      preds=out
+    ))
+  }
+  else{
+    return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
+  }
+  
+}
+
+
+
+# Function 4: do_randL_xmap_once ------------------------------------------
+
+do_randL_xmap_once <- function(df,predictor,target,ID_col=NULL,lib_size,E,tp,keep_preds=FALSE){
+  
+  df_2 <- make_xmap_block(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
+                          E,cause_lag=tp) %>% ungroup()
+  
+  df_2 <- df_2 %>%
+    filter(complete.cases(.)) %>%
+    slice_sample(prop=1)
+
+  lib_L <- paste(1,lib_size)
+  pred_L <- paste(1,nrow(df_2))
+  
+  columns_i <- names(df_2)[4:(E+3)]
+  out <- Simplex(dataFrame=df_2,
+                 lib=lib_L,pred=pred_L,
+                 Tp=0,
+                 target="target",
+                 columns=columns_i,
+                 embedded=TRUE,
+                 parameterList = TRUE,
+                 E=E)
+  
+  params <- out$parameters
+  out <- out$predictions %>% filter(complete.cases(.))
+  
+  stats <- compute_stats(out$Observations,out$Predictions)
+  stats$lib_size = lib_size
+  stats$E=E
+  stats$Tp=0
+  
+  return(stats)
+  
+}
+
+
+
+# Function 5: do_extend_xmap ----------------------------------------------
+
+do_extend_xmap <- function(df,predictor,target,ID_col,E_max=12,cause_lag_max=10){
+  
+  ## make block
+  out <- map_dfr(-cause_lag_max:0,function(lag_i){
+    out_i <- do_xmap_once(df,predictor,target,ID_col,E_max,tp=lag_i)
+    out_i$Tp = lag_i
+    return(out_i)
+  })
+  
+  return(out)
+}
+
