@@ -5,6 +5,7 @@
 library(tidyverse)
 library(patchwork)
 library(lubridate)
+library(tseries)
 
 #spatial packages
 library(sf)
@@ -39,16 +40,18 @@ colOrder<-c("Survey", "Tow_Number", "Region", "Stratum", "logCatch", "logWt", "E
 j_catFull <- j_catFull %>% select(all_of(colOrder))
 r_catFull <- r_catFull %>% select(all_of(colOrder))
 s_catFull <- s_catFull %>% select(all_of(colOrder))
+all_catFull <- rbind(j_catFull, r_catFull, s_catFull)
 
 j_cat <- summaryCatch(j_catFull)
 r_cat <- summaryCatch(r_catFull)
 s_cat <- summaryCatch(s_catFull)
 
+
 catch <- s_cat %>% left_join(j_cat, by=c("Season", "Region", "Stratum", "Year"), suffix = c("_s", "_j"))
 catch <- catch %>% left_join(r_cat, by=c("Season", "Region", "Stratum", "Year")) %>% 
   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt,avgLogCatch_r = avgLogCatch,avgLogWt_r = avgLogWt, .keep="unused")
 
-# ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+geom_smooth(method = "lm")+labs(x="scallops", y="jonah crabs")+facet_grid(Region~Stratum) #+ scale_color_gradientn(colours = rainbow(30))
+# ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+geom_smooth(method = "lm")+labs(x="scallops", y="jonah crabs")+facet_grid(Region~Stratum) #+ scale_color_gradient(colours = rainbow(30))
 # ggplot(catch, aes(x=logS_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="rock crabs")+geom_smooth(method = "lm")+facet_grid(Region~Stratum)
 # ggplot(catch, aes(x=logJ_catch,y=logR_catch, color=Year))+geom_point()+theme_classic()+labs(x="jonah crabs", y="rock crabs")
 # ggplot(catch, aes(x=logS_catch,y=logJ_catch, color=Year))+geom_point()+theme_classic()+labs(x="scallops", y="jonah crabs")+facet_wrap(~Stratum)
@@ -171,8 +174,6 @@ findScallopErho_v(scallopsTidy, season="Fall", type="logWt")
 # ggplot(scalLogWtSpring, aes(x=Year, y=logWeight, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchSpring, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
 # ggplot(scalLogCatchFall, aes(x=Year, y=logCatch, group = Region, color=Region))+geom_line()+facet_grid(~Stratum)
-
-
 
 
 

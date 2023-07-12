@@ -76,7 +76,7 @@ ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 # ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 
 
-# Region 1, Stratum 1 - example -----------------------------------------------------
+################# Region 1, Stratum 1 - example -----------------------------------------------------
 
 #all grids merged together
 ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
@@ -190,6 +190,7 @@ numStrata = 4
 
 allAreasE <- data.frame(matrix(nrow = 5, ncol=4))
 allAreasRho <-data.frame(matrix(nrow = 5, ncol=4))
+LBtest <-data.frame(matrix(nrow = 5, ncol=4))
 
 for (i in 1:numRegions) {
   for (j in 1:numStrata) {
@@ -253,6 +254,7 @@ for (i in 1:numRegions) {
     
     allAreasE[i, j]<- round(mean(v))
     allAreasRho[i,j]<- mean(r)
+    LBtest[i,j]<-Box.test(scalLogCatchFall_1.1$value, lag=5, type="Ljung-Box")
     
   }
 }

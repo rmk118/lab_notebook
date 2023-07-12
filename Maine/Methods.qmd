@@ -1,0 +1,51 @@
+---
+title: 'Methods'
+date: '2023-07-11'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+Ruby Krasnow
+Last modified: July 11, 2023
+
+Load packages
+```{r}
+library(tidyverse)
+library(lubridate) #date formatting
+library(patchwork) #combining plots
+library(rEDM) #EDM
+
+#spatial packages
+library(sf)
+library(sfheaders)
+library(spdep)
+
+```
+
+Read data
+```{r}
+
+df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
+df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
+df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
+df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
+
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") 
+#CRS: WGS 84/EPSG 4326
+```
+
+Clean the grid survey data
+```{r}
+surveyGrid <- surveyGrid %>% 
+  mutate(Region = region_id,
+         Stratum = depth_stra,
+         GridID = grid_id, .keep="unused", .before=last_surve)
+
+surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
+```
+
+

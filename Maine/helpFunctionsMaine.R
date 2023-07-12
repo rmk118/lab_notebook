@@ -1,9 +1,10 @@
 #EDM help functions for analyzing the Maine inshore trawl survey data
 #Ruby Krasnow
-#Last modified: July 9, 2023
+#Last modified: July 12, 2023
 
 library(tidyverse)
 library(lubridate)
+library(tseries)
 
 ########### cleanCatch --------------------------------------------------------------
 
@@ -158,6 +159,7 @@ findSpeciesErho <- function(df, season, type) {
   return(df_out)
 }
 
+
 #Implementation examples
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
 findSpeciesE(s_catchTidy, season="Fall", type="avgLogCatch")
@@ -167,6 +169,25 @@ findSpeciesErho(s_catchTidy, season="Fall", type="avgLogCatch")
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
 findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
+
+############ findSpeciesACF -------------------------------------------------------
+
+#returns a tibble with the p-val for the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test for 
+# time series from each region/stratum combination
+#KPSS tests the null hypothesis that x is level stationary
+
+findSpeciesKPSS <- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(val = (kpss.test(value, null='Level'))$p.value) %>%
+    pivot_wider(names_from = Stratum, values_from = val) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")
 
 # Function 1: delay -------------------------------------------------------
 

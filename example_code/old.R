@@ -188,3 +188,6 @@ neighbors_df_test <- left_join(neighbors_df_test, surveyedNoGeom, by = c("neighb
 
 # This plot adds a 1000m buffer around each point
 #ggplot()+ geom_sf(data=region1.1grid)+geom_sf(data = st_buffer(region1.1points, 1000)) 
+
+Box.test(s_catchTidy %>% filter(Region==1, Stratum==3, Season=="Fall", Type=="avgLogCatch") %>% pull(value), lag=5, type="Ljung-Box")
+acf(s_catchTidy %>% filter(Region==2, Stratum==3, Season=="Fall", Type=="avgLogCatch") %>% pull(value))
