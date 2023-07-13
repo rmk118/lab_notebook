@@ -1,6 +1,6 @@
 #EDM help functions for analyzing the Maine inshore trawl survey data
 #Ruby Krasnow
-#Last modified: July 12, 2023
+#Last modified: July 13, 2023
 
 library(tidyverse)
 library(lubridate)
@@ -14,58 +14,39 @@ df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #catch data o
 cleanCatch <- function(x) {
   full_join(x, df_tows) %>%
     arrange(Survey, Tow_Number) %>% 
-    select(-c("Stratum", "Subsample_Weight_kg_2", "Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "Air_Temp", "Tow_Time")) %>%
+    select(-c("Stratum", "Subsample_Weight_kg", "Subsample_Weight_kg_2", "Male_Wt_kg", "Female_Wt_kg","Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "End_Latitude","End_Longitude", "Air_Temp", "Tow_Time")) %>%
     mutate(Number_Caught = replace_na(Number_Caught,0),
            Weight_kg = replace_na(Weight_kg,0),
            Expanded_Catch = replace_na(Expanded_Catch,0),
            Expanded_Weight_kg = replace_na(Expanded_Weight_kg,0)) %>% 
     mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused") %>% 
     mutate(logCatch = log(Expanded_Catch + 1),
-           logWt = log(Expanded_Weight_kg + 1))
+           logWt = log(Expanded_Weight_kg + 1)) %>%
+    mutate(area = paste(Region, Stratum),.before= Survey)
 }
-
-#implementation
-s_catFull <- cleanCatch(df_s_cat) %>% 
-  mutate(Common_Name = "Scallop")
+ 
+#implementation example
+s_cat_clean <- cleanCatch(df_s_cat) %>% 
+ mutate(Common_Name = "Scallop")
 
 
 ########## summaryCatch ------------------------------------------------------------
 
 summaryCatch <- function(df) {
-  df %>% group_by(Season, Year, Region,Stratum) %>%
+  df %>% group_by(area, Season, Year, Region, Stratum) %>%
     summarise(avgCatch = mean(Expanded_Catch),
               avgWt = mean(Expanded_Weight_kg),
               avgLogCatch = mean(logCatch),
               avgLogWt = mean(logWt)) 
 }
 
-#implementation
-s_cat <- summaryCatch(s_catFull)
+#implementation example
+s_cat_sum <- summaryCatch(s_cat_clean)
 
 
 ########### findSpeciesMean ---------------------------------------------------------
 
 #returns a tibble with the mean catch (avg across years) for each region/stratum combination
-
-s_catchTidy <- pivot_longer(s_cat, 
-                          cols = 5:ncol(s_cat)) %>% 
-  mutate(Type = case_when(
-    name== "avgCatch" ~"avgCatch",
-    name=="avgWt" ~"avgWt",
-    name=="avgLogWt" ~"avgLogWt",
-    name=="avgLogCatch" ~"avgLogCatch")) %>% 
-  mutate(Species = "scallop")
-  # mutate(Species = case_when(
-  #   startsWith(name, "logS") | endsWith(name, "s") ~"scallop",
-  #   startsWith(name, "logR") | endsWith(name, "r") ~"rock",
-  #   startsWith(name, "logJ") | endsWith(name, "j") ~"jonah"))
-
-s_catchTidy <- s_catchTidy %>% 
-  mutate(Species = as.factor(Species),
-    Season = as.factor(Season),
-    Region = as.factor(Region), 
-    Stratum = as.factor(Stratum)) %>% 
-  select(-name)
 
 # actual function
 findSpeciesMean<- function(df, season, type) {
@@ -80,8 +61,27 @@ findSpeciesMean<- function(df, season, type) {
   return(df_out)
 }
 
-#implementation
+#implementation example
+
+s_catchTidy <- pivot_longer(s_cat_sum, cols = 6:ncol(s_cat_sum)) %>% 
+  mutate(Type = case_when(
+    name== "avgCatch" ~"avgCatch",
+    name=="avgWt" ~"avgWt",
+    name=="avgLogWt" ~"avgLogWt",
+    name=="avgLogCatch" ~"avgLogCatch")) %>% 
+  mutate(Species = "scallop")
+
+s_catchTidy <- s_catchTidy %>% 
+  mutate(Species = as.factor(Species),
+         Season = as.factor(Season),
+         Region = as.factor(Region), 
+         area = as.factor(area),
+         Stratum = as.factor(Stratum)) %>% 
+  select(-name)
+
 findSpeciesMean(s_catchTidy, season="Fall", type="avgLogCatch")
+# Check - the below call matches the corresponding cell in the output tibble
+# mean(s_catchTidy %>% filter(Region==1, Stratum ==1, Season=="Fall", Type=="avgLogCatch") %>% pull(value))
 
 ############ Find E - df input -------------------------------------------------------
 
@@ -110,7 +110,7 @@ findE_v <- function(v) {
   df <- data.frame(indices,v)
   colnames(df)<-c("index", "value")
   #print(df)
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 10)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
   E_out<-rho_E[which.max(rho_E$rho),"E"][1]
   return(E_out)
 }
@@ -121,7 +121,7 @@ findErho_v <- function(v) {
   df <- data.frame(indices,v)
   colnames(df)<-c("index", "value")
   #print(df)
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 10)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
   rho_out<-rho_E[which.max(rho_E$rho),"rho"][1]
   return(rho_out)
 }
@@ -188,6 +188,7 @@ findSpeciesKPSS <- function(df, season, type) {
   return(df_out)
 }
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")
+findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogCatch")
 
 # Function 1: delay -------------------------------------------------------
 

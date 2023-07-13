@@ -1,16 +1,16 @@
 ---
 title: 'Methods'
-date: '2023-07-11'
+date: '2023-07-13'
 execute: 
   message: false
   warning: false
 editor_options: 
   chunk_output_type: console
-bibliography: references.bib
+#bibliography: references.bib
 ---
 
 Ruby Krasnow
-Last modified: July 11, 2023
+Last modified: July 13, 2023
 
 Load packages
 ```{r}
@@ -26,26 +26,130 @@ library(spdep)
 
 ```
 
-Read data
-```{r}
-
-df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
-df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
-df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
-df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
-
-surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") 
-#CRS: WGS 84/EPSG 4326
+```{r, include=FALSE}
+sys.source("~/Downloads/lab_notebook/Maine/helpFunctionsMaine.R", envir = knitr::knit_global())
 ```
 
-Clean the grid survey data
+# Organize data
+Analysis was performed on the catch weight (kg) of each species, which was recorded for each tow and standardized by DMR to account for tows that were longer or shorter than the 1 NM standard. 
 ```{r}
+
+df_tows<-read.csv("~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEtows.csv") #tow data
+df_s_cat<- read.csv("~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
+df_r_cat<- read.csv("~/Downloads/lab_notebook/data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
+df_j_cat<- read.csv("~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
+
+```
+
+## Log-transform, summarize, and assess stationarity
+Weight data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).
+```{r}
+# cleanCatch function includes log transformation; see helpFunctionsMaine script for details
+
+s_cat_clean <- cleanCatch(df_s_cat) %>% 
+  mutate(Common_Name = "Scallop")
+
+r_cat_clean <- cleanCatch(df_r_cat) %>% 
+  mutate(Common_Name = "Rock")
+
+j_cat_clean <- cleanCatch(df_j_cat) %>% 
+  mutate(Common_Name = "Jonah")
+
+#Reorder columns
+colOrder<-c("area", "Survey", "Tow_Number", "Region", "Stratum", "logCatch", "logWt", "Expanded_Catch", 
+  "Expanded_Weight_kg", "Date", "Common_Name", "Number_Caught", "Weight_kg",
+  "Start_Latitude", "Start_Longitude","Season",
+  "Year","Grid", "Start_Depth_fathoms", "End_Depth_fathoms",
+  "Bottom_WaterTemp_DegC", "Bottom_Salinity")
+
+j_cat_clean <- j_cat_clean %>% select(all_of(colOrder))
+r_cat_clean <- r_cat_clean %>% select(all_of(colOrder))
+s_cat_clean <- s_cat_clean %>% select(all_of(colOrder))
+
+#computes averages for each study area (area = region-stratum combination)
+j_cat_sum <- summaryCatch(j_cat_clean)
+r_cat_sum <- summaryCatch(r_cat_clean)
+s_cat_sum <- summaryCatch(s_cat_clean)
+
+catch <- s_cat_sum %>% left_join(j_cat_sum, by=c("area", "Season", "Region", "Stratum", "Year"), suffix = c("_s", "_j"))
+catch <- catch %>% left_join(r_cat_sum, by=c("area", "Season", "Region", "Stratum", "Year")) %>% 
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt,avgLogCatch_r = avgLogCatch,avgLogWt_r = avgLogWt, .keep="unused")
+
+catchTidy <- pivot_longer(catch, 
+        cols = 6:ncol(catch)) %>% 
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt",
+    startsWith(name,"avgLogWt") ~"logWt",
+    startsWith(name,"avgLogCatch") ~"logCatch")) %>% 
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy <- catchTidy %>% mutate(area = as.factor(area), Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
+          select(-name)
+
+logWtFall <- catchTidy %>% filter(Type == "logWt") %>% filter(Season == "Fall")
+logCatchFall <- catchTidy %>% filter(Type == "logCatch") %>% filter(Season == "Fall")
+
+#Note that the highest p-value the kpss.test function will show is 0.1, actual p-values may be higher
+findSpeciesKPSS(logWtFall %>% filter(Species=="scallop"), season="Fall", type="logWt")
+findSpeciesKPSS(logWtFall %>% filter(Species=="rock"), season="Fall", type="logWt")
+findSpeciesKPSS(logWtFall %>% filter(Species=="jonah"), season="Fall", type="logWt")
+findSpeciesKPSS(logCatchFall %>% filter(Species=="scallop"), season="Fall", type="logCatch")
+findSpeciesKPSS(logCatchFall %>% filter(Species=="rock"), season="Fall", type="logCatch")
+findSpeciesKPSS(logCatchFall %>% filter(Species=="jonah"), season="Fall", type="logCatch")
+
+```
+
+# Question 1: Do the intensity and pattern of spatial autocorrelation indicate spatial bootstrapping could be an appropriate method?
+
+First, import the location data for the survey region (surveyGrid) and transform the catch dataframes into sf objects for spatial analysis, using the same CRS as the survey grid.
+```{r}
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid/") 
+#CRS: WGS 84/EPSG 4326
+
 surveyGrid <- surveyGrid %>% 
   mutate(Region = region_id,
          Stratum = depth_stra,
          GridID = grid_id, .keep="unused", .before=last_surve)
 
 surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
+
+ggplot(surveyGrid)+geom_sf()
+
+s_cat_sf <- st_as_sf(s_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+r_cat_sf <- st_as_sf(r_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+j_cat_sf <- st_as_sf(j_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+
 ```
 
+Merge the individual survey grids into one region
+```{r}
+mergedGrid <- st_union(surveyGrid, by_feature = FALSE) %>% st_sf()
+mergedGridBuffer <- st_buffer(mergedGrid, 9000)
+ggplot(mergedGridBuffer)+geom_sf()
+```
+
+First, Voronoi polygons were constructed around each data point.
+```{r}
+voronoiScal <- s_cat_sf %>%
+  st_geometry() %>% # to get sfc from sf
+  st_union() %>% # to get a sfc of MULTIPOINT type
+  st_voronoi() %>% #
+  st_collection_extract(type = "POLYGON") %>% # a list of polygons
+  st_sf() %>% # from list to sf object
+  st_intersection(mergedGridBuffer) %>%
+  st_join(s_cat_sf)  # put names back
+ #envelope = st_geometry(mergedGrid)
+```
+
+
+
+
+
+Calculate Global Moran's I
+Calculate and display Local Moran's I
+Briefly present results here to justify the rest of the analysis
 

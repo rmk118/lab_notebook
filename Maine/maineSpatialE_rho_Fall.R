@@ -35,40 +35,34 @@ surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 #plot(surveyGrid["Stratum"], main="Depth Stratum")
 #plot(surveyGrid["region_stratum"], main="Study Area")
 
-surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID)) #number of grids in each study area
+# surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID)) #number of grids in each study area
 
 # surveyed <- surveyGrid %>% filter(!is.na(surveys)) #only accurate through 2019
 # plot(surveyed["region_stratum"], main="Study Area")
 # plot(surveyed["Region"], main="Region")
 
-s_cat_Spatial <- cleanCatch(df_s_cat) %>% 
-  mutate(Common_Name = "Scallop") %>% 
-  select(-c("End_Latitude","End_Longitude")) %>% 
-  mutate(area = paste(Region, Stratum),.before= Survey) %>% 
+s_cat_clean <- cleanCatch(df_s_cat) %>% 
+  mutate(Common_Name = "Scallop") %>%
   filter(Season == "Fall")
 
-r_cat_Spatial <- cleanCatch(df_r_cat) %>% 
+r_cat_clean <- cleanCatch(df_r_cat) %>% 
   mutate(Common_Name = "Rock") %>% 
-  select(-c("End_Latitude","End_Longitude")) %>% 
-  mutate(area = paste(Region, Stratum),.before= Survey) %>% 
   filter(Season == "Fall")
 
-j_cat_Spatial <- cleanCatch(df_j_cat) %>% 
+j_cat_clean <- cleanCatch(df_j_cat) %>% 
   mutate(Common_Name = "Jonah") %>% 
-  select(-c("End_Latitude","End_Longitude")) %>% 
-  mutate(area = paste(Region, Stratum),.before= Survey) %>% 
   filter(Season == "Fall")
 
 # calculate the average number of tows per area over the whole time series
 # there are a few years where there is one more tow for scallops than for the crab species
-numTows<- (s_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
-numTowsCrabs<- (r_cat_Spatial %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+numTows<- (s_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+numTowsCrabs<- (r_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
 # calculate the average number of tows per area per year
-s_cat_Spatial %>% group_by(area, Year) %>% summarise(num = n_distinct(row_number()))
+# s_cat_Spatial %>% group_by(area, Year) %>% summarise(num = n_distinct(row_number()))
 
-s_cat_sf<- st_as_sf(s_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
-r_cat_sf<- st_as_sf(r_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
-j_cat_sf<- st_as_sf(j_cat_Spatial, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+s_cat_sf<- st_as_sf(s_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+r_cat_sf<- st_as_sf(r_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
+j_cat_sf<- st_as_sf(j_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 
 # Map of all points over grid
 ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
