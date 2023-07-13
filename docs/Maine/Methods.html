@@ -203,7 +203,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#organize-data" id="toc-organize-data" class="nav-link active" data-scroll-target="#organize-data">Organize data</a>
+  <ul class="collapse">
+  <li><a href="#log-transform-summarize-and-assess-stationarity" id="toc-log-transform-summarize-and-assess-stationarity" class="nav-link" data-scroll-target="#log-transform-summarize-and-assess-stationarity">Log-transform, summarize, and assess stationarity</a></li>
+  </ul></li>
+  <li><a href="#question-1-do-the-intensity-and-pattern-of-spatial-autocorrelation-indicate-spatial-bootstrapping-could-be-an-appropriate-method" id="toc-question-1-do-the-intensity-and-pattern-of-spatial-autocorrelation-indicate-spatial-bootstrapping-could-be-an-appropriate-method" class="nav-link" data-scroll-target="#question-1-do-the-intensity-and-pattern-of-spatial-autocorrelation-indicate-spatial-bootstrapping-could-be-an-appropriate-method">Question 1: Do the intensity and pattern of spatial autocorrelation indicate spatial bootstrapping could be an appropriate method?</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -237,95 +247,112 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate) <span class="co">#date formatting</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#combining plots</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rEDM) <span class="co">#EDM</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#spatial packages</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sfheaders)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tseries) <span class="co">#for KPSS test for stationarity</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rEDM) <span class="co">#EDM</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#spatial packages</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sfheaders)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<section id="organize-data" class="level1">
+<h1>Organize data</h1>
 <p>Analysis was performed on the catch weight (kg) of each species, which was recorded for each tow and standardized by DMR to account for tows that were longer or shorter than the 1 NM standard.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_tows<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEtows.csv"</span>) <span class="co">#tow data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_s_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEscallopCatch.csv"</span>) <span class="co">#scallop catch</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_r_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Maine_inshore_trawl/MErockCatch.csv"</span>) <span class="co">#rock crab catch</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_j_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEjonahCatch.csv"</span>) <span class="co">#jonah crab catch</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span><span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid/"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `MaineDMR_-_Inshore_Trawl_Survey_Grid' from data source 
-  `/Users/rubykrasnow/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid' 
-  using driver `ESRI Shapefile'
-Simple feature collection with 3698 features and 9 fields
-Geometry type: POLYGON
-Dimension:     XY
-Bounding box:  xmin: -70.81288 ymin: 42.86466 xmax: -66.88822 ymax: 44.81316
-Geodetic CRS:  WGS 84</code></pre>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_j_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEjonahCatch.csv"</span>) <span class="co">#jonah crab catch</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#CRS: WGS 84/EPSG 4326</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span> surveyGrid <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Region =</span> region_id,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Stratum =</span> depth_stra,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">GridID =</span> grid_id, <span class="at">.keep=</span><span class="st">"unused"</span>, <span class="at">.before=</span>last_surve)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>surveyGrid<span class="sc">$</span>region_stratum <span class="ot">&lt;-</span> <span class="fu">paste</span>(surveyGrid<span class="sc">$</span>Region, surveyGrid<span class="sc">$</span>Stratum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Weight data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).</p>
+<section id="log-transform-summarize-and-assess-stationarity" class="level2">
+<h2 class="anchored" data-anchor-id="log-transform-summarize-and-assess-stationarity">Log-transform, summarize, and assess stationarity</h2>
+<p>All data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cleanCatch function includes log transformation; see helpFunctionsMaine script for details</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>s_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_s_cat) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Scallop"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>r_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_r_cat) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Rock"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>j_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_j_cat) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Jonah"</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Reorder columns</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>colOrder<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Survey"</span>, <span class="st">"Tow_Number"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"logCatch"</span>, <span class="st">"logWt"</span>, <span class="st">"Expanded_Catch"</span>, </span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Expanded_Weight_kg"</span>, <span class="st">"Date"</span>, <span class="st">"Common_Name"</span>, <span class="st">"Number_Caught"</span>, <span class="st">"Weight_kg"</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Start_Latitude"</span>, <span class="st">"Start_Longitude"</span>,<span class="st">"Season"</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Year"</span>,<span class="st">"Grid"</span>, <span class="st">"Start_Depth_fathoms"</span>, <span class="st">"End_Depth_fathoms"</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bottom_WaterTemp_DegC"</span>, <span class="st">"Bottom_Salinity"</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>j_cat_clean <span class="ot">&lt;-</span> j_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>r_cat_clean <span class="ot">&lt;-</span> r_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>s_cat_clean <span class="ot">&lt;-</span> s_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>s_cat_sf<span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(s_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>r_cat_sf<span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(r_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>j_cat_sf<span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(j_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">#computes averages for each study area (area = region-stratum combination)</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>j_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(j_cat_clean)</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>r_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(r_cat_clean)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>s_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(s_cat_clean)</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> s_cat_sum <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(j_cat_sum, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>), <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">"_s"</span>, <span class="st">"_j"</span>))</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(r_cat_sum, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avgCatch_r =</span> avgCatch,<span class="at">avgWt_r =</span> avgWt,<span class="at">avgLogCatch_r =</span> avgLogCatch,<span class="at">avgLogWt_r =</span> avgLogWt, <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>catchTidy <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(catch, </span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="dv">6</span><span class="sc">:</span><span class="fu">ncol</span>(catch)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name, <span class="st">"avgCatch_"</span>) <span class="sc">~</span><span class="st">"catch"</span>,</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgWt_"</span>) <span class="sc">~</span><span class="st">"wt"</span>,</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogWt"</span>) <span class="sc">~</span><span class="st">"logWt"</span>,</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogCatch"</span>) <span class="sc">~</span><span class="st">"logCatch"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"s"</span>) <span class="sc">~</span><span class="st">"scallop"</span>,</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"r"</span>) <span class="sc">~</span><span class="st">"rock"</span>,</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"j"</span>) <span class="sc">~</span><span class="st">"jonah"</span>))</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>catchTidy <span class="ot">&lt;-</span> catchTidy <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.factor</span>(area), <span class="at">Species =</span> <span class="fu">as.factor</span>(Species),<span class="at">Season =</span> <span class="fu">as.factor</span>(Season),<span class="at">Region =</span> <span class="fu">as.factor</span>(Region), <span class="at">Stratum =</span> <span class="fu">as.factor</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>          <span class="fu">select</span>(<span class="sc">-</span>name)</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>logWtFall <span class="ot">&lt;-</span> catchTidy <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"logWt"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"Fall"</span>)</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"scallop"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cleanCatch function includes log transformation; see helpFunctionsMaine script for details</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>s_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_s_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Scallop"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>r_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_r_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Rock"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>j_cat_clean <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_j_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Jonah"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Reorder columns</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>colOrder<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Survey"</span>, <span class="st">"Tow_Number"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"logCatch"</span>, <span class="st">"logWt"</span>, <span class="st">"Expanded_Catch"</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Expanded_Weight_kg"</span>, <span class="st">"Date"</span>, <span class="st">"Common_Name"</span>, <span class="st">"Number_Caught"</span>, <span class="st">"Weight_kg"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Start_Latitude"</span>, <span class="st">"Start_Longitude"</span>,<span class="st">"Season"</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Year"</span>,<span class="st">"Grid"</span>, <span class="st">"Start_Depth_fathoms"</span>, <span class="st">"End_Depth_fathoms"</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bottom_WaterTemp_DegC"</span>, <span class="st">"Bottom_Salinity"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>j_cat_clean <span class="ot">&lt;-</span> j_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>r_cat_clean <span class="ot">&lt;-</span> r_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>s_cat_clean <span class="ot">&lt;-</span> s_cat_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#computes averages for each study area (area = region-stratum combination)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>j_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(j_cat_clean)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>r_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(r_cat_clean)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>s_cat_sum <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(s_cat_clean)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> s_cat_sum <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(j_cat_sum, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>), <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">"_s"</span>, <span class="st">"_j"</span>))</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>catch <span class="ot">&lt;-</span> catch <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(r_cat_sum, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avgCatch_r =</span> avgCatch,<span class="at">avgWt_r =</span> avgWt,<span class="at">avgLogCatch_r =</span> avgLogCatch,<span class="at">avgLogWt_r =</span> avgLogWt, <span class="at">.keep=</span><span class="st">"unused"</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>catchTidy <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(catch, </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="dv">6</span><span class="sc">:</span><span class="fu">ncol</span>(catch)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name, <span class="st">"avgCatch_"</span>) <span class="sc">~</span><span class="st">"catch"</span>,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgWt_"</span>) <span class="sc">~</span><span class="st">"wt"</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogWt"</span>) <span class="sc">~</span><span class="st">"logWt"</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogCatch"</span>) <span class="sc">~</span><span class="st">"logCatch"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"s"</span>) <span class="sc">~</span><span class="st">"scallop"</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"r"</span>) <span class="sc">~</span><span class="st">"rock"</span>,</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"j"</span>) <span class="sc">~</span><span class="st">"jonah"</span>))</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>catchTidy <span class="ot">&lt;-</span> catchTidy <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.factor</span>(area), <span class="at">Species =</span> <span class="fu">as.factor</span>(Species),<span class="at">Season =</span> <span class="fu">as.factor</span>(Season),<span class="at">Region =</span> <span class="fu">as.factor</span>(Region), <span class="at">Stratum =</span> <span class="fu">as.factor</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>          <span class="fu">select</span>(<span class="sc">-</span>name)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>logCatchFall <span class="ot">&lt;-</span> catchTidy <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"logCatch"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"Fall"</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>logWtFall <span class="ot">&lt;-</span> catchTidy <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"logWt"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"Fall"</span>)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="co">#Note that the highest p-value the kpss.test function will show is 0.1, actual p-values may be higher</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logCatchFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"scallop"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logCatch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+     `1`    `2`    `3`   `4`
+   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1 0.1    0.1    0.1      0.1
+2 0.1    0.0383 0.0237   0.1
+3 0.1    0.0248 0.0177   0.1
+4 0.1    0.0539 0.01     0.1
+5 0.0766 0.0776 0.1      0.1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logCatchFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"rock"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logCatch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`    `2`   `3`      `4`
+  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1   0.1 0.1      0.1 NaN     
+2   0.1 0.0497   0.1   0.1   
+3   0.1 0.0347   0.1   0.1   
+4   0.1 0.0432   0.1   0.0914
+5   0.1 0.1      0.1   0.1   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logCatchFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logCatch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+     `1`   `2`   `3`   `4`
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 0.0223   0.1   0.1   0.1
+2 0.0646   0.1   0.1   0.1
+3 0.1      0.1   0.1   0.1
+4 0.1      0.1   0.1   0.1
+5 0.1      0.1   0.1   0.1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"scallop"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
      `1`    `2`    `3`    `4`
@@ -336,7 +363,7 @@ Geodetic CRS:  WGS 84</code></pre>
 4 0.1    0.0410 0.0149 0.0495
 5 0.0689 0.1    0.1    0.1   </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"rock"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"rock"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
      `1`    `2`    `3`      `4`
@@ -347,7 +374,7 @@ Geodetic CRS:  WGS 84</code></pre>
 4 0.1    0.1    0.0932   0.0832
 5 0.1    0.1    0.1      0.1   </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">findSpeciesKPSS</span>(logWtFall <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>), <span class="at">season=</span><span class="st">"Fall"</span>, <span class="at">type=</span><span class="st">"logWt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
      `1`    `2`   `3`   `4`
@@ -359,8 +386,153 @@ Geodetic CRS:  WGS 84</code></pre>
 5 0.1    0.1      0.1   0.1</code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="question-1-do-the-intensity-and-pattern-of-spatial-autocorrelation-indicate-spatial-bootstrapping-could-be-an-appropriate-method" class="level1">
+<h1>Question 1: Do the intensity and pattern of spatial autocorrelation indicate spatial bootstrapping could be an appropriate method?</h1>
+<p>First, import the location data for the survey region (surveyGrid) and transform the catch dataframes into sf objects for spatial analysis, using the same CRS as the survey grid.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span><span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid/"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MaineDMR_-_Inshore_Trawl_Survey_Grid' from data source 
+  `/Users/rubykrasnow/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 3698 features and 9 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -70.81288 ymin: 42.86466 xmax: -66.88822 ymax: 44.81316
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#CRS: WGS 84/EPSG 4326</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span> surveyGrid <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Region =</span> region_id,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Stratum =</span> depth_stra,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">GridID =</span> grid_id, <span class="at">.keep=</span><span class="st">"unused"</span>, <span class="at">.before=</span>last_surve)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>surveyGrid<span class="sc">$</span>region_stratum <span class="ot">&lt;-</span> <span class="fu">paste</span>(surveyGrid<span class="sc">$</span>Region, surveyGrid<span class="sc">$</span>Stratum)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(surveyGrid)<span class="sc">+</span><span class="fu">geom_sf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Methods_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>s_cat_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(s_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>r_cat_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(r_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>j_cat_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(j_cat_clean, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Start_Longitude"</span>, <span class="st">"Start_Latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Map of all points over grid</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> surveyGrid) <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> s_cat_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Methods_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Merge the individual survey grids into one region</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mergedGrid <span class="ot">&lt;-</span> <span class="fu">st_union</span>(surveyGrid, <span class="at">by_feature =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">st_sf</span>()</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>mergedGridBuffer <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(mergedGrid, <span class="dv">9000</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mergedGridBuffer)<span class="sc">+</span><span class="fu">geom_sf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Methods_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>First, Voronoi polygons were constructed around each data point.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>voronoiScal <span class="ot">&lt;-</span> s_cat_sf <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_geometry</span>() <span class="sc">%&gt;%</span> <span class="co"># to get sfc from sf</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span> <span class="co"># to get a sfc of MULTIPOINT type</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_voronoi</span>() <span class="sc">%&gt;%</span> <span class="co">#</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_collection_extract</span>(<span class="at">type =</span> <span class="st">"POLYGON"</span>) <span class="sc">%&gt;%</span> <span class="co"># a list of polygons</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_sf</span>() <span class="sc">%&gt;%</span> <span class="co"># from list to sf object</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_intersection</span>(mergedGridBuffer) <span class="sc">%&gt;%</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(s_cat_sf)  <span class="co"># put names back</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(voronoiScal<span class="sc">$</span>geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Methods_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Calculate Global Moran’s I</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a list of neighbors for each polygon</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>nb <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(voronoiScal, <span class="at">queen =</span> <span class="cn">TRUE</span>) <span class="co"># queen shares point or border</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>nbw <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(nb, <span class="at">style =</span> <span class="st">"W"</span>) <span class="co">#creates a weighted list (e.g., if a polygon has 4 neighbors, each neighbor receives a weight of 0.25)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Global Moran's I - used more robust Monte Carlo method rather than the analytical method</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>gmoranScal <span class="ot">&lt;-</span> <span class="fu">moran.mc</span>(voronoiScal<span class="sc">$</span>logCatch, nbw, <span class="at">nsim=</span><span class="dv">999</span>, <span class="at">alternative=</span><span class="st">"greater"</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>gmoranScal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Monte-Carlo simulation of Moran I
+
+data:  voronoiScal$logCatch 
+weights: nbw  
+number of simulations + 1: 1000 
+
+statistic = 0.29948, observed rank = 1000, p-value = 0.001
+alternative hypothesis: greater</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>gmoranScalWt <span class="ot">&lt;-</span> <span class="fu">moran.mc</span>(voronoiScal<span class="sc">$</span>logWt, nbw, <span class="at">nsim=</span><span class="dv">999</span>, <span class="at">alternative=</span><span class="st">"greater"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>gmoranScalWt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Monte-Carlo simulation of Moran I
+
+data:  voronoiScal$logWt 
+weights: nbw  
+number of simulations + 1: 1000 
+
+statistic = 0.18433, observed rank = 1000, p-value = 0.001
+alternative hypothesis: greater</code></pre>
+</div>
+</div>
+<p>Calculate and display Local Moran’s I</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lmoran <span class="ot">&lt;-</span> <span class="fu">localmoran</span>(voronoiScal<span class="sc">$</span>logCatch, nbw, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lmoran)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Ii          E.Ii     Var.Ii       Z.Ii Pr(z &gt; E(Ii))
+1  0.25167493 -6.672188e-05 0.06288115  1.0039101     0.1577110
+2 -0.17850185 -6.672188e-05 0.06288115 -0.7115741     0.7616357
+3  0.10542204 -6.672188e-05 0.04189852  0.5153554     0.3031523
+4 -0.53470594 -6.672188e-05 0.04189852 -2.6119298     0.9954984
+5  0.07617146 -6.672188e-05 0.05029157  0.3399577     0.3669442
+6  0.25167493 -6.672188e-05 0.06288115  1.0039101     0.1577110</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>lmoranWt <span class="ot">&lt;-</span> <span class="fu">localmoran</span>(voronoiScal<span class="sc">$</span>logWt, nbw, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lmoranWt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Ii          E.Ii     Var.Ii       Z.Ii Pr(z &gt; E(Ii))
+1  0.08712977 -2.309909e-05 0.02177038  0.5906751     0.2773691
+2 -0.13287330 -2.309909e-05 0.02177038 -0.9003870     0.8160428
+3  0.07272997 -2.309909e-05 0.01450588  0.6040588     0.2729023
+4 -0.25367845 -2.309909e-05 0.01450588 -2.1060658     0.9824007
+5  0.06985001 -2.309909e-05 0.01741168  0.5295289     0.2982193
+6  0.08712977 -2.309909e-05 0.02177038  0.5906751     0.2773691</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmI <span class="ot">&lt;-</span> lmoran[, <span class="st">"Ii"</span>] <span class="co"># local Moran's I - catch</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmIwt <span class="ot">&lt;-</span> lmoranWt[, <span class="st">"Ii"</span>] <span class="co"># local Moran's I - weight</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmZ <span class="ot">&lt;-</span> lmoran[, <span class="st">"Z.Ii"</span>] <span class="co"># z-scores - catch</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmZwt <span class="ot">&lt;-</span> lmoranWt[, <span class="st">"Z.Ii"</span>] <span class="co"># z-scores - weight</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># p-values corresponding to alternative greater</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmp <span class="ot">&lt;-</span> lmoran[, <span class="st">"Pr(z &gt; E(Ii))"</span>] <span class="co">#catch</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>voronoiScal<span class="sc">$</span>lmpWt <span class="ot">&lt;-</span> lmoranWt[, <span class="st">"Pr(z &gt; E(Ii))"</span>] <span class="co">#weight</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>catchPlot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(voronoiScal)<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>logCatch))<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"D"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>moranPlotZ <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(voronoiScal)<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>lmZ))<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"G"</span>, <span class="at">name=</span><span class="st">"Local Moran's I</span><span class="sc">\n</span><span class="st">Z-score (catch)"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>wtPlot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(voronoiScal)<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>logWt))<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"D"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>moranPlotWtZ <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(voronoiScal)<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>lmZwt))<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"G"</span>, <span class="at">name=</span><span class="st">"Local Moran's I</span><span class="sc">\n</span><span class="st">Z-score (weight)"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>catchPlot <span class="sc">+</span> moranPlotZ <span class="sc">+</span> wtPlot <span class="sc">+</span> moranPlotWtZ <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">tag_levels =</span> <span class="st">'A'</span>) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">tag_level =</span> <span class="st">'new'</span>) <span class="sc">&amp;</span> </span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">vjust =</span> <span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Methods_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -17,13 +17,14 @@ Load packages
 library(tidyverse)
 library(lubridate) #date formatting
 library(patchwork) #combining plots
+library(tseries) #for KPSS test for stationarity
 library(rEDM) #EDM
 
 #spatial packages
 library(sf)
 library(sfheaders)
 library(spdep)
-
+library(mapview)
 ```
 
 ```{r, include=FALSE}
@@ -42,7 +43,7 @@ df_j_cat<- read.csv("~/Downloads/lab_notebook/data/Maine_inshore_trawl/MEjonahCa
 ```
 
 ## Log-transform, summarize, and assess stationarity
-Weight data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).
+All data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).
 ```{r}
 # cleanCatch function includes log transformation; see helpFunctionsMaine script for details
 
@@ -90,16 +91,18 @@ catchTidy <- pivot_longer(catch,
 catchTidy <- catchTidy %>% mutate(area = as.factor(area), Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
           select(-name)
 
-logWtFall <- catchTidy %>% filter(Type == "logWt") %>% filter(Season == "Fall")
 logCatchFall <- catchTidy %>% filter(Type == "logCatch") %>% filter(Season == "Fall")
+logWtFall <- catchTidy %>% filter(Type == "logWt") %>% filter(Season == "Fall")
 
 #Note that the highest p-value the kpss.test function will show is 0.1, actual p-values may be higher
-findSpeciesKPSS(logWtFall %>% filter(Species=="scallop"), season="Fall", type="logWt")
-findSpeciesKPSS(logWtFall %>% filter(Species=="rock"), season="Fall", type="logWt")
-findSpeciesKPSS(logWtFall %>% filter(Species=="jonah"), season="Fall", type="logWt")
 findSpeciesKPSS(logCatchFall %>% filter(Species=="scallop"), season="Fall", type="logCatch")
 findSpeciesKPSS(logCatchFall %>% filter(Species=="rock"), season="Fall", type="logCatch")
 findSpeciesKPSS(logCatchFall %>% filter(Species=="jonah"), season="Fall", type="logCatch")
+
+findSpeciesKPSS(logWtFall %>% filter(Species=="scallop"), season="Fall", type="logWt")
+findSpeciesKPSS(logWtFall %>% filter(Species=="rock"), season="Fall", type="logWt")
+findSpeciesKPSS(logWtFall %>% filter(Species=="jonah"), season="Fall", type="logWt")
+
 
 ```
 
@@ -123,6 +126,9 @@ s_cat_sf <- st_as_sf(s_cat_clean, coords = c("Start_Longitude", "Start_Latitude"
 r_cat_sf <- st_as_sf(r_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 j_cat_sf <- st_as_sf(j_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 
+# Map of all points over grid
+ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
+
 ```
 
 Merge the individual survey grids into one region
@@ -133,7 +139,7 @@ ggplot(mergedGridBuffer)+geom_sf()
 ```
 
 First, Voronoi polygons were constructed around each data point.
-```{r}
+```{r, message=FALSE}
 voronoiScal <- s_cat_sf %>%
   st_geometry() %>% # to get sfc from sf
   st_union() %>% # to get a sfc of MULTIPOINT type
@@ -142,14 +148,55 @@ voronoiScal <- s_cat_sf %>%
   st_sf() %>% # from list to sf object
   st_intersection(mergedGridBuffer) %>%
   st_join(s_cat_sf)  # put names back
- #envelope = st_geometry(mergedGrid)
+
+plot(voronoiScal$geometry)
+```
+
+
+Calculate Global Moran's I
+```{r}
+#Create a list of neighbors for each polygon
+nb <- poly2nb(voronoiScal, queen = TRUE) # queen shares point or border
+nbw <- nb2listw(nb, style = "W") #creates a weighted list (e.g., if a polygon has 4 neighbors, each neighbor receives a weight of 0.25)
+
+# Global Moran's I - used more robust Monte Carlo method rather than the analytical method
+gmoranScal <- moran.mc(voronoiScal$logCatch, nbw, nsim=999, alternative="greater")
+gmoranScal
+
+gmoranScalWt <- moran.mc(voronoiScal$logWt, nbw, nsim=999, alternative="greater")
+gmoranScalWt
+
+```
+
+
+Calculate and display Local Moran's I
+
+```{r}
+lmoran <- localmoran(voronoiScal$logCatch, nbw, alternative = "greater")
+head(lmoran)
+
+lmoranWt <- localmoran(voronoiScal$logWt, nbw, alternative = "greater")
+head(lmoranWt)
+
+voronoiScal$lmI <- lmoran[, "Ii"] # local Moran's I - catch
+voronoiScal$lmIwt <- lmoranWt[, "Ii"] # local Moran's I - weight
+voronoiScal$lmZ <- lmoran[, "Z.Ii"] # z-scores - catch
+voronoiScal$lmZwt <- lmoranWt[, "Z.Ii"] # z-scores - weight
+
+# p-values corresponding to alternative greater
+voronoiScal$lmp <- lmoran[, "Pr(z > E(Ii))"] #catch
+voronoiScal$lmpWt <- lmoranWt[, "Pr(z > E(Ii))"] #weight
+
+catchPlot <- ggplot(voronoiScal)+geom_sf(aes(fill=logCatch))+scale_fill_viridis_c(option = "D")+theme_bw()
+moranPlotZ <- ggplot(voronoiScal)+geom_sf(aes(fill=lmZ))+scale_fill_viridis_c(option = "G", name="Local Moran's I\nZ-score (catch)")+theme_bw()
+
+wtPlot <- ggplot(voronoiScal)+geom_sf(aes(fill=logWt))+scale_fill_viridis_c(option = "D")+theme_bw()
+moranPlotWtZ <- ggplot(voronoiScal)+geom_sf(aes(fill=lmZwt))+scale_fill_viridis_c(option = "G", name="Local Moran's I\nZ-score (weight)")+theme_bw()
+
+catchPlot + moranPlotZ + wtPlot + moranPlotWtZ + plot_annotation(tag_levels = 'A') + plot_layout(tag_level = 'new') & 
+  theme(plot.tag = element_text(size = 12, vjust = 6))
 ```
 
 
 
-
-
-Calculate Global Moran's I
-Calculate and display Local Moran's I
-Briefly present results here to justify the rest of the analysis
 

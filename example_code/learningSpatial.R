@@ -9,7 +9,7 @@ library(spdep)
 library(tidyverse)
 library(Hmisc)
 library(robustHD)
-library(deldir)
+
 library(gap)
 library(gridExtra)
 library(geodaData)
@@ -33,7 +33,6 @@ voronoiScal <- s_cat_sf %>%
 
 class(voronoiScal)
 plot(voronoiScal$geometry)
-voronoiScal$logCatch <- log(voronoiScal$Expanded_Catch+1)
 mapview(voronoiScal, zcol = "logCatch")
 
 # Neighbors
@@ -89,10 +88,40 @@ tmap_arrange(p1, p2, p3, p4)
 mapview(voronoiScal, zcol="logCatch")
 mapview(voronoiScal, zcol="lmI")
 
+ #### weight
+p1a <- tm_shape(voronoiScal) +
+  tm_polygons(col = "logWt", title = "logWeight", style = "quantile") +
+  tm_layout(legend.outside = TRUE)
+
+p2a <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmIwt", title = "Local Moran's I",
+              style = "quantile") +
+  tm_layout(legend.outside = TRUE)
+
+p3a <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmZwt", title = "Z-score",
+              breaks = c(-Inf, 1.65, Inf)) +
+  tm_layout(legend.outside = TRUE)
+
+p4a <- tm_shape(voronoiScal) +
+  tm_polygons(col = "lmpWt", title = "p-value",
+              breaks = c(-Inf, 0.05, Inf)) +
+  tm_layout(legend.outside = TRUE)
+
+tmap_arrange(p1a, p2a, p3a, p4a)
 
 gmoranMC <- moran.mc(voronoiScal$logCatch, nbw, nsim = 999)
 gmoranMC
 
+mapview(voronoiScal, zcol="lmI")
+mapview(voronoiScal, zcol="lmpWt")
+
+# moranPlot <- ggplot(voronoiScal)+geom_sf(aes(fill=lmI))+scale_fill_viridis_c(option = "G", name="Local Moran's I\n(catch)")+theme_bw()
+# catchPplot<- ggplot(voronoiScal)+geom_sf(aes(fill=(as.logical(lmp<0.05))))+scale_fill_grey(start = 0.75, end = 0, name="Local Moran's I\n(catch) p-val", labels=c("p≥0.05", "p<0.05"))+theme_bw()
+# catchPlot + moranPlot+ plot_annotation(tag_levels = 'A') + plot_layout(tag_level = 'new') & 
+#   theme(plot.tag = element_text(size = 12, vjust = 6))
+# moranPlotWt <- ggplot(voronoiScal)+geom_sf(aes(fill=lmIwt))+scale_fill_viridis_c(option = "G", name="Local Moran's I\n(weight)")+theme_bw()
+# wtPplot<- ggplot(voronoiScal)+geom_sf(aes(fill=(as.logical(lmpWt<0.05))))+scale_fill_grey(start = 0.75, end = 0, name="Local Moran's I\n(weight) p-val", labels=c("p≥0.05", "p<0.05"))+theme_bw()
 
 hist(gmoranMC$res)
 abline(v = gmoranMC$statistic, col = "red")
