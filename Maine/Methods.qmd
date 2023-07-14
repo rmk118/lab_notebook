@@ -24,7 +24,6 @@ library(rEDM) #EDM
 library(sf)
 library(sfheaders)
 library(spdep)
-library(mapview)
 ```
 
 ```{r, include=FALSE}
@@ -197,6 +196,12 @@ catchPlot + moranPlotZ + wtPlot + moranPlotWtZ + plot_annotation(tag_levels = 'A
   theme(plot.tag = element_text(size = 12, vjust = 6))
 ```
 
+# Question 2: Does spatial replication using neighboring points preserve the dimensionality and nonlinearity of a system?
 
-
+```{r}
+# calculate the average number of tows per area over the whole time series
+# there are a few years where there is one more tow for scallops than for the crab species
+numTows<- (s_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+numTowsCrabs<- (r_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+```
 

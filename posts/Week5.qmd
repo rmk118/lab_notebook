@@ -51,11 +51,13 @@ Although today was technically a holiday, today I...
 ## Wednesday, July 12
 
 1. Continuing to work on CCM functions, graphing results
+2. I went through the code I've written so far and cleaning it up so everything is clear and reproducible. I'm creating a more organized RMarkdown script (getting rid of things like "test1" "test2") and an accompanying Methods document that describes what/how/why I did what I did.
 
 ## Thursday, July 6
 
 1. BRITE Programming Workshop: Data visualization
 2. Bioinfo Challenge Project Presentations
+3. Continued working on Methods document
 
 ## Friday, July 7
 

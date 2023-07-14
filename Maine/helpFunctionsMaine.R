@@ -5,6 +5,7 @@
 library(tidyverse)
 library(lubridate)
 library(tseries)
+library(rEDM)
 
 ########### cleanCatch --------------------------------------------------------------
 

@@ -1,12 +1,13 @@
 #Maine spatial analysis - Fall
 #Ruby Krasnow
-#Last modified: July 10, 2023
+#Last modified: July 14, 2023
 
 library(tidyverse)
 library(lubridate)
 library(plotly)
 library(patchwork)
 library(car)
+library(rEDM)
 
 #spatial packages
 library(sf)
@@ -56,9 +57,14 @@ j_cat_clean <- cleanCatch(df_j_cat) %>%
 # calculate the average number of tows per area over the whole time series
 # there are a few years where there is one more tow for scallops than for the crab species
 numTows<- (s_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+numTows_fromDF<- df_tows %>% filter(Season == "Fall") %>% group_by(Region, Depth_Stratum, Year) %>% summarise(num = n_distinct(Tow_Number))
 numTowsCrabs<- (r_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
 # calculate the average number of tows per area per year
-# s_cat_Spatial %>% group_by(area, Year) %>% summarise(num = n_distinct(row_number()))
+yearlyTows <- s_cat_clean %>% group_by(area, Year, Season) %>% summarise(num = n_distinct(row_number()))
+hist(yearlyTows$num)
+max(yearlyTows$num)
+ggplot(yearlyTows, aes(x=num)) + geom_histogram(bins=10)+theme_classic()+
+  labs(title="Number of tows per area per year (Fall ME-NH trawl survey)",x="Tows per area", y = "Count")
 
 s_cat_sf<- st_as_sf(s_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 r_cat_sf<- st_as_sf(r_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
@@ -67,7 +73,9 @@ j_cat_sf<- st_as_sf(j_cat_clean, coords = c("Start_Longitude", "Start_Latitude")
 # Map of all points over grid
 ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 
-# ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
+ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
+ggplot()+ geom_sf(data = (surveyGrid  %>% filter(region_stratum == "1 1")))+geom_sf(data=(s_cat_sf %>% filter(area == "1 1")), aes(color = area))
+ggplot()+ geom_sf(data = (surveyGrid  %>% filter(region_stratum == "1 1")))+geom_sf(data=(s_cat_sf %>% filter(area == "1 1")), aes(color = Year))
 
 
 ################# Region 1, Stratum 1 - example -----------------------------------------------------
@@ -76,7 +84,7 @@ ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
 ggplot(st_union(surveyGrid, by_feature = FALSE) %>% st_sf()) + geom_sf()
 
 regionsGrid <- surveyGrid %>% group_by(region_stratum) %>% summarise(num = n_distinct(GridID))
-#plot(regionsGrid)
+plot(regionsGrid[1])
 
 #find the grids and points in region 1.1
 region1.1grid<- surveyGrid %>% filter(region_stratum=="1 1") %>% st_union(by_feature = FALSE) #merged together
@@ -417,18 +425,18 @@ for (i in 1:numRegions) {
     neighborsArea <- st_intersection(notAreaPoints, st_buffer(areaGrid, 3704))
     
     #how many neighboring points are there
-    print("study area")
+   # print("study area")
     print(baseArea)
-    print("number of points within 2 tows")
+    #print("number of points within 2 tows")
     print(nrow(neighborsArea))
     
     #how many neighbors will be used in the bootstrapping
     nNeighbors <- round(0.5*(numTowsCrabs %>% filter(area==baseArea) %>% pull(num)))
     
-    print("number of tows in this region")
-    print(numTowsCrabs %>% filter(area==baseArea) %>% pull(num))
-    print("number of neighbors used in bootstrapping")
-    print(nNeighbors)
+    # print("number of tows in this region")
+    # print(numTowsCrabs %>% filter(area==baseArea) %>% pull(num))
+    # print("number of neighbors used in bootstrapping")
+    # print(nNeighbors)
     
     #trial 1 - so we aren't binding rows to an empty dataframe
     trialStrat <- sample_n(neighborsArea, nNeighbors, replace = FALSE)
@@ -464,11 +472,11 @@ for (i in 1:numRegions) {
       r<-append(r,(rho_E[which.max(rho_E$rho),"rho"][1]))
     }
     
-    print(round(mean(v)))
-    print(mean(r))
+    #print(round(mean(v)))
+    #print(mean(r))
     
-    rockE_20[i, j]<- round(mean(v))
-    rockRho_20[i,j]<- mean(r)
+   # rockE_20[i, j]<- round(mean(v))
+    #rockRho_20[i,j]<- mean(r)
     
   }
 }
