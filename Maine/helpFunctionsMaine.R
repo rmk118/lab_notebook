@@ -252,35 +252,37 @@ findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogCatch")
 
 ############ findAreasCorr -------------------------------------------------------
-library(ggcorrplot)
 
-corrOut <- data.frame(matrix(ncol=3))
-colnames(corrOut) <- c("avgLogCatch_s", "avgLogCatch_r", "avgLogCatch_j")
-
-findAreasCorr <- function(df, season) {
-  df_filtered <- df %>% 
-    filter(Season == season)
+corrOut <- data.frame(matrix(ncol=5))
+colnames(corrOut) <- c("area", "type","s:r", "s:j", "r:j")
+ 
+findAreasCorr <- function(df, season, areaInput) {
+  df_filtered <- df %>% filter(Season == season, area == areaInput) 
   
-  for (i in 1:5) {
-    for (j in 1:4) {
-      df_temp <- df_filtered %>% filter(area== paste(i, j)) %>% select(avgLogCatch_s, avgLogCatch_r, avgLogCatch_j)
-      corrMatTemp <- data.frame(cor(df_temp))
-      rownames(corrMatTemp) <- paste(rownames(corrMatTemp), paste(i, j, sep=""), sep="")
-      corrOut <- rbind(corrOut, corrMatTemp)
-    }
-  }
+    s.r_catch<-max(abs(ccf(df_filtered$avgLogCatch_s, df_filtered$avgLogCatch_r, type = "correlation",lag.max = 6, plot = FALSE)$acf))
+    s.j_catch<-max(abs(ccf(df_filtered$avgLogCatch_s, df_filtered$avgLogCatch_j, type = "correlation",lag.max = 6, plot = FALSE)$acf))
+    r.j_catch<-max(abs(ccf(df_filtered$avgLogCatch_r, df_filtered$avgLogCatch_j, type = "correlation",lag.max = 6, plot = FALSE)$acf))
     
-  return(corrOut)
+    s.r_wt<-max(abs(ccf(df_filtered$avgLogWt_s, df_filtered$avgLogWt_r, type = "correlation", plot = FALSE)$acf))
+    s.j_wt<-max(abs(ccf(df_filtered$avgLogWt_s, df_filtered$avgLogWt_j, type = "correlation", plot = FALSE)$acf))
+    r.j_wt<-max(abs(ccf(df_filtered$avgLogWt_r, df_filtered$avgLogWt_j, type = "correlation", plot = FALSE)$acf))
+  
+    catchV<- c(df_filtered$area[1], "catch", s.r_catch, s.j_catch, r.j_catch)
+    wtV <- c(df_filtered$area[1], "wt", s.r_wt, s.j_wt, r.j_wt)
+    df_area<- data.frame(rbind(catchV, wtV))
+    colnames(df_area)<- c("area", "type","s:r", "s:j", "r:j")
+
+  return(df_area)
 }
 
-findAreasCorr(df=catch %>% ungroup() %>%  select(area, Season, Year, avgLogCatch_s, avgLogCatch_r, avgLogCatch_j), 
-              season="Fall")
+for (i in 1:5) {
+  for (j in 1:4) {
+    areaTemp <- paste(i, j)
+    corrOut<- bind_rows(corrOut,findAreasCorr(df=catch,"Fall", areaTemp))
+   }
+ }
 
-class(data.frame(cor(catch %>% ungroup() %>%  filter(Season=="Fall", area== "1 1") %>% select(avgLogCatch_s, avgLogCatch_r, avgLogCatch_j))))
-
-
-
-
+corrOut <- corrOut %>% slice(-1) %>% remove_rownames()
 
 # Function 1: delay -------------------------------------------------------
 

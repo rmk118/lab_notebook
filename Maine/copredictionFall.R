@@ -85,21 +85,6 @@ findSpeciesTheta_rho((catchTidy %>% filter(Species=="scallop")), season="Fall", 
                  df_Es = findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logCatch"))
 findSpeciesKPSS(catchTidy %>% filter(Species=="scallop"), season="Fall", type="logCatch")
 
-
-
-vars = c("avgLogCatch_s", "avgLogCatch_r", "avgLogCatch_j")
-var_pairs = combn(vars, 2) # Combinations of vars, 2 at a time
-ccm_matrix = array(NA, dim = c(length(vars), length(vars)), dimnames = list(vars,vars))
-for (i in 1:ncol(var_pairs)) {
-  ccm_out = CCM(dataFrame = catch, columns = var_pairs[1, i], target = var_pairs[2, i], libSizes = "2 23 2", Tp = 0, E = E, sample = 100)
-  outVars = names(ccm_out)
-  var_out = unlist(strsplit(outVars[2], ":"))
-  ccm_matrix[var_out[2], var_out[1]] = ccm_out[1, 2]
-  var_out = unlist(strsplit(outVars[3], ":"))
-  ccm_matrix[var_out[2], var_out[1]] = ccm_out[1, 3]
-}
-
-
 #Weight
 findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logWt")
 findSpeciesErho((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logWt")
@@ -111,3 +96,29 @@ findSpeciesTheta_rho((catchTidy %>% filter(Species=="scallop")), season="Fall", 
 findSpeciesKPSS(catchTidy %>% filter(Species=="scallop"), season="Fall", type="logWt")
 
 
+###### CCM
+
+vars <- c("avgLogWt_s", "avgLogWt_r", "avgLogWt_j")
+var_pairs = combn(vars, 2)
+
+for (i in 1:5) {
+  for (j in 1:4) {
+    areaTemp <- paste(i, j)
+    ccm_matrix = array(NA, dim = c(length(vars), length(vars)), dimnames = list(vars,vars))
+    df_temp <- catch %>% filter(area == areaTemp) %>% ungroup() %>% select(Year, all_of(vars))
+    lib_size <- nrow(df_temp)-E
+
+    for (i in 1:ncol(var_pairs)) {
+       ccm_out = CCM(dataFrame = df_temp, columns = var_pairs[1, i],
+                     target = var_pairs[2, i], libSizes = paste(lib_size, lib_size, 10, collapse = " "),
+                     Tp = 0, E = E, sample = 100)
+             outVars = names(ccm_out)
+            var_out = unlist(strsplit(outVars[2], ":"))
+            ccm_matrix[var_out[2], var_out[1]] = ccm_out[1, 2]
+            var_out = unlist(strsplit(outVars[3], ":"))
+            ccm_matrix[var_out[2], var_out[1]] = ccm_out[1, 3]
+    }
+    print(ccm_matrix)
+  }
+  
+  }
