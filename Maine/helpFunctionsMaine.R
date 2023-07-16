@@ -250,6 +250,23 @@ findSpeciesKPSS <- function(df, season, type) {
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogCatch")
 
+############ findAreasCorr -------------------------------------------------------
+
+corrOut <- data.frame(matrix(nrow = 20, ncol=3))
+
+findAreasCorr <- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    #summarise(val = (kpss.test(value, null='Level'))$p.value) %>%
+    pivot_wider(names_from = Stratum, values_from = val) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+
+
 # Function 1: delay -------------------------------------------------------
 
 delay <- function(x,n){

@@ -85,13 +85,33 @@ findSpeciesTheta_rho((catchTidy %>% filter(Species=="scallop")), season="Fall", 
                  df_Es = findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logCatch"))
 findSpeciesKPSS(catchTidy %>% filter(Species=="scallop"), season="Fall", type="logCatch")
 
-testxmap2 <- make_xmap_block(df=(logCatchFall %>% filter(Species=="scallop")), predictor=value, 
-                              target=value, ID_col=area, E_max=6, cause_lag=1)
 
-make_xmap_block(df=(logCatchFall %>% filter(Species=="scallop") %>% ungroup() %>% select(area, Year, value)), predictor=value,
-                target=value, ID_col=area, E_max=6, cause_lag=1)
+logCatchFallInt <- logCatchFall %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
 
-do_xmap_once(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor="value", target="value", ID_col="areaInt", E_max=6, tp=1)
+intBlock<- make_xmap_block(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
+  filter(complete.cases(.))
+
+# do_xmap_once(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor="value", target="value", ID_col="areaInt", E_max=6, tp=1)
+
+lib_1 <- paste(1,nrow(intBlock))
+
+out_1 <- map_df(1:6,function(E_i){
+  columns_i <- names(intBlock)[4:(E_i+3)]
+  out_i <- Simplex(dataFrame=intBlock,
+                   lib="1 200",pred="201 314",Tp=0,
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   parameterList = TRUE,
+                   E=E_i, showPlot = TRUE)
+  params_i <- out_i$parameters
+  out_i <- out_i$predictions %>% filter(complete.cases(.))
+  
+  stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
+  
+  return(bind_cols(data.frame(E=E_i),stats_i))
+  
+})
 
 #Weight
 findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logWt")
@@ -103,9 +123,30 @@ findSpeciesTheta_rho((catchTidy %>% filter(Species=="scallop")), season="Fall", 
                      df_Es = findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logWt"))
 findSpeciesKPSS(catchTidy %>% filter(Species=="scallop"), season="Fall", type="logWt")
 
-logCatchFallInt <- logCatchFall %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
 logWtFallInt <- logWtFall %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
+
 do_xmap_once(df=(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor="value", target="value", ID_col="areaInt", E_max=6, tp=1)
 
+intBlockWt<- make_xmap_block(df=(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
+  filter(complete.cases(.))
 
+lib_2 <- paste(1,nrow(intBlockWt))
+
+out_2 <- map_df(1:6,function(E_i){
+  columns_i <- names(intBlockWt)[4:(E_i+3)]
+  out_i <- Simplex(dataFrame=intBlockWt,
+                   lib=lib_2,pred=lib_2,Tp=0,
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   parameterList = TRUE,
+                   E=E_i, showPlot = TRUE)
+  params_i <- out_i$parameters
+  out_i <- out_i$predictions %>% filter(complete.cases(.))
+  
+  stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
+  
+  return(bind_cols(data.frame(E=E_i),stats_i))
+  
+})
 
