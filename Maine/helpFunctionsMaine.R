@@ -1,11 +1,12 @@
 #EDM help functions for analyzing the Maine inshore trawl survey data
 #Ruby Krasnow
-#Last modified: July 13, 2023
+#Last modified: July 16, 2023
 
 library(tidyverse)
 library(lubridate)
 library(tseries)
 library(rEDM)
+library(patchwork)
 
 ########### cleanCatch --------------------------------------------------------------
 
@@ -251,20 +252,34 @@ findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogCatch")
 
 ############ findAreasCorr -------------------------------------------------------
+library(ggcorrplot)
 
-corrOut <- data.frame(matrix(nrow = 20, ncol=3))
+corrOut <- data.frame(matrix(ncol=3))
+colnames(corrOut) <- c("avgLogCatch_s", "avgLogCatch_r", "avgLogCatch_j")
 
-findAreasCorr <- function(df, season, type) {
-  df_out <- df %>% 
-    filter(Type == type, Season == season) %>% 
-    group_by(Region, Stratum) %>% 
-    select(Year, value) %>%
-    #summarise(val = (kpss.test(value, null='Level'))$p.value) %>%
-    pivot_wider(names_from = Stratum, values_from = val) %>% 
-    ungroup() %>% 
-    select(-Region)
-  return(df_out)
+findAreasCorr <- function(df, season) {
+  df_filtered <- df %>% 
+    filter(Season == season)
+  
+  for (i in 1:5) {
+    for (j in 1:4) {
+      df_temp <- df_filtered %>% filter(area== paste(i, j)) %>% select(avgLogCatch_s, avgLogCatch_r, avgLogCatch_j)
+      corrMatTemp <- data.frame(cor(df_temp))
+      rownames(corrMatTemp) <- paste(rownames(corrMatTemp), paste(i, j, sep=""), sep="")
+      corrOut <- rbind(corrOut, corrMatTemp)
+    }
+  }
+    
+  return(corrOut)
 }
+
+findAreasCorr(df=catch %>% ungroup() %>%  select(area, Season, Year, avgLogCatch_s, avgLogCatch_r, avgLogCatch_j), 
+              season="Fall")
+
+class(data.frame(cor(catch %>% ungroup() %>%  filter(Season=="Fall", area== "1 1") %>% select(avgLogCatch_s, avgLogCatch_r, avgLogCatch_j))))
+
+
+
 
 
 # Function 1: delay -------------------------------------------------------
