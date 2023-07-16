@@ -1,6 +1,6 @@
 #Practicing spatial data science
 #Ruby Krasnow
-#Last modified: July 9, 2023
+#Last modified: July 15, 2023
 
 #Install packages
 
@@ -21,6 +21,7 @@ mergedGrid <- st_union(surveyGrid, by_feature = FALSE) %>% st_sf()
 mergedGridBuffer <- st_buffer(mergedGrid, 9000)
 ggplot(mergedGridBuffer)+geom_sf()
 
+s_cat_sf<- st_as_sf(s_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 voronoiScal <- s_cat_sf %>%
   st_geometry() %>% # to get sfc from sf
   st_union() %>% # to get a sfc of MULTIPOINT type

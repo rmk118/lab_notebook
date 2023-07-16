@@ -194,3 +194,48 @@ acf(s_catchTidy %>% filter(Region==2, Stratum==3, Season=="Fall", Type=="avgLogC
 
 logCatchFall <- catchTidy %>% filter(Type == "logCatch") %>% filter(Season == "Fall")
 
+
+# Second highest E --------------------------------------------------------
+
+findE_v_new <- function(v) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  r<- rho_E$rho
+  E_out<-rho_E[which.max(r),"E"][1]
+  
+  if (E_out == 1) {
+    rho2<- max(r[-E_out])
+    print(rho2)
+    E_out_2 <- which(r==rho2)
+    return(E_out_2)
+    
+  } else {
+    return(E_out)
+  }
+}
+
+findSpeciesE_new <- function(df, season, type) {
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(E_opt = findE_v_new(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
+    ungroup() %>% 
+    select(-Region)
+  return(df_out)
+}
+
+findE_v_new(logCatchFall %>% filter(Species=="scallop", area=="1 1") %>% pull(value))
+findE_v_new(logCatchFall %>% filter(Species=="scallop", area=="1 4") %>% pull(value))
+findSpeciesTheta(df=(catchTidy %>% filter(Species=="scallop")), df_Es=scalCatchEs, season="Fall", type="logCatch")
+findSpeciesTheta(df=(catchTidy %>% filter(Species=="scallop")), df_Es=scalCatchEs_new, season="Fall", type="logCatch")
+
+second<-EmbedDimension(dataFrame = (logCatchFall %>% filter(Species=="scallop", area=="1 4") %>% ungroup() %>% select(Year, value)), lib = "1 20", pred = "1 20", columns = "value",target = "value", maxE = 7)
+secondE<- max(second$rho[-which.max(second$rho)])
+which(second$rho == secondE)
+
+scalCatchEs_new<-findSpeciesE_new((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logCatch")

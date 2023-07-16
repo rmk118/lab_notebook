@@ -1,6 +1,6 @@
 ---
 title: 'Methods'
-date: '2023-07-13'
+date: '2023-07-14'
 execute: 
   message: false
   warning: false
@@ -10,7 +10,7 @@ editor_options:
 ---
 
 Ruby Krasnow
-Last modified: July 13, 2023
+Last modified: July 14, 2023
 
 Load packages
 ```{r}
@@ -203,5 +203,11 @@ catchPlot + moranPlotZ + wtPlot + moranPlotWtZ + plot_annotation(tag_levels = 'A
 # there are a few years where there is one more tow for scallops than for the crab species
 numTows<- (s_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
 numTowsCrabs<- (r_cat_clean %>% group_by(area) %>% summarise(num = n_distinct(row_number())))
+```
+
+To demonstrate our spatial resampling method, we will take study area 1.1 (Region 1, Stratum 1) as an example:
+Data points marked as being in 1.1 form the 'base' area
+```{r}
+
 ```
 

@@ -103,7 +103,7 @@ scalLogCatchFall_1.1 <- s_catchTidy %>%
 
 findE_df(scalLogCatchFall_1.1)
 
-############ Find E - vector input -------------------------------------------------
+############ Find E and rho - vector input -------------------------------------------------
 
 findE_v <- function(v) {
   lib_vec <- paste(1, length(v))
@@ -130,6 +130,31 @@ findErho_v <- function(v) {
 #implementation examples
 findE_v(scalLogCatchFall_1.1$value)
 findErho_v(scalLogCatchFall_1.1$value)
+
+findTheta_v <- function(v, E) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  #print(df)
+  rho_Theta<- PredictNonlinear(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", E=E)
+  Theta_out<-rho_Theta[which.max(rho_Theta$rho),"Theta"][1]
+  return(Theta_out)
+}
+
+findThetaRho_v <- function(v, E) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  #print(df)
+  rho_Theta<- PredictNonlinear(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", E=E)
+  Rho_out<-rho_Theta[which.max(rho_Theta$rho),"rho"][1]
+  return(Rho_out)
+}
+#implementation examples
+findTheta_v(scalLogCatchFall_1.1$value, 2)
+findThetaRho_v(scalLogCatchFall_1.1$value, 2)
 
 ############ findSpeciesE & findSpeciesErho -------------------------------------------------------
 
@@ -170,6 +195,40 @@ findSpeciesErho(s_catchTidy, season="Fall", type="avgLogCatch")
 par(mfrow=c(5,4), mar=c(0.6,1,0.4,0.4))
 findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt")
 findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
+
+############ findSpeciesTheta -------------------------------------------------------
+
+
+findSpeciesTheta <- function(df, df_Es, season, type) {
+  df_E <- as_tibble(df_Es)
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
+    mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+    group_by(Region, Stratum) %>%
+    summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
+    pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+    ungroup() %>%
+    select(-Region)
+  return(df_out)
+}
+
+findSpeciesTheta_rho <- function(df, df_Es, season, type) {
+  df_E <- as_tibble(df_Es)
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
+    mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+    group_by(Region, Stratum) %>%
+    summarise(Rho_opt =  findThetaRho_v(value, E[1])) %>%
+    pivot_wider(names_from = Stratum, values_from = Rho_opt) %>%
+    ungroup() %>%
+    select(-Region)
+  return(df_out)
+}
+
+findSpeciesTheta(s_catchTidy, season="Fall", type="avgLogWt", df_Es = findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt"))
+findSpeciesTheta_rho(s_catchTidy, season="Fall", type="avgLogWt", df_Es = findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt"))
 
 ############ findSpeciesACF -------------------------------------------------------
 
@@ -226,7 +285,6 @@ make_xmap_block <- function(df,predictor,target,ID_col,E_max,cause_lag){
   return(df_out)
   
 }
-
 
 
 # Function 3: do_xmap_once ------------------------------------------------

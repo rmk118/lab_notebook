@@ -30,11 +30,11 @@ surveyGrid <- surveyGrid %>%
 
 surveyGrid$region_stratum <- paste(surveyGrid$Region, surveyGrid$Stratum)
 
-#plot(surveyGrid["GridID"], main="Grid ID")
-#plot(surveyGrid["OBJECTID"], main="Object ID")
-#plot(surveyGrid["Region"], main="Region")
-#plot(surveyGrid["Stratum"], main="Depth Stratum")
-#plot(surveyGrid["region_stratum"], main="Study Area")
+plot(surveyGrid["GridID"], main="Grid ID")
+plot(surveyGrid["OBJECTID"], main="Object ID")
+plot(surveyGrid["Region"], main="Region")
+plot(surveyGrid["Stratum"], main="Depth Stratum")
+plot(surveyGrid["region_stratum"], main="Study Area")
 
 # surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID)) #number of grids in each study area
 
@@ -71,7 +71,7 @@ r_cat_sf<- st_as_sf(r_cat_clean, coords = c("Start_Longitude", "Start_Latitude")
 j_cat_sf<- st_as_sf(j_cat_clean, coords = c("Start_Longitude", "Start_Latitude"), crs=4326)
 
 # Map of all points over grid
-ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf)
+ggplot() + geom_sf(data = surveyGrid) + geom_sf(data = s_cat_sf) +facet_wrap(~Year)
 
 ggplot(data=s_cat_sf)+geom_sf(aes(color = area))
 ggplot()+ geom_sf(data = (surveyGrid  %>% filter(region_stratum == "1 1")))+geom_sf(data=(s_cat_sf %>% filter(area == "1 1")), aes(color = area))
