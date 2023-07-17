@@ -311,7 +311,7 @@ make_xmap_block_ID <- function(df,predictor,target,ID_col,E_max,cause_lag){
 
 do_xmap_noID <- function(df,predictor,target,E_max,tp,keep_preds=FALSE){
 
-    df_2 <- make_xmap_block_noID(df,!!sym(predictor),!!sym(target),ID_col=NULL,E_max,cause_lag=tp) %>% ungroup()
+    df_2 <- make_xmap_block_noID(df,!!sym(predictor),!!sym(target),E_max,cause_lag=tp) %>% ungroup()
     df_1 <- df_2 %>%
       mutate(target=lag(target,1)) %>% 
       ungroup() %>%
@@ -447,7 +447,6 @@ do_xmap_ID <- function(df,predictor,target,ID_col,E_max,tp,keep_preds=FALSE){
   else{
     return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
   }
-  
 }
 
 
