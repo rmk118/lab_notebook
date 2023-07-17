@@ -241,60 +241,77 @@ which(second$rho == secondE)
 scalCatchEs_new<-findSpeciesE_new((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logCatch")
 
 
-# Concantenation for copred -----------------------------------------------
-logCatchFallInt <- logCatchFall %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
 
-intBlock<- make_xmap_block(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
-  filter(complete.cases(.))
+# CCM for copred ----------------------------------------------------------
 
-# do_xmap_once(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor="value", target="value", ID_col="areaInt", E_max=6, tp=1)
+# emptyXmap <- data.frame(matrix(ncol=43, nrow=1))
+# colnames(emptyXmap)<- c(xmapCols, "area1")
+# emptyXmap[,] <- NA
+# for (k in 1:5) {
+#   for (j in 1:4) {
+#     areaTemp <- paste(k, j)
+df_temp_xmap <- catch %>% filter(Season =="Fall", area=="1 1")%>% ungroup() %>% select(Year, all_of(vars))
+do_xmap_noID(df_temp_xmap, predictor = "avgLogCatch_s", target="avgLogCatch_r", E_max=5, tp=1,keep_preds = FALSE)
+#emptyXmap<- bind_rows(emptyXmap, outputDf)
 
-lib_1 <- paste(1,nrow(intBlock))
+# xmapCols<-colnames(do_xmap_noID(df_temp_xmap, predictor = "avgLogCatch_s", target="avgLogCatch_r", E_max=5, tp=1,keep_preds = FALSE))
+#View(make_xmap_block_noID(df = df_temp_xmap, predictor = avgLogCatch_s, target=avgLogCatch_r, E_max=5, cause_lag=1))
 
-out_1 <- map_df(1:6,function(E_i){
-  columns_i <- names(intBlock)[4:(E_i+3)]
-  out_i <- Simplex(dataFrame=intBlock,
-                   lib="1 200",pred="201 314",Tp=0,
-                   target="target",
-                   columns=columns_i,
-                   embedded=TRUE,
-                   parameterList = TRUE,
-                   E=E_i, showPlot = TRUE)
-  params_i <- out_i$parameters
-  out_i <- out_i$predictions %>% filter(complete.cases(.))
-  
-  stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
-  
-  return(bind_cols(data.frame(E=E_i),stats_i))
-  
-})
 
-logWtFallInt <- logWtFall %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
 
-do_xmap_once(df=(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor="value", target="value", ID_col="areaInt", E_max=6, tp=1)
 
-intBlockWt<- make_xmap_block(df=(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
-  filter(complete.cases(.))
+# Concantenation for copred - manual -----------------------------------------------
 
-lib_2 <- paste(1,nrow(intBlockWt))
 
-out_2 <- map_df(1:6,function(E_i){
-  columns_i <- names(intBlockWt)[4:(E_i+3)]
-  out_i <- Simplex(dataFrame=intBlockWt,
-                   lib=lib_2,pred=lib_2,Tp=0,
-                   target="target",
-                   columns=columns_i,
-                   embedded=TRUE,
-                   parameterList = TRUE,
-                   E=E_i, showPlot = TRUE)
-  params_i <- out_i$parameters
-  out_i <- out_i$predictions %>% filter(complete.cases(.))
-  
-  stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
-  
-  return(bind_cols(data.frame(E=E_i),stats_i))
-  
-})
+# intBlock<- make_xmap_block_ID(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
+#   filter(complete.cases(.))
+
+# lib_1 <- paste(1,nrow(intBlock))
+# 
+# out_1 <- map_df(1:6,function(E_i){
+#   columns_i <- names(intBlock)[4:(E_i+3)]
+#   out_i <- Simplex(dataFrame=intBlock,
+#                    lib="1 200",pred="201 314",Tp=0,
+#                    target="target",
+#                    columns=columns_i,
+#                    embedded=TRUE,
+#                    parameterList = TRUE,
+#                    E=E_i, showPlot = TRUE)
+#   params_i <- out_i$parameters
+#   out_i <- out_i$predictions %>% filter(complete.cases(.))
+#   
+#   stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
+#   print(bind_cols(data.frame(E=E_i),stats_i))
+#   return(bind_cols(data.frame(E=E_i),stats_i))
+#   
+# })
+
+# make_xmap_block_ID(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value), predictor=value, target=value, ID_col=areaInt, E_max=6,cause_lag=1)
+# 
+# intBlockWt<- make_xmap_block_ID(df=(logWtFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
+#   filter(complete.cases(.))
+
+# lib_2 <- paste(1,nrow(intBlockWt))
+# 
+# out_2 <- map_df(1:6,function(E_i){
+#   columns_i <- names(intBlockWt)[4:(E_i+3)]
+#   out_i <- Simplex(dataFrame=intBlockWt,
+#                    lib=lib_2,pred=lib_2,Tp=0,
+#                    target="target",
+#                    columns=columns_i,
+#                    embedded=TRUE,
+#                    parameterList = TRUE,
+#                    E=E_i, showPlot = TRUE)
+#   params_i <- out_i$parameters
+#   out_i <- out_i$predictions %>% filter(complete.cases(.))
+#   
+#   stats_i <- compute_stats(out_i$Observations,out_i$Predictions)
+#   
+#   return(bind_cols(data.frame(E=E_i),stats_i))
+#   
+# })
+
+
 
 
 # Graphics testing --------------------------------------------------------
@@ -306,3 +323,10 @@ patchObj <- wrap_elements(panel=ggcorrplot(M)) + wrap_elements(panel=ggcorrplot(
 O = cor(mtcars[7:9])
 patchObj <- patchObj + wrap_elements(panel=ggcorrplot(O))
 
+ # NOTE TO SELF: ALWAYS CHECK THAT YOU AREN'T REUSING VARIABLE NAMES
+for (i in 1:5) {
+  for (j in 1:4) {
+    # cat("i=",i, ",")
+    # cat("j=",j, "\n")
+    print(paste(i, j))
+  }}
