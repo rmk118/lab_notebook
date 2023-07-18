@@ -29,8 +29,8 @@ findE_v(r$avgLogWt) #4
 findErho_v(r$avgLogWt) #0.34
 findE_v(j$avgLogWt) #1
 findErho_v(j$avgLogWt) #0.29
-s_xmap_r <- cbind(s, r) %>% select(-c(Species...3, Year...4, Species...6)) %>% mutate(scallopWt = avgLogWt...2, rockWt = avgLogWt...5, id = 1,.keep = "unused")
-s_xmap_j <- cbind(s, j) %>% select(-c(Species...3, Year...4, Species...6)) %>% mutate(scallopWt = avgLogWt...2, jonahWt = avgLogWt...5, id = 1,.keep = "unused")
+s_xmap_r <- cbind(s, r) %>% select(-c(Species...3, Year...4, Species...6)) %>% mutate(scallopWt = avgLogWt...2, rockWt = avgLogWt...5, .keep = "unused")
+s_xmap_j <- cbind(s, j) %>% select(-c(Species...3, Year...4, Species...6)) %>% mutate(scallopWt = avgLogWt...2, jonahWt = avgLogWt...5, .keep = "unused")
 
 # cmap <- CCM(dataFrame = s_xmap_r, E = 4, Tp = 0, columns = "scallopWt",
 #             target = "rockWt", libSizes = "4 20 1", sample=100, showPlot = TRUE)
@@ -39,7 +39,7 @@ ComputeError(s$avgLogWt,r$avgLogWt)
 compute_stats(s$avgLogWt,r$avgLogWt)
 
 #sig linear, non-sig EDM with E=5
-do_xmap_once(s_xmap_r, predictor="scallopWt", ID_col = "id", target="rockWt", E_max=7, tp=1)
+do_xmap_noID(s_xmap_r, predictor="scallopWt", target="rockWt", E_max=7, tp=1)
 #sig linear, non-sig EDM with E=3
 do_xmap_once(s_xmap_r, predictor="scallopWt", ID_col = "id", target="rockWt", E_max=7, tp=0)
 #sig linear, non-sig EDM with E=1

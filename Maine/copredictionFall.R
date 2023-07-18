@@ -178,7 +178,7 @@ var_pairs = combn(vars, 2)
 
 scalEs <- findSpeciesE((catchTidy %>% filter(Species=="scallop")), season="Fall", type="logCatch")
 
-par(mfrow=c(5,4), mar=c(0.6,-0.01,1,0.01))
+par(mfrow=c(5,4), mar=c(0.6,0.01,1,0.01))
 
 for (k in 1:5) {
   for (j in 1:4) {
@@ -258,14 +258,14 @@ findSpeciesGroups(catchTidy, season="Fall", type="logCatch", g="Stratum", specie
 findSpeciesGroups(catchTidy, season="Fall", type="logWt", g="Stratum", species="jonah")
 
 
-do_xmap_ID(df=logWtFall %>% filter(Species=="scallop") %>%
+do_xmap_ID(df=logCatchFall %>% filter(Species=="scallop") %>%
              ungroup() %>% 
              mutate(Stratum = as.numeric(Stratum)) %>% group_by(Stratum, Year) %>% 
              summarise(avg = mean(value)) %>% 
              ungroup() %>% select(Stratum, Year, avg),
            predictor="avg", target="avg", ID_col="Stratum", E_max=7, tp=1)
 
-do_xmap_ID(df=logCatchFall %>% filter(Species=="scallop") %>%
+do_xmap_ID(df=logWtFall %>% filter(Species=="scallop") %>%
              ungroup() %>% 
              mutate(Stratum = as.numeric(Stratum)) %>% group_by(Stratum, Year) %>% 
              summarise(avg = mean(value)) %>% 
