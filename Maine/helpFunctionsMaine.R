@@ -239,15 +239,20 @@ findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
 
 ############ findSpeciesTheta -------------------------------------------------------
 
-
 findSpeciesTheta <- function(df, season=NULL, type) {
   df_E <- findSpeciesE(df=df, season=season, type=type)
   
+  findE <- function (reg, strat) {
+     E <- as.integer(df_E %>% slice(reg) %>% pull(strat))
+    return(E) 
+    }
+  
   if (is.null(season)) {
-    df_out <- df %>% 
-      filter(Type == type) %>% 
-      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
-      mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+    df_out <- df %>%
+      filter(Type == type) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
       group_by(Region, Stratum) %>%
       summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
       pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
@@ -255,49 +260,57 @@ findSpeciesTheta <- function(df, season=NULL, type) {
       select(-Region) }
   
   else {
-  df_out <- df %>% 
-    filter(Type == type, Season == season) %>% 
-    mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
-    mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
-    group_by(Region, Stratum) %>%
-    summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
-    pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
-    ungroup() %>%
-    select(-Region) }
+      df_out <- df %>%
+        filter(Type == type, Season==season) %>%
+        mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+        rowwise() %>% 
+        mutate(E = findE(reg=E_row, strat=E_col)) %>%
+        group_by(Region, Stratum) %>%
+        summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
+        pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+        ungroup() %>%
+        select(-Region) }
   
   return(df_out)
 }
 
-findSpeciesTheta_rho <- function(df, df_Es, season=NULL, type) {
-  df_E <- matrix(df_Es)
+findSpeciesTheta_rho <- function(df, season=NULL, type) {
+  df_E <- findSpeciesE(df=df, season=season, type=type)
+  
+  findE <- function (reg, strat) {
+    E <- as.integer(df_E %>% slice(reg) %>% pull(strat))
+    return(E) 
+  }
+  
   if (is.null(season)) {
-  df_out <- df %>% 
-    filter(Type == type,) %>% 
-    mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
-   # mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>%
-    mutate(E = as.integer(df_E[E_row, E_col])) %>% 
-    group_by(Region, Stratum) %>%
-    summarise(Rho_opt =  findThetaRho_v(value, E[1])) %>%
-    pivot_wider(names_from = Stratum, values_from = Rho_opt) %>%
-    ungroup() %>%
-    select(-Region) }
+    df_out <- df %>%
+      filter(Type == type) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
+      group_by(Region, Stratum) %>%
+      summarise(Theta_opt =  findThetaRho_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+      ungroup() %>%
+      select(-Region) }
   
   else {
-    df_out <- df %>% 
-      filter(Type == type, Season == season) %>% 
-      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
-      mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+    df_out <- df %>%
+      filter(Type == type, Season==season) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
       group_by(Region, Stratum) %>%
-      summarise(Rho_opt =  findThetaRho_v(value, E[1])) %>%
-      pivot_wider(names_from = Stratum, values_from = Rho_opt) %>%
+      summarise(Theta_opt =  findThetaRho_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
       ungroup() %>%
-      select(-Region)
-  }
+      select(-Region) }
+  
   return(df_out)
 }
 
-findSpeciesTheta(s_catchTidy, season="Fall", type="avgLogWt", df_Es = findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt"))
-findSpeciesTheta_rho(s_catchTidy, season="Fall", type="avgLogWt", df_Es = findSpeciesE(s_catchTidy, season="Fall", type="avgLogWt"))
+findSpeciesTheta(s_catchTidy, season="Fall", type="avgLogWt")
+findSpeciesTheta_rho(s_catchTidy, season="Fall", type="avgLogWt")
 
 ############ findSpeciesACF -------------------------------------------------------
 
