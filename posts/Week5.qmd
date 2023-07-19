@@ -53,13 +53,25 @@ Although today was technically a holiday, today I...
 1. Continuing to work on CCM functions, graphing results
 2. I went through the code I've written so far and cleaning it up so everything is clear and reproducible. I'm creating a more organized RMarkdown script (getting rid of things like "test1" "test2") and an accompanying Methods document that describes what/how/why I did what I did.
 
-## Thursday, July 6
+## Thursday, July 13
 
 1. BRITE Programming Workshop: Data visualization
 2. Bioinfo Challenge Project Presentations
 3. Continued working on Methods document
 
-## Friday, July 7
+## Friday, July 14
 
-1. Meeting with Dr. Deyle?
-2. TBD
+1. Meeting with Dr. Deyle
+2. Methods, CCM
+3. Lots of geospatial analysis: investigating spatial bootstrapping methods
+
+## Monday, July 17th
+1. S-mapping
+2. Re-ran untransformed data
+3. Co-prediction script
+4. NSF GFRP webinar at 4pm, so couldn't make it to the Rotjan lab meeting
+
+## Tuesday, July 18
+1. Looked at mabmeans data Dr. Hart sent
+2. Started working with the data in ts format to remove seasonality, hoping that incorporating the additional data will improve predictability. Read a lot about time series analysis
+3. https://zanna-researchteam.github.io/ 

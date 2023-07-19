@@ -51,15 +51,29 @@ s_cat_sum <- summaryCatch(s_cat_clean)
 #returns a tibble with the mean catch (avg across years) for each region/stratum combination
 
 # actual function
-findSpeciesMean<- function(df, season, type) {
+findSpeciesMean<- function(df, season=NULL, type) {
+  if (is.null(season)) {
+    df_out <- df %>% 
+      filter(Type == type) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(avg = mean(value, na.rm=TRUE)) %>%
+      pivot_wider(names_from = Stratum, values_from = avg) %>% 
+      ungroup() %>% 
+      select(-Region)
+    
+  }
+  
+  else{
   df_out <- df %>% 
     filter(Type == type, Season == season) %>% 
     group_by(Region, Stratum) %>% 
     select(Year, value) %>%
-    summarise(avg = mean(value)) %>%
+    summarise(avg = mean(value, na.rm = TRUE)) %>%
     pivot_wider(names_from = Stratum, values_from = avg) %>% 
     ungroup() %>% 
-    select(-Region)
+    select(-Region) }
+  
   return(df_out)
 }
 
@@ -162,7 +176,19 @@ findThetaRho_v(scalLogCatchFall_1.1$value, 2)
 #returns a tibble with the optimal embedding dimension for time series from each region/stratum combination
 #Same idea as the findSpeciesMean function, but finding the optimal embedding dimension instead of the mean
 
-findSpeciesE <- function(df, season, type) {
+findSpeciesE <- function(df, season=NULL, type) {
+  if (is.null(season)) {
+    df_out <- df %>% 
+      filter(Type == type) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(E_opt = findE_v(value)) %>%
+      pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
+      ungroup() %>% 
+      select(-Region)
+  }
+  else {
+  
   df_out <- df %>% 
     filter(Type == type, Season == season) %>% 
     group_by(Region, Stratum) %>% 
@@ -170,19 +196,33 @@ findSpeciesE <- function(df, season, type) {
     summarise(E_opt = findE_v(value)) %>%
     pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
     ungroup() %>% 
-    select(-Region)
+    select(-Region) }
+  
   return(df_out)
 }
 
-findSpeciesErho <- function(df, season, type) {
+findSpeciesErho <- function(df, season=NULL, type) {
+  if (is.null(season)) {
   df_out <- df %>% 
-    filter(Type == type, Season == season) %>% 
+    filter(Type == type) %>% 
     group_by(Region, Stratum) %>% 
     select(Year, value) %>%
     summarise(E_opt_rho = findErho_v(value)) %>%
     pivot_wider(names_from = Stratum, values_from = E_opt_rho) %>% 
     ungroup() %>% 
-    select(-Region)
+    select(-Region) }
+  
+  else {
+    df_out <- df %>% 
+      filter(Type == type, Season == season) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(E_opt_rho = findErho_v(value)) %>%
+      pivot_wider(names_from = Stratum, values_from = E_opt_rho) %>% 
+      ungroup() %>% 
+      select(-Region)
+    
+  }
   return(df_out)
 }
 
@@ -200,8 +240,21 @@ findSpeciesErho(s_catchTidy, season="Fall", type="avgLogWt")
 ############ findSpeciesTheta -------------------------------------------------------
 
 
-findSpeciesTheta <- function(df, df_Es, season, type) {
-  df_E <- as_tibble(df_Es)
+findSpeciesTheta <- function(df, season=NULL, type) {
+  df_E <- findSpeciesE(df=df, season=season, type=type)
+  
+  if (is.null(season)) {
+    df_out <- df %>% 
+      filter(Type == type) %>% 
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
+      mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+      group_by(Region, Stratum) %>%
+      summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+      ungroup() %>%
+      select(-Region) }
+  
+  else {
   df_out <- df %>% 
     filter(Type == type, Season == season) %>% 
     mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
@@ -210,21 +263,36 @@ findSpeciesTheta <- function(df, df_Es, season, type) {
     summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
     pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
     ungroup() %>%
-    select(-Region)
+    select(-Region) }
+  
   return(df_out)
 }
 
-findSpeciesTheta_rho <- function(df, df_Es, season, type) {
-  df_E <- as_tibble(df_Es)
+findSpeciesTheta_rho <- function(df, df_Es, season=NULL, type) {
+  df_E <- matrix(df_Es)
+  if (is.null(season)) {
   df_out <- df %>% 
-    filter(Type == type, Season == season) %>% 
+    filter(Type == type,) %>% 
     mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
-    mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+   # mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>%
+    mutate(E = as.integer(df_E[E_row, E_col])) %>% 
     group_by(Region, Stratum) %>%
     summarise(Rho_opt =  findThetaRho_v(value, E[1])) %>%
     pivot_wider(names_from = Stratum, values_from = Rho_opt) %>%
     ungroup() %>%
-    select(-Region)
+    select(-Region) }
+  
+  else {
+    df_out <- df %>% 
+      filter(Type == type, Season == season) %>% 
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>%
+      mutate(E = df_E %>% slice(E_row) %>% pull(E_col)) %>% 
+      group_by(Region, Stratum) %>%
+      summarise(Rho_opt =  findThetaRho_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Rho_opt) %>%
+      ungroup() %>%
+      select(-Region)
+  }
   return(df_out)
 }
 
@@ -237,7 +305,17 @@ findSpeciesTheta_rho(s_catchTidy, season="Fall", type="avgLogWt", df_Es = findSp
 # time series from each region/stratum combination
 #KPSS tests the null hypothesis that x is level stationary
 
-findSpeciesKPSS <- function(df, season, type) {
+findSpeciesKPSS <- function(df, season=NULL, type) {
+  if (is.null(season)) {
+    df_out <- df %>% 
+      filter(Type == type) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(val = (kpss.test(value, null='Level'))$p.value) %>%
+      pivot_wider(names_from = Stratum, values_from = val) %>% 
+      ungroup() %>% 
+      select(-Region) }
+  else {
   df_out <- df %>% 
     filter(Type == type, Season == season) %>% 
     group_by(Region, Stratum) %>% 
@@ -245,7 +323,7 @@ findSpeciesKPSS <- function(df, season, type) {
     summarise(val = (kpss.test(value, null='Level'))$p.value) %>%
     pivot_wider(names_from = Stratum, values_from = val) %>% 
     ungroup() %>% 
-    select(-Region)
+    select(-Region) }
   return(df_out)
 }
 findSpeciesKPSS(s_catchTidy, season="Fall", type="avgLogWt")

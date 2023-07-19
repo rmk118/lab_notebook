@@ -4,7 +4,7 @@
     "href": "Maine/Methods.html",
     "title": "Methods",
     "section": "",
-    "text": "Ruby Krasnow Last modified: July 13, 2023\nLoad packages\nlibrary(tidyverse)\nlibrary(lubridate) #date formatting\nlibrary(patchwork) #combining plots\nlibrary(tseries) #for KPSS test for stationarity\nlibrary(rEDM) #EDM\n\n#spatial packages\nlibrary(sf)\nlibrary(sfheaders)\nlibrary(spdep)\nlibrary(mapview)"
+    "text": "Ruby Krasnow Last modified: July 14, 2023\nLoad packages\nlibrary(tidyverse)\nlibrary(lubridate) #date formatting\nlibrary(patchwork) #combining plots\nlibrary(tseries) #for KPSS test for stationarity\nlibrary(rEDM) #EDM\n\n#spatial packages\nlibrary(sf)\nlibrary(sfheaders)\nlibrary(spdep)"
   },
   {
     "objectID": "spatialExploration.html",
@@ -75,5 +75,96 @@
     "title": "Methods",
     "section": "Log-transform, summarize, and assess stationarity",
     "text": "Log-transform, summarize, and assess stationarity\nAll data was log transformed to reduce nonstationarity, which was assessed for each study area using the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test (Kwiatkowski et al., 1992).\n\n# cleanCatch function includes log transformation; see helpFunctionsMaine script for details\n\ns_cat_clean &lt;- cleanCatch(df_s_cat) %&gt;% \n  mutate(Common_Name = \"Scallop\")\n\nr_cat_clean &lt;- cleanCatch(df_r_cat) %&gt;% \n  mutate(Common_Name = \"Rock\")\n\nj_cat_clean &lt;- cleanCatch(df_j_cat) %&gt;% \n  mutate(Common_Name = \"Jonah\")\n\n#Reorder columns\ncolOrder&lt;-c(\"area\", \"Survey\", \"Tow_Number\", \"Region\", \"Stratum\", \"logCatch\", \"logWt\", \"Expanded_Catch\", \n  \"Expanded_Weight_kg\", \"Date\", \"Common_Name\", \"Number_Caught\", \"Weight_kg\",\n  \"Start_Latitude\", \"Start_Longitude\",\"Season\",\n  \"Year\",\"Grid\", \"Start_Depth_fathoms\", \"End_Depth_fathoms\",\n  \"Bottom_WaterTemp_DegC\", \"Bottom_Salinity\")\n\nj_cat_clean &lt;- j_cat_clean %&gt;% select(all_of(colOrder))\nr_cat_clean &lt;- r_cat_clean %&gt;% select(all_of(colOrder))\ns_cat_clean &lt;- s_cat_clean %&gt;% select(all_of(colOrder))\n\n#computes averages for each study area (area = region-stratum combination)\nj_cat_sum &lt;- summaryCatch(j_cat_clean)\nr_cat_sum &lt;- summaryCatch(r_cat_clean)\ns_cat_sum &lt;- summaryCatch(s_cat_clean)\n\ncatch &lt;- s_cat_sum %&gt;% left_join(j_cat_sum, by=c(\"area\", \"Season\", \"Region\", \"Stratum\", \"Year\"), suffix = c(\"_s\", \"_j\"))\ncatch &lt;- catch %&gt;% left_join(r_cat_sum, by=c(\"area\", \"Season\", \"Region\", \"Stratum\", \"Year\")) %&gt;% \n  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt,avgLogCatch_r = avgLogCatch,avgLogWt_r = avgLogWt, .keep=\"unused\")\n\ncatchTidy &lt;- pivot_longer(catch, \n        cols = 6:ncol(catch)) %&gt;% \n  mutate(Type = case_when(\n    startsWith(name, \"avgCatch_\") ~\"catch\",\n    startsWith(name,\"avgWt_\") ~\"wt\",\n    startsWith(name,\"avgLogWt\") ~\"logWt\",\n    startsWith(name,\"avgLogCatch\") ~\"logCatch\")) %&gt;% \n  mutate(Species = case_when(\n    endsWith(name, \"s\") ~\"scallop\",\n    endsWith(name, \"r\") ~\"rock\",\n    endsWith(name, \"j\") ~\"jonah\"))\n\ncatchTidy &lt;- catchTidy %&gt;% mutate(area = as.factor(area), Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %&gt;% \n          select(-name)\n\nlogCatchFall &lt;- catchTidy %&gt;% filter(Type == \"logCatch\") %&gt;% filter(Season == \"Fall\")\nlogWtFall &lt;- catchTidy %&gt;% filter(Type == \"logWt\") %&gt;% filter(Season == \"Fall\")\n\n#Note that the highest p-value the kpss.test function will show is 0.1, actual p-values may be higher\nfindSpeciesKPSS(logCatchFall %&gt;% filter(Species==\"scallop\"), season=\"Fall\", type=\"logCatch\")\n\n# A tibble: 5 × 4\n     `1`    `2`    `3`   `4`\n   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;\n1 0.1    0.1    0.1      0.1\n2 0.1    0.0383 0.0237   0.1\n3 0.1    0.0248 0.0177   0.1\n4 0.1    0.0539 0.01     0.1\n5 0.0766 0.0776 0.1      0.1\n\nfindSpeciesKPSS(logCatchFall %&gt;% filter(Species==\"rock\"), season=\"Fall\", type=\"logCatch\")\n\n# A tibble: 5 × 4\n    `1`    `2`   `3`      `4`\n  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;\n1   0.1 0.1      0.1 NaN     \n2   0.1 0.0497   0.1   0.1   \n3   0.1 0.0347   0.1   0.1   \n4   0.1 0.0432   0.1   0.0914\n5   0.1 0.1      0.1   0.1   \n\nfindSpeciesKPSS(logCatchFall %&gt;% filter(Species==\"jonah\"), season=\"Fall\", type=\"logCatch\")\n\n# A tibble: 5 × 4\n     `1`   `2`   `3`   `4`\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 0.0223   0.1   0.1   0.1\n2 0.0646   0.1   0.1   0.1\n3 0.1      0.1   0.1   0.1\n4 0.1      0.1   0.1   0.1\n5 0.1      0.1   0.1   0.1\n\nfindSpeciesKPSS(logWtFall %&gt;% filter(Species==\"scallop\"), season=\"Fall\", type=\"logWt\")\n\n# A tibble: 5 × 4\n     `1`    `2`    `3`    `4`\n   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;\n1 0.0794 0.0948 0.1    0.1   \n2 0.1    0.0674 0.0528 0.1   \n3 0.1    0.0385 0.0428 0.1   \n4 0.1    0.0410 0.0149 0.0495\n5 0.0689 0.1    0.1    0.1   \n\nfindSpeciesKPSS(logWtFall %&gt;% filter(Species==\"rock\"), season=\"Fall\", type=\"logWt\")\n\n# A tibble: 5 × 4\n     `1`    `2`    `3`      `4`\n   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;\n1 0.1    0.1    0.1    NaN     \n2 0.0372 0.0881 0.1      0.1   \n3 0.1    0.0183 0.1      0.1   \n4 0.1    0.1    0.0932   0.0832\n5 0.1    0.1    0.1      0.1   \n\nfindSpeciesKPSS(logWtFall %&gt;% filter(Species==\"jonah\"), season=\"Fall\", type=\"logWt\")\n\n# A tibble: 5 × 4\n     `1`    `2`   `3`   `4`\n   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 0.0303 0.1      0.1   0.1\n2 0.0439 0.0979   0.1   0.1\n3 0.1    0.1      0.1   0.1\n4 0.1    0.1      0.1   0.1\n5 0.1    0.1      0.1   0.1"
+  },
+  {
+    "objectID": "posts/Week5.html",
+    "href": "posts/Week5.html",
+    "title": "Weeks 5 & 6",
+    "section": "",
+    "text": "I spent most of the day working with the scallop data that Dr. Hart emailed me on Friday. As she requested, I created an R script that turns the data file she gave me into two data frames with lists of 3 or more consecutive stations that have been labeled as star/crab samples not taken. I also manually read the catch comment for each station to evaluate the possibility that crabs/starfish might have been sampled at that station and the catch photo needs to be checked.\nI worked through the SCC+Bash BRITE Workshop materials that Michael emailed us so I will be prepared for the workshop on Thursday. I learned a great deal of new syntax and practiced creating and running basic bash scripts on the SCC."
+  },
+  {
+    "objectID": "posts/Week5.html#monday-july-3-preceding-weekend",
+    "href": "posts/Week5.html#monday-july-3-preceding-weekend",
+    "title": "Weeks 5 & 6",
+    "section": "",
+    "text": "I spent most of the day working with the scallop data that Dr. Hart emailed me on Friday. As she requested, I created an R script that turns the data file she gave me into two data frames with lists of 3 or more consecutive stations that have been labeled as star/crab samples not taken. I also manually read the catch comment for each station to evaluate the possibility that crabs/starfish might have been sampled at that station and the catch photo needs to be checked.\nI worked through the SCC+Bash BRITE Workshop materials that Michael emailed us so I will be prepared for the workshop on Thursday. I learned a great deal of new syntax and practiced creating and running basic bash scripts on the SCC."
+  },
+  {
+    "objectID": "posts/Week5.html#tuesday-july-4",
+    "href": "posts/Week5.html#tuesday-july-4",
+    "title": "Weeks 5 & 6",
+    "section": "Tuesday, July 4",
+    "text": "Tuesday, July 4\nAlthough today was technically a holiday, today I… 1. Worked through athlete survey/sensor repository Dr. Deyle shared with me 2. Based on clarification provided by Dr. Hart, I created a list of the stations with a comment mentioning “stars and crabs” (affirmative). I also made an updated version of the csv file I sent previously that lists the first stations in runs of 3+ consecutive stations with “starsample = FALSE”. The new version excludes five such runs that would not exist if the stations with a “stars and crabs” comment were all changed to “starsample = TRUE”."
+  },
+  {
+    "objectID": "posts/Week5.html#wednesday-july-5",
+    "href": "posts/Week5.html#wednesday-july-5",
+    "title": "Weeks 5 & 6",
+    "section": "Wednesday, July 5",
+    "text": "Wednesday, July 5\n\nMaine data: grid overlays\nFunction to do EDM on Maine-formatted input file"
+  },
+  {
+    "objectID": "posts/Week5.html#thursday-july-6",
+    "href": "posts/Week5.html#thursday-july-6",
+    "title": "Weeks 5 & 6",
+    "section": "Thursday, July 6",
+    "text": "Thursday, July 6\n\nBRITE Programming Workshop: Bash/Linux\nWorking on identifying nearest neighbors"
+  },
+  {
+    "objectID": "posts/Week5.html#friday-july-7",
+    "href": "posts/Week5.html#friday-july-7",
+    "title": "Weeks 5 & 6",
+    "section": "Friday, July 7",
+    "text": "Friday, July 7\n\nWriting functions to bootstrap samples\nMeeting with Dr. Deyle, Josue, and Dr. Suchi Gopal"
+  },
+  {
+    "objectID": "posts/Week5.html#monday-july-10-preceding-weekend",
+    "href": "posts/Week5.html#monday-july-10-preceding-weekend",
+    "title": "Weeks 5 & 6",
+    "section": "Monday, July 10 (+ preceding weekend)",
+    "text": "Monday, July 10 (+ preceding weekend)\n\nRotjan lab meeting\nVoronoi polygons and Moran’s I - assessing spatial autocorrelation\nWorking on loop to find avg E, rho using bootstrapped/Frankenstein strata"
+  },
+  {
+    "objectID": "posts/Week5.html#tuesday-july-11",
+    "href": "posts/Week5.html#tuesday-july-11",
+    "title": "Weeks 5 & 6",
+    "section": "Tuesday, July 11",
+    "text": "Tuesday, July 11\n\nStart exploration of crab data\nUsing E from the loop I developed yesterday to do CCM with the crab data"
+  },
+  {
+    "objectID": "posts/Week5.html#wednesday-july-12",
+    "href": "posts/Week5.html#wednesday-july-12",
+    "title": "Weeks 5 & 6",
+    "section": "Wednesday, July 12",
+    "text": "Wednesday, July 12\n\nContinuing to work on CCM functions, graphing results\nI went through the code I’ve written so far and cleaning it up so everything is clear and reproducible. I’m creating a more organized RMarkdown script (getting rid of things like “test1” “test2”) and an accompanying Methods document that describes what/how/why I did what I did."
+  },
+  {
+    "objectID": "posts/Week5.html#thursday-july-13",
+    "href": "posts/Week5.html#thursday-july-13",
+    "title": "Weeks 5 & 6",
+    "section": "Thursday, July 13",
+    "text": "Thursday, July 13\n\nBRITE Programming Workshop: Data visualization\nBioinfo Challenge Project Presentations\nContinued working on Methods document"
+  },
+  {
+    "objectID": "posts/Week5.html#friday-july-14",
+    "href": "posts/Week5.html#friday-july-14",
+    "title": "Weeks 5 & 6",
+    "section": "Friday, July 14",
+    "text": "Friday, July 14\n\nMeeting with Dr. Deyle\nMethods, CCM\nLots of geospatial analysis: investigating spatial bootstrapping methods"
+  },
+  {
+    "objectID": "posts/Week5.html#monday-july-17th",
+    "href": "posts/Week5.html#monday-july-17th",
+    "title": "Weeks 5 & 6",
+    "section": "Monday, July 17th",
+    "text": "Monday, July 17th\n\nS-mapping\nRe-ran untransformed data\nCo-prediction script"
+  },
+  {
+    "objectID": "posts/Week5.html#tuesday-july-18",
+    "href": "posts/Week5.html#tuesday-july-18",
+    "title": "Weeks 5 & 6",
+    "section": "Tuesday, July 18",
+    "text": "Tuesday, July 18\n\nLooked at mabmeans data Dr. Hart sent\nStarted working with the data in ts format to remove seasonality, hoping that incorporating the additional data will improve predictability. Read a lot about time series analysis"
   }
 ]
