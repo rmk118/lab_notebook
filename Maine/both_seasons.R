@@ -70,10 +70,10 @@ catchTidy_seasons <- pivot_longer(catch_seasons,
 catchTidy_seasons <- catchTidy_seasons %>% mutate(area = as.factor(area), Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
   select(-name)
 
-logCatch <- catchTidy_seasons %>% filter(Type == "logCatch")
-logWt <- catchTidy_seasons %>% filter(Type == "logWt") %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01",
-                                    Season =="Spring" ~"-05-01"), sep = ""))
+# logCatch <- catchTidy_seasons %>% filter(Type == "logCatch")
+# logWt <- catchTidy_seasons %>% filter(Type == "logWt") %>% 
+#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01",
+#                                     Season =="Spring" ~"-05-01"), sep = ""))
 
 
 
@@ -91,8 +91,7 @@ logWt <- catchTidy_seasons %>% filter(Type == "logWt") %>%
 
 catch_complete <- complete(data=catch_seasons %>% ungroup(), Region, Stratum, Season, Year) %>% 
   mutate(area = paste(Region, Stratum)) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01",
-                                    Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% 
   filter(date != "2000-05-01")
 
 catch_ts <- catch_complete %>% group_by(area) %>% arrange(date) %>% select(avgLogWt_s) %>% 
@@ -106,7 +105,9 @@ lag2 <- function(x) {
 } 
 
 # lag2(c(1, 3, 3, 5, 6, 9, 12))
-catch_complete_diff <- catch_complete %>% arrange(date) %>% group_by(area) %>% mutate(across(where(is.double) & !date, lag2)) %>% arrange(area) %>% 
+catch_complete_diff <- catch_complete %>% arrange(date) %>% group_by(area) %>% 
+  mutate(across(where(is.double) & !date, lag2)) %>% 
+  arrange(area) %>% 
   filter(date != "2000-11-01" & date != "2001-05-01") %>%  filter(date < as.Date("2020-05-01"))
 
 #ggplot(data=logCatch, aes(x=Year, y=value, color=Species)) +geom_line()+facet_grid(Region~Stratum)
@@ -134,8 +135,6 @@ catch_complete_diff <- catch_complete %>% arrange(date) %>% group_by(area) %>% m
 #   autoplot()
 # 
  #catch_ts2diff <- map(catch_ts, diff, lag=2)
-
-
 # 
 # plot(catch_ts2)
 # plot(catch_ts2diff)
@@ -192,6 +191,14 @@ do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %
                summarise(avg = mean(value, na.rm = TRUE)) %>% 
                ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
              predictor="avg", target="avg", E_max=7, tp=1) #better than linear!
+
+EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %>% group_by(date) %>% 
+                 summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                 ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37") #E=2, rho=0.55
+
+EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>% group_by(date) %>% 
+                 summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                 ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37") #E=2, rho=0.4
 
 do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>% group_by(date) %>% 
                summarise(avg = mean(value, na.rm = TRUE)) %>% 
