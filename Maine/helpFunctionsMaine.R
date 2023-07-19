@@ -433,7 +433,7 @@ do_xmap_noID <- function(df,predictor,target,E_max,tp,keep_preds=FALSE){
   })
   
   E_star <- out_1 %>% top_n(1,rho) %>% pull(E)
-    columns_star <- names(df_1)[3:(E_star+3)]
+    columns_star <- names(df_1)[3:(E_star+2)]
   
   out <- Simplex(dataFrame=df_2,
                  lib=lib_2,pred=lib_2,Tp=0, # The target has already been "manually" lagged

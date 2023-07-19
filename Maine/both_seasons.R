@@ -105,7 +105,7 @@ lag2 <- function(x) {
   return(x_lagged)
 } 
 
-lag2(c(1, 3, 3, 5, 6, 9, 12))
+# lag2(c(1, 3, 3, 5, 6, 9, 12))
 catch_complete_diff <- catch_complete %>% arrange(date) %>% group_by(area) %>% mutate(across(where(is.double) & !date, lag2)) %>% arrange(area) %>% 
   filter(date != "2000-11-01" & date != "2001-05-01") %>%  filter(date < as.Date("2020-05-01"))
 
@@ -188,14 +188,14 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "logWt") %>% group_by(date, 
 
 ggplot(data = catch_complete_tidy %>% filter(Type == "logWt"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species)
 
-do_xmap_noID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %>% group_by(date) %>% 
+do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %>% group_by(date) %>% 
                summarise(avg = mean(value, na.rm = TRUE)) %>% 
-               ungroup() %>% select(date, avg),
+               ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
              predictor="avg", target="avg", E_max=7, tp=1) #better than linear!
 
-do_xmap_noID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>% group_by(date) %>% 
+do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>% group_by(date) %>% 
                summarise(avg = mean(value, na.rm = TRUE)) %>% 
-               ungroup() %>% select(date, avg),
+               ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
              predictor="avg", target="avg", E_max=7, tp=1) #also better than linear
 
 # Areas -------------------------------------------------------------------
@@ -332,12 +332,12 @@ strataDf<- catchCCMdf %>% ungroup() %>%
 #Regions as replicates
 RESULTS_ccm_combos_regions <- pmap_dfr(params_ccm_combos,function(predator,prey){
   
-  out_1 <- do_xmap_ID(regionsDF,predictor=predator,target=prey,"Region",E_max = 7, tp=1)  %>%
+  out_1 <- do_xmap_ID(regionsDf,predictor=predator,target=prey,"Region",E_max = 7, tp=1)  %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("predator","->","prey"))
   
-  out_2 <- do_xmap_ID(regionsDF,predictor=prey,target=predator,"Region",E_max = 7, tp=1) %>% 
+  out_2 <- do_xmap_ID(regionsDf,predictor=prey,target=predator,"Region",E_max = 7, tp=1) %>% 
     mutate(predator=predator,
            prey=prey,
            direction= paste("prey","->","predator"))
@@ -412,5 +412,4 @@ RESULTS_ccm_combos_by_area2 <- RESULTS_ccm_combos_by_area %>%
 make_xmap_block_noID(df=catchCCMdf %>% filter(area==11), predictor = scallop, target = jonah, E_max = 7, 
                    cause_lag = 1)
 
-do_xmap_noID(df=catchCCMdf %>% filter(area==11), predictor = "scallop", target = "jonah", E_max = 7, 
-                     tp = 1)
+do_xmap_noID(df=catchCCMdf %>% filter(area==14) %>% select(-c(Region, Stratum, area)), predictor = "scallop", target = "jonah", E_max = 7,tp = 1)
