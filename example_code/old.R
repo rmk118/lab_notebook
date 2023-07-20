@@ -330,3 +330,103 @@ for (i in 1:5) {
     # cat("j=",j, "\n")
     print(paste(i, j))
   }}
+
+
+# from both seasons.R -----------------------------------------------------
+
+# logCatch <- catchTidy_seasons %>% filter(Type == "logCatch")
+# logWt <- catchTidy_seasons %>% filter(Type == "logWt") %>% 
+#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01",
+#                                     Season =="Spring" ~"-05-01"), sep = ""))
+# logWt %>% group_by(area, Species) %>% arrange(Year) %>% select(value) %>% 
+#   group_map(~ts(., frequency = 2, start=c(2000, 2)))
+
+# logWt_complete <- complete(data=logWt %>% ungroup(), date, Species, Region, Stratum, explicit = TRUE) %>% mutate(area = paste(Region, Stratum), Type="logWt") %>% select(date, Species, area, value)
+
+# logWt_areas <- logWt_complete %>% group_by(area, Species) %>% arrange(date) %>% select(value) %>% 
+#   group_map(~ts(., frequency = 2, start=c(2000, 2)))
+# 
+# logWt_areas2 <- logWt_complete %>% group_by(area) %>% arrange(date) %>% select(Species, value) %>% 
+#   group_map(~ts(., frequency = 2, start=c(2000, 2)))
+
+
+# logWt_ts <- ts(logWt, frequency = 2)
+# logCatch_ts <- ts(logCatch, frequency = 2)
+# catch_seasons_ts <- ts(catch_seasons %>% ungroup() %>% filter(area== "1 1") %>% select(Season, Year,avgLogCatch_s) %>% arrange(Year), frequency = 2)
+# 
+# autoplot(catch_seasons_ts)
+# monthplot(catch_seasons_ts, phase = "Season")
+# 
+# s_cat_seasons <- ts(s_cat_clean %>% filter(area== "1 1") %>% select(Date,Tow_Number, Region, Stratum, logWt) %>% group_by(Date, Region, Stratum) %>% mutate(date = as.POSIXct(Date)) %>% summarise(lWt = mean(logWt)))
+
+# plot(catch_ts[[1]])
+# Box.test(catch_ts[[1]], type = "Ljung-Box")
+# #apply(catch_ts[[1]], 2, kpss.test, null = "Trend")                      
+# 
+# decompose(catch_ts2)
+# plot(decompose(catch_ts2))
+# ggAcf(catch_ts[[1]])
+# 
+# catch_ts2 <- na.interp(catch_ts[[1]])
+# catch_ts2[[1]] %>%
+#   stl() %>%
+#   autoplot()
+# 
+#catch_ts2diff <- map(catch_ts, diff, lag=2)
+# 
+# plot(catch_ts2)
+# plot(catch_ts2diff)
+# 
+#fried(catch_ts[[1]])
+#map(catch_ts2diff, fried, freq=2)
+#map(catch_ts2diff, isSeasonal, test="qs",freq=2)
+# summary(seastests::wo(catch_ts[[1]]))
+# # plot(decompose(catch_ts2diff))
+
+# catch_complete_tidy <-pivot_longer(catch_complete, 
+#                                    cols = 7:ncol(catch_complete)) %>% 
+#   mutate(Type = case_when(
+#     startsWith(name, "avgCatch_") ~"catch",
+#     startsWith(name,"avgWt_") ~"wt",
+#     startsWith(name,"avgLogWt") ~"logWt",
+#     startsWith(name,"avgLogCatch") ~"logCatch")) %>% 
+#   mutate(Species = case_when(
+#     endsWith(name, "s") ~"scallop",
+#     endsWith(name, "r") ~"rock",
+#     endsWith(name, "j") ~"jonah")) %>%
+#   mutate(area = as.factor(area), Species = as.factor(Species),
+#          Region = as.factor(Region), Type = as.factor(Type),
+#          Stratum = as.factor(Stratum)) %>% 
+#   select(-name)
+
+# logCatchComplete <- catch_complete_tidy %>% filter(Type == "logCatch")
+# logWtComplete <- catch_complete_tidy %>% filter(Type == "logWt")
+
+
+
+do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %>% group_by(date) %>% 
+             summarise(avg = mean(value, na.rm = TRUE)) %>% 
+             ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
+           predictor="avg", target="avg", E_max=7, tp=1) #better than linear!
+
+do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>% group_by(date) %>% 
+             summarise(avg = mean(value, na.rm = TRUE)) %>% 
+             ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
+           predictor="avg", target="avg", E_max=7, tp=1) #also better than linear
+
+make_xmap_block_noID(df=catchCCMdf %>% filter(area==11), predictor = scallop, target = jonah, E_max = 7, 
+                     cause_lag = 1)
+
+do_xmap_noID(df=catchCCMdf %>% filter(area==14) %>% select(-c(Region, Stratum, area)), predictor = "scallop", target = "jonah", E_max = 7,tp = 1)
+
+#out1<- catchCCMdf %>% filter(area == areaInput) %>% mutate(predator=predator,
+#                                                                         prey=prey,
+#                                                                         direction= paste("prey","->","predator")
+
+summary(lm(as.formula(scallop ~ jonah),data=data.frame(catchCCMdf %>% filter(area == 11))))
+
+library(correlation)
+cor_to_p(cor=0.2444023, n=35)
+library(psych)
+fisherz(rho=0.2444023)
+r.con(rho=0.2444023, n=35, p=0.95)
