@@ -430,3 +430,8 @@ cor_to_p(cor=0.2444023, n=35)
 library(psych)
 fisherz(rho=0.2444023)
 r.con(rho=0.2444023, n=35, p=0.95)
+
+# print(ccf(catchCCMdf %>% filter(area == 11) %>% pull(jonah), catchCCMdf %>% filter(area == 11) %>% 
+#       pull(scallop), type="correlation"))
+
+#ggplot(data=logCatch, aes(x=Year, y=value, color=Species)) +geom_line()+facet_grid(Region~Stratum)
