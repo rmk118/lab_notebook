@@ -423,15 +423,74 @@ do_xmap_noID(df=catchCCMdf %>% filter(area==14) %>% select(-c(Region, Stratum, a
 #                                                                         prey=prey,
 #                                                                         direction= paste("prey","->","predator")
 
-summary(lm(as.formula(scallop ~ jonah),data=data.frame(catchCCMdf %>% filter(area == 11))))
 
-library(correlation)
-cor_to_p(cor=0.2444023, n=35)
-library(psych)
-fisherz(rho=0.2444023)
-r.con(rho=0.2444023, n=35, p=0.95)
 
 # print(ccf(catchCCMdf %>% filter(area == 11) %>% pull(jonah), catchCCMdf %>% filter(area == 11) %>% 
 #       pull(scallop), type="correlation"))
 
 #ggplot(data=logCatch, aes(x=Year, y=value, color=Species)) +geom_line()+facet_grid(Region~Stratum)
+
+test<-CCM(dataFrame=data.frame(catchCCMdf %>% filter(area == 11)), columns="jonah", target="scallop", E = 2, Tp=0, libSizes = "36 36 10", sample=100, verbose = FALSE, includeData = TRUE)
+
+ggplot(data=test[["CCM1_Predictions"]][[1]] %>% mutate(index = row_number()), aes(x=index, y=Predictions))+geom_line() +geom_line(aes(x=index, y=Observations, color="red"))
+
+##### CCM by area - tp0
+
+RESULTS_ccm_combos_by_area_tp0 <- pmap_dfr(params_areas_ccm_combos,function(predator,prey, areaInput){
+  
+  df_temp <- catchCCMdf %>% filter(area == areaInput)
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=0,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=TRUE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           area = areaInput,
+           E = E_out_1)
+  
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=0,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=TRUE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           area = areaInput,
+           E= E_out_2)
+  
+  bind_rows(out_1,out_2)
+})
+
+regionsGrid_tp0<- left_join(regionsGrid, max_rho_by_area_tp0)
+
+CCM(dataFrame=data.frame(catchCCMdf %>% filter(area == 11)), columns="jonah", target="scallop", E = 2, Tp=1, libSizes = "4 36 1", sample=100, verbose = TRUE, showPlot = TRUE)
+
+
+summary(lm(as.formula(scallop ~ jonah),data=data.frame(catchCCMdf %>% filter(area == 11))))
+
+
+test2<-Simplex(dataFrame=data.frame(catchCCMdf %>% filter(area == 11)), columns="jonah", target="scallop", E = 2, Tp=1, lib = "1 36", pred="1 36", showPlot = TRUE, parameterList = TRUE)
+compute_stats(test2$predictions$Observations, test2$predictions$Predictions)
+
+library(correlation)
+cor_to_p(cor=0.2444023, n=35) #0.157
+library(psych)
+fisherz(rho=0.2444023) #z-score = 0.249?
+r.con(rho=0.2444023, n=35, p=0.95) #95% CI for rho: -0.097 to 0.534
+
+max_rho_by_area_tp0<- RESULTS_ccm_combos_by_area_tp0 %>% group_by(area) %>% summarise(
+  max_J_S = max(`jonah:scallop`, na.rm = TRUE),
+  max_S_J = max(`scallop:jonah`, na.rm = TRUE),
+  max_R_S = max(`rock:scallop`, na.rm = TRUE),
+  max_S_R = max(`scallop:rock`, na.rm = TRUE),
+  max_J_R = max(`jonah:rock`, na.rm = TRUE),
+  max_R_J = max(`rock:jonah`, na.rm = TRUE),
+  max_lib = max(LibSize),
+  min_lib = min(LibSize))
+
+tibble(as.matrix(max_rho_by_area) - as.matrix(max_rho_by_area_tp0))
