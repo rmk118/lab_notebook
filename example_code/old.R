@@ -1,13 +1,19 @@
 #Code chunks I commented out of other documents
 # Moved here to improve readability of actual code
 
+# library(ggfortify)
+# library(xts)
+# library(tseries) #for KPSS test for stationarity
+
+
+# NOAA stuff --------------------------------------------------------------
+
 #ggplot(scallopsNew, aes(x = CRUISE)) + geom_bar()
 #ggplot(scallopsNew, aes(x = CRUISE6)) + geom_bar()
 #ggplot(scallopsNew, aes(x = STRATUM)) + geom_bar()
 
 # diffMonths <- df_stationsNew %>% 
 #   filter(EST_MONTH != GMT_MONTH)
-
 
 # trues <- species %>%  filter(!is.na(species$avg)==TRUE)
 
@@ -16,8 +22,6 @@
 scallopsNew <-  scallopsNew %>%
   mutate(STRATUM = as.integer(STRATUM)) %>% 
   filter(!is.na(STRATUM))
-
-
 
 # df_stations_wrangled <- df_stations %>%
 #   # filter(EST_YEAR %in% unlist(target_chunks)) %>%
@@ -30,8 +34,6 @@ scallopsNew <-  scallopsNew %>%
 data.frame(table(df_stations$STATION))
 
 # data.frame(table(df_stations_wrangled$DATE)) #only goes up to 2006, then a few in 2015 and 2021. Missing HabCam data?
-
-# Find strata with all 45 years of data -----------------------------------------------------
 
 #This will show you which ones were removed
 # scallopsTest <-  scallopsNew %>%
@@ -46,7 +48,6 @@ scallop_E <- EmbedDimension(dataFrame = formatScal, lib = "1 21", pred = "1 21",
 scallop_theta <- PredictNonlinear(dataFrame = formatScal, lib = "1 21", pred = "1 21", columns = "avg",target = "avg", E = 8)
 asterias_E <- EmbedDimension(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg")
 asterias_theta <- PredictNonlinear(dataFrame = formatStar, lib = "1 19", pred = "1 19", columns = "avg",target = "avg", E = 6)
-
 
 
 #Scallop biomass exploration
@@ -87,12 +88,12 @@ onlyData <- fish %>%
 #   filter(station %in% stations30$station)
 
 
+# Maine starts ------------------------------------------------------------
+
 #Not very many observations
 # testingStars<- read.csv("data/Maine_inshore_trawl/starCatch.csv")
 # testingStars %>%  distinct(Common_Name)
 # testingStars <- testingStars %>% filter(Common_Name == "Northern Sea Star" | Common_Name == "Star Common")
-
-
 
 #ggplot(j_cat, aes(x=Year, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
 # ggplot(r_cat, aes(x=Survey, y=avgCatch, group=Region, color=Region))+geom_line()+facet_wrap(~Stratum)
@@ -142,18 +143,18 @@ onlyData <- fish %>%
 #   filter(neighborRegion == "3 4")
 
 
-# stuff with the surveyed grid and nearest neighboring grids --------------
+# surveyed grid (not accurate) --------------
 
 st_queen <- function(a, b = a) st_relate(a, b, pattern = "F***T****")
 sf.sgbp.surveyed <- st_queen(surveyed)
 
-as.nb.sgbp <- function(x, ...) {
-  attrs <- attributes(x)
-  x <- lapply(x, function(i) { if(length(i) == 0L) 0L else i } )
-  attributes(x) <- attrs
-  class(x) <- "nb"
-  x
-}
+# as.nb.sgbp <- function(x, ...) {
+#   attrs <- attributes(x)
+#   x <- lapply(x, function(i) { if(length(i) == 0L) 0L else i } )
+#   attributes(x) <- attrs
+#   class(x) <- "nb"
+#   x
+# }
 sf.nb.surveyed <- as.nb.sgbp(sf.sgbp.surveyed)
 summary(sf.nb.surveyed)
 
@@ -258,11 +259,6 @@ do_xmap_noID(df_temp_xmap, predictor = "avgLogCatch_s", target="avgLogCatch_r", 
 #View(make_xmap_block_noID(df = df_temp_xmap, predictor = avgLogCatch_s, target=avgLogCatch_r, E_max=5, cause_lag=1))
 
 
-
-
-# Concantenation for copred - manual -----------------------------------------------
-
-
 # intBlock<- make_xmap_block_ID(df=(logCatchFallInt %>% filter(Species=="scallop") %>% ungroup() %>% select(areaInt, Year, value)), predictor=value, target=value, ID_col=areaInt, E_max=6, cause_lag=1) %>%
 #   filter(complete.cases(.))
 
@@ -311,10 +307,7 @@ do_xmap_noID(df_temp_xmap, predictor = "avgLogCatch_s", target="avgLogCatch_r", 
 #   
 # })
 
-
-
-
-# Graphics testing --------------------------------------------------------
+# Graphics testing (corr)--------------------------------------------------------
 
 M = cor(mtcars[1:3])
 patchObj <- ggcorrplot(M)
@@ -332,7 +325,7 @@ for (i in 1:5) {
   }}
 
 
-# from both seasons.R -----------------------------------------------------
+# both_seasons.R scatch work-----------------------------------------------------
 
 # logCatch <- catchTidy_seasons %>% filter(Type == "logCatch")
 # logWt <- catchTidy_seasons %>% filter(Type == "logWt") %>% 
@@ -403,7 +396,6 @@ for (i in 1:5) {
 # logWtComplete <- catch_complete_tidy %>% filter(Type == "logWt")
 
 
-
 do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="catch") %>% group_by(date) %>% 
              summarise(avg = mean(value, na.rm = TRUE)) %>% 
              ungroup() %>% select(date, avg) %>% mutate(ID=1), ID_col = "ID",
@@ -419,11 +411,7 @@ make_xmap_block_noID(df=catchCCMdf %>% filter(area==11), predictor = scallop, ta
 
 do_xmap_noID(df=catchCCMdf %>% filter(area==14) %>% select(-c(Region, Stratum, area)), predictor = "scallop", target = "jonah", E_max = 7,tp = 1)
 
-#out1<- catchCCMdf %>% filter(area == areaInput) %>% mutate(predator=predator,
-#                                                                         prey=prey,
-#                                                                         direction= paste("prey","->","predator")
-
-
+#out1<- catchCCMdf %>% filter(area == areaInput) %>% mutate(predator=predator,prey=prey,direction= paste("prey","->","predator")
 
 # print(ccf(catchCCMdf %>% filter(area == 11) %>% pull(jonah), catchCCMdf %>% filter(area == 11) %>% 
 #       pull(scallop), type="correlation"))
@@ -472,7 +460,6 @@ CCM(dataFrame=data.frame(catchCCMdf %>% filter(area == 11)), columns="jonah", ta
 
 
 summary(lm(as.formula(scallop ~ jonah),data=data.frame(catchCCMdf %>% filter(area == 11))))
-
 
 test2<-Simplex(dataFrame=data.frame(catchCCMdf %>% filter(area == 11)), columns="jonah", target="scallop", E = 2, Tp=1, lib = "1 36", pred="1 36", showPlot = TRUE, parameterList = TRUE)
 compute_stats(test2$predictions$Observations, test2$predictions$Predictions)

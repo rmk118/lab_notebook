@@ -1,23 +1,20 @@
-#Analysis using both seasons of ME-NH survey data
+# Analysis using both seasons of ME-NH survey data
 #Ruby Krasnow
-#Last modified: July 20, 2023
+#Last modified: July 21, 2023
 
 #Load packages
 library(tidyverse)
 library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(rEDM) #EDM
-library(forecast)
-library(seastests)
-
-# library(ggfortify)
-# library(xts)
-# library(tseries) #for KPSS test for stationarity
+#library(forecast)
+#library(seastests)
+library(clipr) #Copying code to keyboard
 
 #spatial packages
-# library(sf)
-# library(sfheaders)
-# library(spdep)
+library(sf)
+library(sfheaders)
+library(spdep)
 
 #import help functions and data
 source('~/Downloads/lab_notebook/Maine/helpFunctionsMaine.R')
@@ -75,8 +72,8 @@ catch_complete <- complete(data=catch_seasons %>% ungroup(), Region, Stratum, Se
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% 
   filter(date != "2000-05-01")
 
-catch_ts <- catch_complete %>% group_by(area) %>% arrange(date) %>% select(avgLogWt_s) %>% 
-  group_map(~ts(., frequency = 2, start=c(2000, 2)))# .keep = FALSE))
+#catch_ts <- catch_complete %>% group_by(area) %>% arrange(date) %>% select(avgLogWt_s) %>% 
+#  group_map(~ts(., frequency = 2, start=c(2000, 2)))# .keep = FALSE))
 
 catch_complete <- catch_complete %>% mutate(date = lubridate::ymd(date))
 
@@ -109,10 +106,10 @@ ggplot(data = complete_tidy_diff %>%
          filter(Type == "logWt", Species=="scallop"), aes(x=date, y=value, color=area))+geom_line()
 
 ggplot(data = complete_tidy_diff %>% 
-         filter(Type == "logWt"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) 
+         filter(Type == "wt"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) 
 #a lot more variation in the jonah crabs
 
-ggplot(data = complete_tidy_diff %>% filter(Type == "logWt") %>% group_by(date, Species) %>% 
+ggplot(data = complete_tidy_diff %>% filter(Type == "wt") %>% group_by(date, Species) %>% 
     summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)
 #a lot more variation in the jonah crabs
 
@@ -131,6 +128,41 @@ PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="scallop", Typ
                    summarise(avg = mean(value, na.rm = TRUE)) %>% 
                    ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37", E=2)
 
+# CCM of average over all areas
+
+params_ccm_combos <- data.frame(predator=c("rock", "jonah", "jonah"), prey=c("scallop", "scallop", "rock"))
+
+RESULTS_ccm_combos_aggregate <- pmap_dfr(params_ccm_combos,function(predator,prey){
+  
+  df_temp <- catchCCMdf %>% filter(area == areaInput)
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           area = areaInput, 
+           E = E_out_1)
+  
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           area = areaInput,
+           E = E_out_2)
+  
+  bind_rows(out_1,out_2)
+  
+}) %>% addDirection()
+
 # Areas -------------------------------------------------------------------
 
 #Scallops
@@ -141,7 +173,7 @@ findSpeciesErho(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(),
 findSpeciesTheta(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(), type="catch")
 findSpeciesTheta_rho(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(), type="catch")
 
-findSpeciesKPSS(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(), type="wt")
+#findSpeciesKPSS(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(), type="wt")
 
 #univariate dewdrop with areas as replicates
 catchDiffInt <- complete_tidy_diff %>% mutate(areaInt = as.integer(paste0(Region, Stratum)))
@@ -160,7 +192,6 @@ findSpeciesTheta(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit()
 findSpeciesTheta_rho(complete_tidy_diff %>% filter(Species=="scallop") %>% na.omit(), type="wt")
 
 do_xmap_ID(df=(catchDiffInt %>% filter(Species=="scallop", Type=="wt") %>% ungroup() %>% select(Year, areaInt, value)), predictor="value", target="value", ID_col="areaInt", E_max=7, tp=1)
-
 
 findSpeciesGroups_both<- function(df, species, type, g) {
   df_out <- df %>% na.omit() %>% 
@@ -236,7 +267,7 @@ catchCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>%
   rename(rock = avgCatch_r , scallop = avgCatch_s , jonah= avgCatch_j)  %>% 
   mutate(area = as.integer(paste0(Region, Stratum)))
 
-params_ccm_combos <- data.frame(predator=c("rock", "jonah", "jonah"), prey=c("scallop", "scallop", "rock"))
+
 
 v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
                 "rmse_linear","perc_linear","p_val_linear", "predator", "prey", "direction")
@@ -268,7 +299,6 @@ RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(predator,prey){
   bind_rows(out_1,out_2) %>% select(all_of(v_keep_col))
   
 }) %>% addDirection()
-
 
 regionsDf<- catchCCMdf %>% ungroup() %>% 
   group_by(Region, date) %>% 
@@ -385,8 +415,9 @@ RESULTS_ccm_combos_strata_wt <- pmap_dfr(params_ccm_combos,function(predator,pre
 
 params_areas_ccm_combos<- expand.grid(predator=c("jonah", "rock"),
             prey=c("scallop", "rock"),
-            areaInput=levels(as.factor(catchCCMdf$area)), stringsAsFactors = FALSE) %>% filter(predator != prey) %>% 
-            mutate(areaInput = as.integer(areaInput))
+            areaInput=levels(as.factor(catchCCMdf$area)), stringsAsFactors = FALSE) %>% 
+    filter(predator != prey) %>% 
+    mutate(areaInput = as.integer(areaInput))
 
 # By area, each individually - CATCH
 RESULTS_ccm_combos_by_area <- pmap_dfr(params_areas_ccm_combos,function(predator,prey, areaInput){
@@ -398,7 +429,7 @@ RESULTS_ccm_combos_by_area <- pmap_dfr(params_areas_ccm_combos,function(predator
                            columns = predator,target = prey, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
   out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("predator","->","prey"),
@@ -409,7 +440,7 @@ RESULTS_ccm_combos_by_area <- pmap_dfr(params_areas_ccm_combos,function(predator
                            columns = prey,target = predator, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
   out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
-               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("prey","->","predator"),
@@ -430,7 +461,7 @@ RESULTS_ccm_combos_by_area_wt <- pmap_dfr(params_areas_ccm_combos,function(preda
                            columns = predator,target = prey, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
   out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("predator","->","prey"),
@@ -441,7 +472,7 @@ RESULTS_ccm_combos_by_area_wt <- pmap_dfr(params_areas_ccm_combos,function(preda
                            columns = prey,target = predator, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
   out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
-               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("prey","->","predator"),
@@ -458,21 +489,20 @@ combos <- c("jonah:scallop", "scallop:jonah", "rock:scallop", "scallop:rock","jo
 RESULTS_ccm_combos_by_area <- RESULTS_ccm_combos_by_area %>% select(all_of(ccm_col_order))
 RESULTS_ccm_combos_by_area_wt <- RESULTS_ccm_combos_by_area_wt %>% select(all_of(ccm_col_order))
 
-max_rho_by_area<- RESULTS_ccm_combos_by_area %>% group_by(area) %>% summarise(
-  max_J_S = max(`jonah:scallop`, na.rm = TRUE),
-  max_S_J = max(`scallop:jonah`, na.rm = TRUE),
-  max_R_S = max(`rock:scallop`, na.rm = TRUE),
-  max_S_R = max(`scallop:rock`, na.rm = TRUE),
-  max_J_R = max(`jonah:rock`, na.rm = TRUE),
-  max_R_J = max(`rock:jonah`, na.rm = TRUE))
+find_max <- function(df) {
+  df_out <- df %>% summarise(
+    max_J_S = max(`jonah:scallop`, na.rm = TRUE),
+    max_S_J = max(`scallop:jonah`, na.rm = TRUE),
+    max_R_S = max(`rock:scallop`, na.rm = TRUE),
+    max_S_R = max(`scallop:rock`, na.rm = TRUE),
+    max_J_R = max(`jonah:rock`, na.rm = TRUE),
+    max_R_J = max(`rock:jonah`, na.rm = TRUE))
+  return(df_out)
+}
 
-max_rho_by_area_wt<- RESULTS_ccm_combos_by_area_wt %>% group_by(area) %>% summarise(
-  max_J_S = max(`jonah:scallop`, na.rm = TRUE),
-  max_S_J = max(`scallop:jonah`, na.rm = TRUE),
-  max_R_S = max(`rock:scallop`, na.rm = TRUE),
-  max_S_R = max(`scallop:rock`, na.rm = TRUE),
-  max_J_R = max(`jonah:rock`, na.rm = TRUE),
-  max_R_J = max(`rock:jonah`, na.rm = TRUE))
+max_rho_by_area<- RESULTS_ccm_combos_by_area %>% group_by(area) %>% find_max()
+
+max_rho_by_area_wt<- RESULTS_ccm_combos_by_area_wt %>% group_by(area) %>% find_max()
 
 find_delta = function(x) {
   delta_rho = last(x)-first(x)
@@ -507,28 +537,221 @@ no_convergence_wt <- pivot_longer(min_max_lib_wt, cols=3:8) %>% na.omit() %>%
 
 conv_table_wt <- data.frame(rbind(table(converges_wt$name), table(no_convergence_wt$name))) %>% mutate(conv = c("Yes", "No"), .before=1)
 
-regionsGrid_CCM<- left_join(regionsGrid, max_rho_by_area)
+#regionsGrid_CCM<- left_join(regionsGrid, max_rho_by_area)
 
-ggplot(data=pivot_longer(regionsGrid_tp1, cols=4:ncol(regionsGrid_tp1)))+geom_sf(aes(fill=value))+
-scale_fill_viridis_b()+facet_wrap(~name)
+#ggplot(data=pivot_longer(regionsGrid_tp1, cols=4:ncol(regionsGrid_tp1)))+geom_sf(aes(fill=value))+
+#scale_fill_viridis_b()+facet_wrap(~name)
 
-ggplot(data=pivot_longer(regionsGrid_tp1, cols=4:ncol(regionsGrid_tp1)))+geom_sf(aes(fill=value))+scale_fill_viridis_b()+facet_wrap(~name)
+#ggplot(data=pivot_longer(regionsGrid_tp1, cols=4:ncol(regionsGrid_tp1)))+geom_sf(aes(fill=value#))+scale_fill_viridis_b()+facet_wrap(~name)
 
+################################################ Non-multispatial CCM by region ########################
+
+params_regions_ccm_combos<- expand.grid(predator=c("jonah", "rock"), prey=c("scallop", "rock"),
+                                      region=c(1:5), stringsAsFactors = FALSE) %>% 
+  filter(predator != prey)
+
+# By region, each individually - CATCH
+catchCCMdf_reg <- catchCCMdf %>% group_by(Region, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_combos_by_reg <- pmap_dfr(params_regions_ccm_combos,function(predator,prey, region){
+  df_temp <- catchCCMdf_reg %>% filter(Region == region)
+  lib_vec <- paste(1, nrow(df_temp))
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           region=region,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           region=region,
+           E = E_out_2)
+
+  bind_rows(out_1,out_2)
+}) %>% addDirection()
+
+max_rho_by_reg<- RESULTS_ccm_combos_by_reg %>% group_by(region) %>% find_max()
+
+# By region, each individually - weight
+wtCCMdf_reg <- wtCCMdf %>% group_by(Region, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_combos_by_reg_wt <- pmap_dfr(params_regions_ccm_combos,function(predator,prey, region){
+  df_temp <- wtCCMdf_reg %>% filter(Region == region)
+  lib_vec <- paste(1, nrow(df_temp))
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           region=region,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           region=region,
+           E = E_out_2)
+  
+  bind_rows(out_1,out_2)
+}) %>% addDirection()
+
+max_rho_by_reg_wt<- RESULTS_ccm_combos_by_reg_wt %>% group_by(region) %>% find_max()
+
+################################################ Non-multispatial CCM by stratum ########################
+
+params_strata_ccm_combos<- expand.grid(predator=c("jonah", "rock"), prey=c("scallop", "rock"),
+                                        stratum=c(1:4), stringsAsFactors = FALSE) %>% 
+  filter(predator != prey)
+
+# By stratum, each individually - CATCH
+catchCCMdf_strat <- catchCCMdf %>% group_by(Stratum, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+
+RESULTS_ccm_combos_by_strat <- pmap_dfr(params_strata_ccm_combos,function(predator,prey, stratum){
+  df_temp <- catchCCMdf_strat %>% filter(Stratum == stratum)
+  lib_vec <- paste(1, nrow(df_temp))
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           stratum=stratum,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           stratum=stratum,
+           E = E_out_2)
+  
+  bind_rows(out_1,out_2)
+}) %>% addDirection()
+
+max_rho_by_strat<- RESULTS_ccm_combos_by_strat %>% group_by(stratum) %>% find_max()
+
+# By stratum, each individually - weight
+wtCCMdf_strat <- wtCCMdf %>% group_by(Stratum, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+
+RESULTS_ccm_combos_by_strat_wt <- pmap_dfr(params_strata_ccm_combos,function(predator,prey, stratum){
+  df_temp <- wtCCMdf_strat %>% filter(Stratum == stratum)
+  lib_vec <- paste(1, nrow(df_temp))
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           stratum=stratum,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE)  %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           stratum=stratum,
+           E = E_out_2)
+  
+  bind_rows(out_1,out_2)
+}) %>% addDirection()
+
+max_rho_by_strat_wt<- RESULTS_ccm_combos_by_strat_wt %>% group_by(stratum) %>% find_max()
+
+############ findAreasCorr -------------------------------------------------------
+
+corrOut_areas <- data.frame(matrix(ncol=4))
+corrOut_areas_wt <- data.frame(matrix(ncol=4))
+colnames(corrOut_areas) <- c("area","s:r", "s:j", "r:j")
+colnames(corrOut_areas_wt) <- c("area","s:r", "s:j", "r:j")
+
+find_corr_area <- function(df, areaInput) {
+  
+  df_filtered <- df %>% filter(area == areaInput) 
+  
+  absmax <- function(x) { x[which.max( abs(x) )]}
+
+  s.r_catch<-absmax(ccf(df_filtered$scallop, df_filtered$rock, type = "correlation",lag.max = 4, plot = FALSE)$acf)
+  s.j_catch<-absmax(ccf(df_filtered$scallop, df_filtered$jonah, type = "correlation",lag.max = 4, plot = FALSE)$acf)
+  r.j_catch<-absmax(ccf(df_filtered$rock, df_filtered$jonah, type = "correlation",lag.max = 4, plot = FALSE)$acf)
+
+  catchV<- c(df_filtered$area[1], s.r_catch, s.j_catch, r.j_catch)
+  df_area<- data.frame(t(catchV))
+  colnames(df_area)<- c("area","s:r", "s:j", "r:j")
+  df_area <- df_area %>% mutate(area = round(area))
+  
+  return(df_area)
+}
+#catch
+for (i in 1:5) {
+  for (j in 1:4) {
+    areaTemp <- as.integer(paste0(i, j))
+    corrOut_areas<- bind_rows(corrOut_areas,find_corr_area(df=catchCCMdf,areaInput=areaTemp))
+  }
+}
+#weight
+for (i in 1:5) {
+  for (j in 1:4) {
+    areaTemp <- as.integer(paste0(i, j))
+    corrOut_areas_wt<- bind_rows(corrOut_areas_wt,find_corr_area(df=wtCCMdf,areaInput=areaTemp))
+  }
+}
+corrOut_areas <- corrOut_areas %>% slice(-1)
+corrOut_areas_wt <- corrOut_areas_wt %>% slice(-1)
 
 ########## CCM randomization #################
-compute_perm <- function(df, predictor,target,E,tp,keep_preds=FALSE){
-  
-  df_2 <- df %>% filter(complete.cases(.)) %>% slice_sample(prop=1)
-  L <- paste(1,nrow(df_2))
-  out <- Simplex(dataFrame=df_2, lib=L,pred=L, Tp=1,target=target,columns=predictor, embedded=FALSE,parameterList = TRUE,E=E)
-  
-  params <- out$parameters
-  out <- out$predictions %>% filter(complete.cases(.))
-  
-  stats <- compute_stats(out$Observations,out$Predictions)
-  stats$lib_size = L
-  stats$E=E
-  stats$Tp=1
-  
-  return(stats)
-}
+# compute_perm <- function(df, predictor,target,E,tp,keep_preds=FALSE){
+#   
+#   df_2 <- df %>% filter(complete.cases(.)) %>% slice_sample(prop=1)
+#   L <- paste(1,nrow(df_2))
+#   out <- Simplex(dataFrame=df_2, lib=L,pred=L, Tp=1,target=target,columns=predictor, embedded=FALSE,parameterList = TRUE,E=E)
+#   
+#   params <- out$parameters
+#   out <- out$predictions %>% filter(complete.cases(.))
+#   
+#   stats <- compute_stats(out$Observations,out$Predictions)
+#   stats$lib_size = L
+#   stats$E=E
+#   stats$Tp=1
+#   
+#   return(stats)
+# }
+
+########## Neighbors #################
+
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
+
+surveyGrid <- surveyGrid %>% 
+  mutate(Region = region_id,
+         Stratum = depth_stra,
+         GridID = grid_id, .keep="unused", .before=last_surve)
+
+surveyGrid$area <- paste(surveyGrid$Region, surveyGrid$Stratum)
