@@ -100,10 +100,10 @@ complete_tidy_diff <- pivot_longer(catch_complete_diff,cols = 7:ncol(catch_compl
   mutate(area = as.factor(area), Species = as.factor(Species),
          Region = as.factor(Region), Type = as.factor(Type),
          Stratum = as.factor(Stratum)) %>% 
-  select(-name) %>%  filter(date < as.Date("2020-05-01"))
+  select(-name)
 
 ggplot(data = complete_tidy_diff %>% 
-         filter(Type == "logWt", Species=="scallop"), aes(x=date, y=value, color=area))+geom_line()
+         filter(Type == "wt", Species=="scallop"), aes(x=date, y=value, color=area))+geom_line()
 
 ggplot(data = complete_tidy_diff %>% 
          filter(Type == "wt"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) 
@@ -113,6 +113,8 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "wt") %>% group_by(date, Spe
     summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)
 #a lot more variation in the jonah crabs
 
+catchCCMdf_agg <- catchCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, mean))
+wtCCMdf_agg <- wtCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, mean))
 
 # Aggregate stats ---------------------------------------------------------
 
@@ -132,36 +134,70 @@ PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="scallop", Typ
 
 params_ccm_combos <- data.frame(predator=c("rock", "jonah", "jonah"), prey=c("scallop", "scallop", "rock"))
 
+par(mfrow=c(2,2), mar=c(1,1,1,1))
+
 RESULTS_ccm_combos_aggregate <- pmap_dfr(params_ccm_combos,function(predator,prey){
+  lib_vec <- paste(1, nrow(catchCCMdf_agg))
   
-  df_temp <- catchCCMdf %>% filter(area == areaInput)
-  lib_vec <- paste(1, nrow(df_temp))
-  
-  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
+  rho_E_1<- EmbedDimension(dataFrame = catchCCMdf_agg, lib = lib_vec, pred = lib_vec, 
                            columns = predator,target = prey, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
-  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+  out_1 <- CCM(dataFrame= catchCCMdf_agg, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(catchCCMdf_agg) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("predator","->","prey"),
-           area = areaInput, 
            E = E_out_1)
   
-  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
+  rho_E_2<- EmbedDimension(dataFrame = catchCCMdf_agg, lib = lib_vec, pred = lib_vec, 
                            columns = prey,target = predator, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
-  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
-               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+  out_2 <- CCM(dataFrame= catchCCMdf_agg, columns=prey, target=predator, E = E_out_2, Tp=1, 
+               libSizes = paste(E_out_2+2, nrow(catchCCMdf_agg)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)%>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("prey","->","predator"),
-           area = areaInput,
            E = E_out_2)
   
   bind_rows(out_1,out_2)
   
 }) %>% addDirection()
+RESULTS_ccm_combos_aggregate <- RESULTS_ccm_combos_aggregate %>% select(-c(prey, predator, direction))
+RESULTS_ccm_combos_aggregate %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:7)
+
+RESULTS_ccm_combos_aggregate_wt <- pmap_dfr(params_ccm_combos,function(predator,prey){
+  lib_vec <- paste(1, nrow(wtCCMdf_agg))
+  
+  rho_E_1<- EmbedDimension(dataFrame = wtCCMdf_agg, lib = lib_vec, pred = lib_vec, 
+                           columns = predator,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= wtCCMdf_agg, columns=predator, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(wtCCMdf_agg) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("predator","->","prey"),
+           E = E_out_1)
+  
+  rho_E_2<- EmbedDimension(dataFrame = wtCCMdf_agg, lib = lib_vec, pred = lib_vec, 
+                           columns = prey,target = predator, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= wtCCMdf_agg, columns=prey, target=predator, E = E_out_2, Tp=1, 
+               libSizes = paste(E_out_2+2, nrow(wtCCMdf_agg)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)%>%
+    mutate(predator=predator,
+           prey=prey,
+           direction= paste("prey","->","predator"),
+           E = E_out_2)
+  
+  bind_rows(out_1,out_2)
+  
+}) %>% addDirection()
+RESULTS_ccm_combos_aggregate_wt <- RESULTS_ccm_combos_aggregate_wt %>% select(-c(prey, predator, direction))
+RESULTS_ccm_combos_aggregate_wt %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:7)
+
+#Overall xmap skill
+ggplot(data = RESULTS_ccm_combos_aggregate %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:7)) +geom_line(aes(x=LibSize, y=value, color=name))
+
+ggplot(data = RESULTS_ccm_combos_aggregate_wt %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:7)) +geom_line(aes(x=LibSize, y=value, color=name))
 
 # Areas -------------------------------------------------------------------
 
@@ -745,6 +781,98 @@ corrOut_areas_wt <- corrOut_areas_wt %>% slice(-1)
 #   return(stats)
 # }
 
+
+########## Environment #################
+
+envi_df <- df_tows %>%
+  group_by(Region, Depth_Stratum, Season, Year) %>%
+  summarise(temp = mean(Bottom_WaterTemp_DegC, na.rm = TRUE)) %>%
+  rename(Stratum = Depth_Stratum) %>%
+  mutate(area = as.numeric(paste0(Region, Stratum)), .before=temp) %>%
+  mutate(date= paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% ungroup() %>%
+  select(-c(Year, Season)) %>%
+  mutate(date = lubridate::ymd(date)) %>%  filter(date < as.Date("2020-05-01"))
+
+envi_df <- envi_df %>% 
+  mutate(temp2 = case_when(
+    !is.na(temp) ~ temp,
+    is.na(temp)  ~ (lag(temp) + lead(temp))/2
+  )) %>% select(-temp) %>% rename(temp = temp2)
+
+envi <- envi_df %>% arrange(date) %>% group_by(area) %>% 
+  mutate(temp = lag2(temp)) %>% 
+  arrange(area)
+
+envi_catch <- left_join(envi, catchCCMdf) %>% na.omit()
+#envi_df %>% group_by(area) %>% summarise(num = n_distinct(date))
+
+envi_ccm_combos<- expand.grid(species=c("scallop", "jonah", "rock"), areaInput=levels(as.factor(catchCCMdf$area)), stringsAsFactors = FALSE) %>%
+  mutate(areaInput = as.integer(areaInput))
+
+
+# By area, each individually - CATCH with depth
+RESULTS_ccm_temp_by_area <- pmap_dfr(envi_ccm_combos,function(species, areaInput){
+  
+  df_temp <- envi_catch %>% filter(area == areaInput)
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
+                           columns = species,target = species, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = species, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(species=species,
+           area = areaInput, 
+           E = E_out_1)
+})
+
+max_rho_temp_by_area <- RESULTS_ccm_temp_by_area %>% group_by(area) %>% 
+ summarise(
+    max_T_S = max(`temp:scallop`, na.rm = TRUE),
+    max_S_T = max(`scallop:temp`, na.rm = TRUE),
+    max_R_T = max(`rock:temp`, na.rm = TRUE),
+    max_T_R = max(`temp:rock`, na.rm = TRUE),
+    max_J_T = max(`jonah:temp`, na.rm = TRUE),
+    max_T_J = max(`temp:jonah`, na.rm = TRUE))
+
+
+regionsGrid <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
+plot(regionsGrid[1])
+regionsGrid <- left_join(regionsGrid, max_rho_temp_by_area)
+regionsGrid <- left_join(regionsGrid, max_rho_by_area)
+
+
+p1 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_R_S))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('R->S')
+p2 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_S_R))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('S->R')
+p3 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_R_J))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('R->J')
+p4 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_J_R))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('J->R')
+p5 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_J_S))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('J->S')
+p6 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_S_J))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
+  ggtitle('S->J')
+
+((p1 + p2) / (p3 + p4) / (p5 + p6) ) +plot_layout(guides = 'collect') #& 
+  #scale_colour_continuous(limits = range(c(-0.3, 0.7)))
+
+t1 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_T_S))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('T->S')
+t2 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_S_T))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('S->T')
+t3 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_T_R))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('T->R')
+t4 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_R_T))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('R->T')
+t5 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_T_J))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('T->J')
+t6 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_J_T))+lims(fill = c(-0.3, .6))+labs(fill=NULL)+ 
+  ggtitle('J->T')
+
+((t1 + t2) / (t3 + t4) / (t5 + t6) ) +plot_layout(guides = 'collect')# & scale_fill_viridis_b()
+
 ########## Neighbors #################
 
 surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
@@ -754,4 +882,16 @@ surveyGrid <- surveyGrid %>%
          Stratum = depth_stra,
          GridID = grid_id, .keep="unused", .before=last_surve)
 
-surveyGrid$area <- paste(surveyGrid$Region, surveyGrid$Stratum)
+surveyGrid$area <- as.integer(paste0(surveyGrid$Region, surveyGrid$Stratum))
+
+regionsGrid <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
+plot(regionsGrid[1])
+
+scalCatchFall<- catchTidy_seasons %>% mutate(area = as.integer(paste0(Region, Stratum))) %>% filter(Type=="catch", Season=="Fall") %>% group_by(area, Species) %>% summarise(avg = mean(value))
+
+scalCatchFall <- left_join(regionsGrid, scalCatchFall)
+
+ggplot(data=scalCatchFall)+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Species)+
+scale_fill_viridis_c(option="F", name="catch")
+
+
