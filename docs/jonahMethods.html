@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Ruby’s Lab Notebook - Summer 2023 - All Posts</title>
+<title>Ruby’s Lab Notebook - Summer 2023 - Methods - Jonah Crab</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -61,38 +93,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -115,7 +116,7 @@ ul.task-list li input[type="checkbox"] {
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
@@ -201,14 +202,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(9)</span></div><div class="category" data-category="Data exploration">Data exploration <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Events">Events <span class="quarto-category-count">(2)</span></div><div class="category" data-category="NEFMC meeting">NEFMC meeting <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Reading">Reading <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Week 1">Week 1 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Week 2">Week 2 <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Week 3">Week 3 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Week 4">Week 4 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Week 5">Week 5 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Week 6">Week 6 <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#load-packages" id="toc-load-packages" class="nav-link active" data-scroll-target="#load-packages">Load packages</a></li>
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import data</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content column-body" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">All Posts</h1>
+<h1 class="title">Methods - Jonah Crab</h1>
 </div>
 
 
@@ -217,297 +225,63 @@ ul.task-list li input[type="checkbox"] {
 
     
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">July 24, 2023</p>
+    </div>
+  </div>
     
   </div>
   
 
 </header>
 
+<section id="load-packages" class="level2">
+<h2 class="anchored" data-anchor-id="load-packages">Load packages</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate) <span class="co">#date formatting</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#combining plots</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rEDM) <span class="co">#EDM</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spatial data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="import-data" class="level2">
+<h2 class="anchored" data-anchor-id="import-data">Import data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_tows<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MEtows.csv"</span>) <span class="co">#tow data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_s_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MEscallopCatch.csv"</span>) <span class="co">#scallop catch</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_r_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MErockCatch.csv"</span>) <span class="co">#rock crab catch</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_j_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MEjonahCatch.csv"</span>) <span class="co">#jonah crab catch</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span><span class="fu">st_read</span>(<span class="st">"~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid"</span>) <span class="co">#CRS: WGS 84/EPSG 4326</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MaineDMR_-_Inshore_Trawl_Survey_Grid' from data source 
+  `/Users/rubykrasnow/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 3698 features and 9 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -70.81288 ymin: 42.86466 xmax: -66.88822 ymax: 44.81316
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>Rename and add variables to survey grid</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>surveyGrid <span class="ot">&lt;-</span> surveyGrid <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Region =</span> region_id,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">Stratum =</span> depth_stra,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">GridID =</span> grid_id, <span class="at">.keep=</span><span class="st">"unused"</span>, <span class="at">.before=</span>last_surve)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>surveyGrid<span class="sc">$</span>area <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">paste0</span>(surveyGrid<span class="sc">$</span>Region, surveyGrid<span class="sc">$</span>Stratum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-       <option value="" disabled="" selected="" hidden="">Order By</option>
-       <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title" data-direction="asc">
-          Title
-        </option>
-         <option value="listing-date-sort" data-direction="asc">
-          Date - Oldest
-        </option>
-         <option value="listing-date-sort" data-direction="desc">
-          Date - Newest
-        </option>
-     </select>
-  </div>
-</div>
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="Week 5,Week 6" data-listing-date-sort="1688875200000" data-listing-file-modified-sort="1689724575186" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
-<a href="./posts/Week5.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Weeks 5 &amp; 6
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 5'); return false;">
-Week 5
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Week 6'); return false;">
-Week 6
-</div>
-</div>
-<div class="card-text listing-description">
-A flurry of activity
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jul 9, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-categories="Week 4,Data exploration,NEFMC meeting" data-listing-date-sort="1688270400000" data-listing-file-modified-sort="1688329266444" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
-<a href="./posts/Week4.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Week 4
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 4'); return false;">
-Week 4
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data exploration'); return false;">
-Data exploration
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('NEFMC meeting'); return false;">
-NEFMC meeting
-</div>
-</div>
-<div class="card-text listing-description">
-My activities for the week
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jul 2, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="2" data-listing-date-sort="1687752000000" data-listing-file-modified-sort="1687808323421" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
-<a href="./posts/SMASTdataExample.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-SMAST Example
-</h5>
-<div class="card-text listing-description">
-Goal: a similar file to the one below, but with time series for each…<em></em>
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 26, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="3" data-categories="Week 3,Reading,Data exploration" data-listing-date-sort="1687492800000" data-listing-file-modified-sort="1687806395224" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
-<a href="./posts/Week3words.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Week 3
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 3'); return false;">
-Week 3
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Reading'); return false;">
-Reading
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data exploration'); return false;">
-Data exploration
-</div>
-</div>
-<div class="card-text listing-description">
-My activities for the week
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 23, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="4" data-categories="Week 2,R" data-listing-date-sort="1686888000000" data-listing-file-modified-sort="1686945965192" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
-<a href="./posts/Week2R.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Week 2 in R
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 2'); return false;">
-Week 2
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-</div>
-<div class="card-text listing-description">
-My activities for the week
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 16, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="5" data-categories="Week 2,Events,Reading,Data exploration" data-listing-date-sort="1686888000000" data-listing-file-modified-sort="1687368041659" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8">
-<a href="./posts/Week2words.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Week 2 in Words
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 2'); return false;">
-Week 2
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Events'); return false;">
-Events
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Reading'); return false;">
-Reading
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data exploration'); return false;">
-Data exploration
-</div>
-</div>
-<div class="card-text listing-description">
-My activities for the week
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 16, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="6" data-categories="Week 2,Data exploration,Reading" data-listing-date-sort="1686715200000" data-listing-file-modified-sort="1686758883349" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
-<a href="./posts/Jun13_14.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-June 13 &amp; 14
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 2'); return false;">
-Week 2
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data exploration'); return false;">
-Data exploration
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Reading'); return false;">
-Reading
-</div>
-</div>
-<div class="card-text listing-description">
-Making progress!
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 14, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="7" data-categories="Week 2,Data exploration,Reading" data-listing-date-sort="1686542400000" data-listing-file-modified-sort="1686609142317" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
-<a href="./posts/Jun12.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-June 12
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 2'); return false;">
-Week 2
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Data exploration'); return false;">
-Data exploration
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Reading'); return false;">
-Reading
-</div>
-</div>
-<div class="card-text listing-description">
-My activities for the day.
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 12, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="8" data-categories="Week 1,Events,Reading" data-listing-date-sort="1686283200000" data-listing-file-modified-sort="1686840026895" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
-<a href="./posts/Week1.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Week 1 in Words
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Week 1'); return false;">
-Week 1
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Events'); return false;">
-Events
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Reading'); return false;">
-Reading
-</div>
-</div>
-<div class="card-text listing-description">
-My first week on the job! Lots of getting organized, reading papers, and learning/refreshing my knowledge of Git, GitHub, R Markdown, Python, and Quarto. We also had our…
-</div>
-<div class="card-attribution card-text-small end">
-<div class="listing-date">
-Jun 9, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

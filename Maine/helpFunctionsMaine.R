@@ -120,13 +120,13 @@ findE_df(scalLogCatchFall_1.1)
 
 ############ Find E and rho - vector input -------------------------------------------------
 
-findE_v <- function(v) {
+findE_v <- function(v, maxE = 7) {
   lib_vec <- paste(1, length(v))
   indices <- c(1:length(v))
   df <- data.frame(indices,v)
   colnames(df)<-c("index", "value")
   #print(df)
-  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = maxE)
   E_out<-rho_E[which.max(rho_E$rho),"E"][1]
   return(E_out)
 }

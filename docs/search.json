@@ -158,13 +158,34 @@
     "href": "posts/Week5.html#monday-july-17th",
     "title": "Weeks 5 & 6",
     "section": "Monday, July 17th",
-    "text": "Monday, July 17th\n\nS-mapping\nRe-ran untransformed data\nCo-prediction script"
+    "text": "Monday, July 17th\n\nS-mapping\nRe-ran untransformed data\nCo-prediction script\nNSF GFRP webinar at 4pm, so couldn’t make it to the Rotjan lab meeting"
   },
   {
     "objectID": "posts/Week5.html#tuesday-july-18",
     "href": "posts/Week5.html#tuesday-july-18",
     "title": "Weeks 5 & 6",
     "section": "Tuesday, July 18",
-    "text": "Tuesday, July 18\n\nLooked at mabmeans data Dr. Hart sent\nStarted working with the data in ts format to remove seasonality, hoping that incorporating the additional data will improve predictability. Read a lot about time series analysis"
+    "text": "Tuesday, July 18\n\nLooked at mabmeans data Dr. Hart sent\nStarted working with the data in ts format to remove seasonality, hoping that incorporating the additional data will improve predictability. Read a lot about time series analysis\nhttps://zanna-researchteam.github.io/"
+  },
+  {
+    "objectID": "jonahMethods.html",
+    "href": "jonahMethods.html",
+    "title": "Methods - Jonah Crab",
+    "section": "",
+    "text": "#Load packages\nlibrary(tidyverse)\nlibrary(lubridate) #date formatting\nlibrary(patchwork) #combining plots\nlibrary(rEDM) #EDM\nlibrary(sf) #for spatial data"
+  },
+  {
+    "objectID": "jonahMethods.html#load-packages",
+    "href": "jonahMethods.html#load-packages",
+    "title": "Methods - Jonah Crab",
+    "section": "",
+    "text": "#Load packages\nlibrary(tidyverse)\nlibrary(lubridate) #date formatting\nlibrary(patchwork) #combining plots\nlibrary(rEDM) #EDM\nlibrary(sf) #for spatial data"
+  },
+  {
+    "objectID": "jonahMethods.html#import-data",
+    "href": "jonahMethods.html#import-data",
+    "title": "Methods - Jonah Crab",
+    "section": "Import data",
+    "text": "Import data\n\ndf_tows&lt;-read.csv(\"data/Maine_inshore_trawl/MEtows.csv\") #tow data\ndf_s_cat&lt;- read.csv(\"data/Maine_inshore_trawl/MEscallopCatch.csv\") #scallop catch\ndf_r_cat&lt;- read.csv(\"data/Maine_inshore_trawl/MErockCatch.csv\") #rock crab catch\ndf_j_cat&lt;- read.csv(\"data/Maine_inshore_trawl/MEjonahCatch.csv\") #jonah crab catch\n\nsurveyGrid &lt;-st_read(\"~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid\") #CRS: WGS 84/EPSG 4326\n\nReading layer `MaineDMR_-_Inshore_Trawl_Survey_Grid' from data source \n  `/Users/rubykrasnow/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid' \n  using driver `ESRI Shapefile'\nSimple feature collection with 3698 features and 9 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: -70.81288 ymin: 42.86466 xmax: -66.88822 ymax: 44.81316\nGeodetic CRS:  WGS 84\n\n\nRename and add variables to survey grid\n\nsurveyGrid &lt;- surveyGrid %&gt;% \n  mutate(Region = region_id,\n         Stratum = depth_stra,\n         GridID = grid_id, .keep=\"unused\", .before=last_surve)\n\nsurveyGrid$area &lt;- as.numeric(paste0(surveyGrid$Region, surveyGrid$Stratum))"
   }
 ]

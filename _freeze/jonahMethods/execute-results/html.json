@@ -1,0 +1,14 @@
+{
+  "hash": "024b91000bd2378c7a10ca1fecadfe49",
+  "result": {
+    "markdown": "---\ntitle: 'Methods - Jonah Crab'\ndate-modified: '2023-07-24'\nexecute: \n  message: false\n  warning: false\neditor_options: \n  chunk_output_type: console\n---\n\n\n## Load packages\n\n::: {.cell}\n\n```{.r .cell-code}\n#Load packages\nlibrary(tidyverse)\nlibrary(lubridate) #date formatting\nlibrary(patchwork) #combining plots\nlibrary(rEDM) #EDM\nlibrary(sf) #for spatial data\n```\n:::\n\n\n## Import data\n\n::: {.cell}\n\n```{.r .cell-code}\ndf_tows<-read.csv(\"data/Maine_inshore_trawl/MEtows.csv\") #tow data\ndf_s_cat<- read.csv(\"data/Maine_inshore_trawl/MEscallopCatch.csv\") #scallop catch\ndf_r_cat<- read.csv(\"data/Maine_inshore_trawl/MErockCatch.csv\") #rock crab catch\ndf_j_cat<- read.csv(\"data/Maine_inshore_trawl/MEjonahCatch.csv\") #jonah crab catch\n\nsurveyGrid <-st_read(\"~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid\") #CRS: WGS 84/EPSG 4326\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nReading layer `MaineDMR_-_Inshore_Trawl_Survey_Grid' from data source \n  `/Users/rubykrasnow/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid' \n  using driver `ESRI Shapefile'\nSimple feature collection with 3698 features and 9 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: -70.81288 ymin: 42.86466 xmax: -66.88822 ymax: 44.81316\nGeodetic CRS:  WGS 84\n```\n:::\n:::\n\n\nRename and add variables to survey grid\n\n::: {.cell}\n\n```{.r .cell-code}\nsurveyGrid <- surveyGrid %>% \n  mutate(Region = region_id,\n         Stratum = depth_stra,\n         GridID = grid_id, .keep=\"unused\", .before=last_surve)\n\nsurveyGrid$area <- as.numeric(paste0(surveyGrid$Region, surveyGrid$Stratum))\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

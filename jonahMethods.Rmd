@@ -1,0 +1,526 @@
+---
+title: 'Methods - Jonah Crab'
+date-modified: '2023-07-24'
+execute: 
+  message: false
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Load packages
+```{r}
+#Load packages
+library(tidyverse)
+library(lubridate) #date formatting
+library(patchwork) #combining plots
+library(viridis)
+library(rEDM) #EDM
+library(sf) #for spatial data
+```
+
+## Import data
+```{r}
+df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
+df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
+df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
+df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
+
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
+```
+
+Rename and add variables to survey grid
+```{r}
+surveyGrid <- surveyGrid %>% 
+  mutate(Region = region_id,
+         Stratum = depth_stra,
+         GridID = grid_id, .keep="unused", .before=last_surve)
+
+surveyGrid$area <- as.numeric(paste0(surveyGrid$Region, surveyGrid$Stratum))
+```
+
+Define function cleanCatch and apply to the three catch data files
+```{r}
+cleanCatch <- function(x) {
+  full_join(x, df_tows) %>%
+    arrange(Survey, Tow_Number) %>% 
+    select(-c("Stratum", "Subsample_Weight_kg", "Subsample_Weight_kg_2", "Male_Wt_kg", "Female_Wt_kg","Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "End_Latitude","End_Longitude", "Air_Temp", "Tow_Time")) %>%
+    mutate(Number_Caught = replace_na(Number_Caught,0),
+           Weight_kg = replace_na(Weight_kg,0),
+           Expanded_Catch = replace_na(Expanded_Catch,0),
+           Expanded_Weight_kg = replace_na(Expanded_Weight_kg,0)) %>% 
+    mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused") %>%
+    mutate(area = as.numeric(paste0(Region, Stratum)),.before= Survey)
+}
+
+s_cat_clean_seasons <- cleanCatch(df_s_cat) %>% 
+mutate(Common_Name = "Scallop")
+
+r_cat_clean_seasons <- cleanCatch(df_r_cat) %>% 
+  mutate(Common_Name = "Rock")
+
+j_cat_clean_seasons <- cleanCatch(df_j_cat) %>% 
+  mutate(Common_Name = "Jonah")
+
+```
+
+Reorder columns so the dataframes are easier to work with
+```{r}
+#Reorder columns
+colOrder<-c("area", "Survey", "Tow_Number", "Region", "Stratum", "Expanded_Catch", 
+            "Expanded_Weight_kg", "Date", "Common_Name", "Number_Caught", "Weight_kg",
+            "Start_Latitude", "Start_Longitude","Season",
+            "Year","Grid", "Start_Depth_fathoms", "End_Depth_fathoms",
+            "Bottom_WaterTemp_DegC", "Bottom_Salinity")
+
+j_cat_clean_seasons <- j_cat_clean_seasons %>% select(all_of(colOrder))
+r_cat_clean_seasons <- r_cat_clean_seasons %>% select(all_of(colOrder))
+s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
+```
+
+Define a function, summaryCatch, to summarize over tows for each area (area = region/stratum combination) and apply to all three species.
+```{r}
+summaryCatch <- function(df) {
+  df %>% group_by(area, Season, Year, Region, Stratum) %>%
+    summarise(avgCatch = mean(Expanded_Catch),
+              avgWt = mean(Expanded_Weight_kg)) 
+}
+
+#computes averages for each study area (area = region-stratum combination)
+j_cat_sum_seasons <- summaryCatch(j_cat_clean_seasons)
+r_cat_sum_seasons <- summaryCatch(r_cat_clean_seasons)
+s_cat_sum_seasons <- summaryCatch(s_cat_clean_seasons)
+```
+
+Combine the three separate dataframes
+```{r}
+catch_seasons <- s_cat_sum_seasons %>% left_join(j_cat_sum_seasons, by=c("area", "Season", "Region", "Stratum", "Year"), suffix = c("_s", "_j"))
+
+catch_seasons <- catch_seasons %>% left_join(r_cat_sum_seasons, by=c("area", "Season", "Region", "Stratum", "Year")) %>% 
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
+```
+
+Now make it ~tidy~ and convert area, Species, Season, Region, and Stratum to factors.
+```{r}
+catchTidy_seasons <- pivot_longer(catch_seasons, 
+                          cols = 6:ncol(catch_seasons)) %>% 
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>% 
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy_seasons <- catchTidy_seasons %>% 
+  mutate(area = as.factor(area), Species = as.factor(Species),Season = as.factor(Season),Region = as.factor(Region), Stratum = as.factor(Stratum)) %>% 
+  select(-name)
+```
+
+The complete function will turn implicit missing values into explicit ones. In this case, Stratum 4 was not surveyed until 2003, so this will add in the appropriate NA values for 2000-2002. We do this for both the tidy version and the original/long version. Turning Fall/Spring and Year into specific dates makes for easier plotting, although they may be slightly different than the original dates that were associated with individual tows.
+```{r}
+catch_complete <- complete(data=catch_seasons %>% ungroup(), Region, Stratum, Season, Year) %>% 
+  mutate(area = paste(Region, Stratum)) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% 
+  filter(date != "2000-05-01")
+
+catchTidy_complete<- complete(data = catchTidy_seasons %>% ungroup() %>%  filter(Type=="catch"),  Region, Stratum, Season, Year) %>% 
+        mutate(area = as.numeric(paste0(Region, Stratum))) %>% 
+        mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% filter(date != "2000-05-01")
+
+```
+
+Parse the date column
+```{r}
+catch_complete <- catch_complete %>% mutate(date = lubridate::ymd(date))
+catchTidy_complete <- catchTidy_complete %>% mutate(date = lubridate::ymd(date))
+```
+
+First, we look at trends in overall abundance:
+```{r}
+#line graph of abundance over time by season, no spatial distinction
+ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+```
+
+For comparison, we also plot the catch time series of Jonah crabs alongside rock crabs, both overall and separated by season:
+```{r}
+ggplot(data = catchTidy_complete %>% filter(Type == "catch", Species != "scallop") %>% group_by(date, Species) %>% 
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)+labs(y="catch")+theme_classic()
+#a lot more variation in the jonah crabs
+
+
+ggplot(data = catchTidy_complete %>% filter(Type == "catch", Species != "scallop") %>% group_by(Year, Season, Species) %>% 
+          summarise(avg = mean(value, na.rm = TRUE)), aes(x=Year, y=avg))+geom_line()+facet_grid(Season~Species)+labs(y="catch")+theme_classic()
+#a lot more variation in the jonah crabs
+```
+
+Fluctuations in catch of rock crabs appear smaller and more regular than for Jonah crabs.
+
+Now we'll incorporate the spatial aspect of the data. We start by looking at abundance of Jonah and rock crabs averaged from 2000-2022,
+```{r}
+regionsGrid_orig <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
+regionsGrid <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Type=="catch",) %>% group_by(area, date, Species) %>% summarise(avg = mean(value)))
+
+ggplot(data=regionsGrid %>% filter(Species != "scallop") %>% group_by(Species, area) %>% summarise(avg = mean(avg)))+geom_sf(aes(fill=avg))+facet_wrap(~Species)+scale_fill_viridis_c()
+
+```
+
+We can also separate by seasons:
+```{r}
+regionsGrid_seasons <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Type=="catch",) %>% group_by(area, date, Species, Season) %>% summarise(avg = mean(value)))
+
+#Jonah and rock crabs
+ggplot(data=regionsGrid_seasons %>% filter(Species != "scallop") %>% group_by(area, Species, Season) %>% summarize(avg = mean(avg, na.rm=TRUE)))+geom_sf(aes(fill=avg))+facet_grid(Season~Species)+scale_fill_viridis_c(option = "F", name="avg catch")
+
+# Jonah crab only
+#ggplot(data=regionsGrid_seasons %>% filter(Species == "jonah") %>% group_by(area, Season) %>% summarize(avg = mean(avg)))+geom_sf(aes(fill=avg))+facet_wrap(~Season)+scale_fill_viridis_c()
+
+```
+
+We look at seasonal movement by year:
+```{r}
+jonahCatch <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Species=="jonah"))
+
+jonahCatchFall <- jonahCatch %>% filter(Season == "Fall", Type == "catch") %>% rename(valueFall = value) %>% select(-c("Season", "date"))
+jonahCatchSpring <- jonahCatch %>% filter(Season == "Spring", Type == "catch") %>% st_drop_geometry() %>% rename(valueSpring = value) %>% select(-c("Season", "date"))
+
+jonahCatchDiff <- left_join(jonahCatchFall, jonahCatchSpring) %>% arrange(area, Year)
+jonahCatchDiff <- jonahCatchDiff %>% mutate(diff = valueFall -valueSpring)
+
+#difference fall vs spring by year
+ggplot(data = jonahCatchDiff %>% filter(Type=="catch") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
+scale_fill_viridis_b(name="fall catch minus spring catch")
+
+#difference fall vs spring by year and area
+ggplot(data = jonahCatchDiff %>% filter(Type=="catch") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
+scale_fill_viridis_b(name="fall catch minus spring catch")+facet_wrap(~Year)
+
+seasonalDiff_by_area<- jonahCatchDiff %>% st_drop_geometry() %>% group_by(area) %>% summarise(avg = mean(diff, na.rm=TRUE), sd = sd(diff, na.rm=TRUE))
+seasonalDiff_by_area
+
+```
+
+For EDM, we want the time series to be as long as possible, so instead of considering seasons separately, we utilize the entire time series but take second-differences (i.e., x(t) = x(t)-x(t-2)) to remove the seasonal effect. Unfortunately, because of COVID, we are also going to get rid of the data after the missed Spring 2020 survey, since we can't take second-differences with NA values and we want to avoid linear interpolation that may obscure nonlinear system dynamics.
+
+```{r}
+lag2 <- function(x) {
+  x_lagged <- (x - lag(x, 2))
+  return(x_lagged)
+}  # test with lag2(c(1, 3, 3, 5, 6, 9, 12))
+
+catch_complete_diff <- catch_complete %>% arrange(date) %>% group_by(area) %>% 
+  mutate(across(where(is.double) & !date, lag2)) %>% 
+  arrange(area) %>% 
+  filter(date != "2000-11-01" & date != "2001-05-01") %>%  filter(date < as.Date("2020-05-01"))
+
+#Tidy it up
+complete_tidy_diff <- pivot_longer(catch_complete_diff,cols = 7:ncol(catch_complete)) %>% 
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt",
+    startsWith(name,"avgLogWt") ~"logWt",
+    startsWith(name,"avgLogCatch") ~"logCatch")) %>% 
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah")) %>%
+  mutate(area = as.factor(area), Species = as.factor(Species),
+         Region = as.factor(Region), Type = as.factor(Type),
+         Stratum = as.factor(Stratum)) %>% 
+  select(-name)
+```
+
+Let's look at the differenced data:
+```{r}
+#All areas on one graph, split by species
+ggplot(data = complete_tidy_diff %>% 
+         filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) +labs(y="2nd-differenced catch", x="Year")
+
+#Averaged across areas, split by species
+ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop") %>% group_by(date, Species) %>% 
+    summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)+theme_classic()+labs(y="2nd-differenced catch", x="Year")
+
+#Colored by species, split by area
+ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=Species))+geom_line()+facet_grid(Region~Stratum)+labs(x="Depth stratum", y="Region")+theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
+
+
+```
+
+As we noted earlier, there appears to be much more variation in Jonah crab abundance compared to the rock crabs, although not in every area.
+
+We start our EDM analyses by looking at the dynamics of the system in aggregate, averaged across all areas. First we look at embedding dimension using Simplex projection with leave-one-out cross-validation:
+```{r}
+EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
+                 summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                 ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37")
+
+
+EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="wt") %>% group_by(date) %>% 
+                 summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                 ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37")
+```
+
+The optimal embedding dimension is the one with the highest predictive skill. For both catch and weight, E=2 has the highest rho value, although neither measure of abundance shows particularly high rho values.
+
+We will also use S-mapping to evaluate nonlinearity, with E=2:
+```{r}
+PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
+                   summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                   ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37", E=2)
+
+PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="wt") %>% group_by(date) %>% 
+                   summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                   ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37", E=2)
+```
+
+We can see that both catch and weight are better represented by a nonlinear model (theta >0) than a linear one. In addition, the predictive skill of the s-map projections is higher than the Simplex models.
+
+Now we want to see how these characteristics change at different spatial scales.
+We will first define some useful functions to more efficiently repeat the previous tests:
+```{r}
+############ Find E and rho - vector input -------------------------------------------------
+
+findE_v <- function(v, maxE = 7) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = maxE)
+  E_out<-rho_E[which.max(rho_E$rho),"E"][1]
+  return(E_out)
+}
+
+findErho_v <- function(v) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  rho_out<-rho_E[which.max(rho_E$rho),"rho"][1]
+  return(rho_out)
+}
+
+############ Find Theta and rho - vector input -------------------------------------------------
+
+findTheta_v <- function(v, E) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_Theta<- PredictNonlinear(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", E=E)
+  Theta_out<-rho_Theta[which.max(rho_Theta$rho),"Theta"][1]
+  return(Theta_out)
+}
+
+findThetaRho_v <- function(v, E) {
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_Theta<- PredictNonlinear(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", E=E)
+  Rho_out<-rho_Theta[which.max(rho_Theta$rho),"rho"][1]
+  return(Rho_out)
+}
+
+############ findSpeciesE & findSpeciesErho -------------------------------------------------------
+
+#returns a tibble with the optimal embedding dimension for time series from each region/stratum combination
+#Find species E
+findSpeciesE <- function(df, season=NULL, type) {
+  if (is.null(season)) {
+    df_out <- df %>% 
+      filter(Type == type) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(E_opt = findE_v(value)) %>%
+      pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
+      ungroup() %>% 
+      select(-Region)
+  }
+  else {
+  
+  df_out <- df %>% 
+    filter(Type == type, Season == season) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(E_opt = findE_v(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = E_opt) %>% 
+    ungroup() %>% 
+    select(-Region) }
+  
+  return(df_out)
+}
+
+#Find predictive skill for Simplex with optimal E
+findSpeciesErho <- function(df, season=NULL, type) {
+  if (is.null(season)) {
+  df_out <- df %>% 
+    filter(Type == type) %>% 
+    group_by(Region, Stratum) %>% 
+    select(Year, value) %>%
+    summarise(E_opt_rho = findErho_v(value)) %>%
+    pivot_wider(names_from = Stratum, values_from = E_opt_rho) %>% 
+    ungroup() %>% 
+    select(-Region) }
+  
+  else {
+    df_out <- df %>% 
+      filter(Type == type, Season == season) %>% 
+      group_by(Region, Stratum) %>% 
+      select(Year, value) %>%
+      summarise(E_opt_rho = findErho_v(value)) %>%
+      pivot_wider(names_from = Stratum, values_from = E_opt_rho) %>% 
+      ungroup() %>% 
+      select(-Region)
+    
+  }
+  return(df_out)
+}
+
+############ findSpeciesTheta -------------------------------------------------------
+
+findSpeciesTheta <- function(df, season=NULL, type) {
+  df_E <- findSpeciesE(df=df, season=season, type=type)
+  
+  findE <- function (reg, strat) {
+     E <- as.integer(df_E %>% slice(reg) %>% pull(strat))
+    return(E) 
+    }
+  
+  if (is.null(season)) {
+    df_out <- df %>%
+      filter(Type == type) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
+      group_by(Region, Stratum) %>%
+      summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+      ungroup() %>%
+      select(-Region) }
+  
+  else {
+      df_out <- df %>%
+        filter(Type == type, Season==season) %>%
+        mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+        rowwise() %>% 
+        mutate(E = findE(reg=E_row, strat=E_col)) %>%
+        group_by(Region, Stratum) %>%
+        summarise(Theta_opt =  findTheta_v(value, E[1])) %>%
+        pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+        ungroup() %>%
+        select(-Region) }
+  
+  return(df_out)
+}
+#Find predictive skill for s-map with optimal E and theta
+findSpeciesTheta_rho <- function(df, season=NULL, type) {
+  df_E <- findSpeciesE(df=df, season=season, type=type)
+  
+  findE <- function (reg, strat) {
+    E <- as.integer(df_E %>% slice(reg) %>% pull(strat))
+    return(E) 
+  }
+  
+  if (is.null(season)) {
+    df_out <- df %>%
+      filter(Type == type) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
+      group_by(Region, Stratum) %>%
+      summarise(Theta_opt =  findThetaRho_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+      ungroup() %>%
+      select(-Region) }
+  
+  else {
+    df_out <- df %>%
+      filter(Type == type, Season==season) %>%
+      mutate(E_row = as.integer(Region), E_col = as.integer(Stratum)) %>% 
+      rowwise() %>% 
+      mutate(E = findE(reg=E_row, strat=E_col)) %>%
+      group_by(Region, Stratum) %>%
+      summarise(Theta_opt =  findThetaRho_v(value, E[1])) %>%
+      pivot_wider(names_from = Stratum, values_from = Theta_opt) %>%
+      ungroup() %>%
+      select(-Region) }
+  
+  return(df_out)
+}
+
+```
+
+Now we apply the functions to the catch data:
+```{r}
+jonah_catchE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch") 
+jonah_catchE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")%>% round(digits=3)
+
+jonah_catch_theta<- findSpeciesTheta(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")
+jonah_catch_theta_rho<- findSpeciesTheta_rho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")
+```
+
+And repeat for the weight data:
+```{r}
+jonah_wtE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt") 
+jonah_wtE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")%>% round(digits=3)
+
+jonah_wt_theta<- findSpeciesTheta(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")
+jonah_wt_theta_rho<- findSpeciesTheta_rho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")
+```
+
+Let's take a look:
+```{r}
+jonah_catchE
+jonah_catchE_rho
+
+jonah_catch_theta
+jonah_catch_theta_rho
+
+jonah_wtE
+jonah_wtE_rho
+
+jonah_wt_theta
+jonah_wt_theta_rho
+```
+
+The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho >0.7).
+
+The lowered-number regions and strata (further south and closer inshore, respectively) appear to be generally more predictable than the outer strata and more northern regions. This seems reminiscent of the geographical area (in square miles) and number of tows allocated to each region/stratum combination. Let's test this by first creating data frames with the numbers from the ME-NH Inshore Trawl Survey protocols and procedures manual.
+
+```{r}
+sq_miles <- data.frame(c(253.27, 279.63, 259.62, 205.3, 138.54), c(214.22, 191.23, 262.9, 206.12, 220.49), c(227.35, 211.66, 280.03, 310.49, 365.04), c(225.65, 263.49, 183.69, 170.72, 196.11))
+colnames(sq_miles)<- colnames(jonah_catchE)
+
+tows_per_area <- data.frame(c(6, 7, 6, 5, 4), c(6, 5, 7, 5, 6), c(6, 6, 7, 8, 9), c(5, 5, 4, 4, 4))
+colnames(tows_per_area)<- colnames(jonah_catchE)
+
+sq_miles_v <- c(as.matrix(sq_miles))
+tows_v <- c(as.matrix(tows_per_area))
+
+jonah_catchE_v <- c(as.matrix(jonah_catchE))
+jonah_catchE_rho_v <- c(as.matrix(jonah_catchE_rho))
+jonah_catch_theta_v <- c(as.matrix(jonah_catch_theta))
+jonah_catch_theta_rho_v <- c(as.matrix(jonah_catch_theta_rho))
+jonah_wtE_v <- c(as.matrix(jonah_wtE))
+jonah_wtE_rho_v <- c(as.matrix(jonah_wtE_rho))
+jonah_wt_theta_v <- c(as.matrix(jonah_wt_theta))
+jonah_wt_theta_rho_v <- c(as.matrix(jonah_wt_theta_rho))
+
+corDf <- data.frame(sq_miles_v, tows_v, jonah_catchE_v, jonah_catchE_rho_v, jonah_catch_theta_v, jonah_catch_theta_rho_v, jonah_wtE_v, jonah_wtE_rho_v, jonah_wt_theta_v, jonah_wt_theta_rho_v)
+areaList <- c(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54)
+
+library(corrplot)
+corrplot(cor(corDf), method = "circle", order = 'hclust', type="lower", diag=FALSE)
+
+testRes = cor.mtest(corDf, conf.level = 0.95, method="spearman")
+
+corrplot(cor(corDf), method = "circle", order = 'hclust', type="lower", diag=FALSE, p.mat = testRes$p, sig.level = c(0.001, 0.01, 0.05), pch.cex = 0.9,
+         insig = 'label_sig', pch.col = 'grey20')
+```
+
+Key takeaways: 
+(1) Weight E and catch E are positively correlated, as are weight theta and catch theta
+(2) Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping
+(3) Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity
+(4) The size of an area (in sq miles) is not significantly correlated with any of the other metrics. Number of tows per area appeared significantly (using Spearman's method) with catch Simplex rho (positive correlation) and weight nonlinearity (negative correlation), but the strength of the correlations was not very strong, and it is likely that this is a case of statistical significance without practical/biological significance.

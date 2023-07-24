@@ -4,6 +4,9 @@
 # library(ggfortify)
 # library(xts)
 # library(tseries) #for KPSS test for stationarity
+#library(forecast)
+#library(seastests)
+
 
 
 # NOAA stuff --------------------------------------------------------------
@@ -334,6 +337,8 @@ for (i in 1:5) {
 # logWt %>% group_by(area, Species) %>% arrange(Year) %>% select(value) %>% 
 #   group_map(~ts(., frequency = 2, start=c(2000, 2)))
 
+catch_ts <- read.zoo(catchTidy_seasons_complete, index.column = "date")
+
 # logWt_complete <- complete(data=logWt %>% ungroup(), date, Species, Region, Stratum, explicit = TRUE) %>% mutate(area = paste(Region, Stratum), Type="logWt") %>% select(date, Species, area, value)
 
 # logWt_areas <- logWt_complete %>% group_by(area, Species) %>% arrange(date) %>% select(value) %>% 
@@ -341,6 +346,10 @@ for (i in 1:5) {
 # 
 # logWt_areas2 <- logWt_complete %>% group_by(area) %>% arrange(date) %>% select(Species, value) %>% 
 #   group_map(~ts(., frequency = 2, start=c(2000, 2)))
+
+# 
+# jonah_ts <- catch_complete_diff %>% group_by(area) %>% arrange(date) %>% select(avgLogWt_s) %>%
+#   group_map(~ts(., frequency = 2, start=c(2000, 2)))# .keep = FALSE))
 
 
 # logWt_ts <- ts(logWt, frequency = 2)
@@ -481,3 +490,13 @@ max_rho_by_area_tp0<- RESULTS_ccm_combos_by_area_tp0 %>% group_by(area) %>% summ
   min_lib = min(LibSize))
 
 tibble(as.matrix(max_rho_by_area) - as.matrix(max_rho_by_area_tp0))
+
+library(mgcv)
+jonahGAM <- gam(rho ~ region + stratum, data=jonah_E_rho_long)
+summary(jonahGAM)
+
+ggplot(data=regionsGrid %>% filter(Species != "scallop"))+geom_sf(aes(fill=avg))+facet_wrap(~Species)+scale_fill_gradientn(colors = viridis_pal(option="F")(9),limits=c(0, 5))
+
+ggplot(data=regionsGrid_seasons %>% filter(Species != "scallop"))+geom_sf(aes(fill=log(avg+1)))+facet_grid(Season~Species)+ scale_fill_gradientn(colors = viridis_pal(option="F")(9),limits=c(0, 2.5))
+
+ggplot(data=regionsGrid_seasons %>% filter(Species == "jonah"))+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Season)+ scale_fill_gradientn(colors = viridis_pal(option="D")(9),limits=c(0, 2.1))

@@ -1,14 +1,12 @@
 # Analysis using both seasons of ME-NH survey data
 #Ruby Krasnow
-#Last modified: July 21, 2023
+#Last modified: July 24, 2023
 
 #Load packages
 library(tidyverse)
 library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(rEDM) #EDM
-#library(forecast)
-#library(seastests)
 library(clipr) #Copying code to keyboard
 
 #spatial packages
@@ -72,9 +70,6 @@ catch_complete <- complete(data=catch_seasons %>% ungroup(), Region, Stratum, Se
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% 
   filter(date != "2000-05-01")
 
-#catch_ts <- catch_complete %>% group_by(area) %>% arrange(date) %>% select(avgLogWt_s) %>% 
-#  group_map(~ts(., frequency = 2, start=c(2000, 2)))# .keep = FALSE))
-
 catch_complete <- catch_complete %>% mutate(date = lubridate::ymd(date))
 
 lag2 <- function(x) {
@@ -113,8 +108,31 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "wt") %>% group_by(date, Spe
     summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)
 #a lot more variation in the jonah crabs
 
+catchCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>% 
+  select(date, Region, Stratum, area, avgCatch_s, avgCatch_r, avgCatch_j) %>% 
+  rename(rock = avgCatch_r , scallop = avgCatch_s , jonah= avgCatch_j)  %>% 
+  mutate(area = as.integer(paste0(Region, Stratum)))
+
+wtCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>% 
+  select(date, Region, Stratum, area, avgWt_s, avgWt_r, avgWt_j) %>% 
+  rename(rock = avgWt_r , scallop = avgWt_s , jonah= avgWt_j)  %>% 
+  mutate(area = as.integer(paste0(Region, Stratum)))
+
 catchCCMdf_agg <- catchCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, mean))
 wtCCMdf_agg <- wtCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, mean))
+
+addDirection <- function(df) {
+  df_out <- df %>% 
+    mutate(xmap = case_when(predator=="jonah" & prey=="scallop" & direction=="predator -> prey" ~ "jonah -> scallop",
+                            predator=="jonah" & prey=="scallop" & direction=="prey -> predator" ~ "scallop -> jonah",
+                            predator=="rock" & prey=="scallop" & direction=="predator -> prey" ~ "rock -> scallop",
+                            predator=="rock" & prey=="scallop" & direction=="prey -> predator" ~ "scallop -> rock",
+                            predator=="jonah" & prey=="rock" & direction=="predator -> prey" ~ "jonah -> rock",
+                            predator=="jonah" & prey=="rock" & direction=="prey -> predator" ~ "rock -> jonah"))
+  return(df_out)
+}
+
+combos <- c("jonah:scallop", "scallop:jonah", "rock:scallop", "scallop:rock","jonah:rock","rock:jonah")
 
 # Aggregate stats ---------------------------------------------------------
 
@@ -152,8 +170,10 @@ RESULTS_ccm_combos_aggregate <- pmap_dfr(params_ccm_combos,function(predator,pre
   rho_E_2<- EmbedDimension(dataFrame = catchCCMdf_agg, lib = lib_vec, pred = lib_vec, 
                            columns = prey,target = predator, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  
   out_2 <- CCM(dataFrame= catchCCMdf_agg, columns=prey, target=predator, E = E_out_2, Tp=1, 
-               libSizes = paste(E_out_2+2, nrow(catchCCMdf_agg)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)%>%
+               libSizes = paste(E_out_2+2, nrow(catchCCMdf_agg)-E_out_2, "1",sep=" "), 
+               sample=100, verbose=FALSE, showPlot = FALSE) %>%
     mutate(predator=predator,
            prey=prey,
            direction= paste("prey","->","predator"),
@@ -298,26 +318,11 @@ do_xmap_ID(df=complete_tidy_diff %>% filter(Species=="scallop", Type=="wt") %>%
 
 ################################################ Multispatial CCM - catch ########################
 
-catchCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>% 
-  select(date, Region, Stratum, area, avgCatch_s, avgCatch_r, avgCatch_j) %>% 
-  rename(rock = avgCatch_r , scallop = avgCatch_s , jonah= avgCatch_j)  %>% 
-  mutate(area = as.integer(paste0(Region, Stratum)))
-
-
 
 v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
                 "rmse_linear","perc_linear","p_val_linear", "predator", "prey", "direction")
 
-addDirection <- function(df) {
-  df_out <- df %>% 
-    mutate(xmap = case_when(predator=="jonah" & prey=="scallop" & direction=="predator -> prey" ~ "jonah -> scallop",
-                            predator=="jonah" & prey=="scallop" & direction=="prey -> predator" ~ "scallop -> jonah",
-                            predator=="rock" & prey=="scallop" & direction=="predator -> prey" ~ "rock -> scallop",
-                            predator=="rock" & prey=="scallop" & direction=="prey -> predator" ~ "scallop -> rock",
-                            predator=="jonah" & prey=="rock" & direction=="predator -> prey" ~ "jonah -> rock",
-                            predator=="jonah" & prey=="rock" & direction=="prey -> predator" ~ "rock -> jonah"))
-  return(df_out)
-}
+
 
 # Areas as replicates
 RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(predator,prey){
@@ -381,10 +386,7 @@ RESULTS_ccm_combos_strata <- pmap_dfr(params_ccm_combos,function(predator,prey){
 
 ################################################ Multispatial CCM - weight ########################
 
-wtCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>% 
-  select(date, Region, Stratum, area, avgWt_s, avgWt_r, avgWt_j) %>% 
-  rename(rock = avgWt_r , scallop = avgWt_s , jonah= avgWt_j)  %>% 
-  mutate(area = as.integer(paste0(Region, Stratum)))
+
 
 # Areas as replicates - weight
 RESULTS_ccm_combos_areas_wt <- pmap_dfr(params_ccm_combos,function(predator,prey){
@@ -520,7 +522,7 @@ RESULTS_ccm_combos_by_area_wt <- pmap_dfr(params_areas_ccm_combos,function(preda
 }) %>% addDirection()
 
 ccm_col_order <- c("LibSize", "xmap", "area", "E", "jonah:scallop", "scallop:jonah", "rock:scallop", "scallop:rock","jonah:rock","rock:jonah")
-combos <- c("jonah:scallop", "scallop:jonah", "rock:scallop", "scallop:rock","jonah:rock","rock:jonah")
+
 
 RESULTS_ccm_combos_by_area <- RESULTS_ccm_combos_by_area %>% select(all_of(ccm_col_order))
 RESULTS_ccm_combos_by_area_wt <- RESULTS_ccm_combos_by_area_wt %>% select(all_of(ccm_col_order))
@@ -572,8 +574,6 @@ no_convergence_wt <- pivot_longer(min_max_lib_wt, cols=3:8) %>% na.omit() %>%
   filter(delta_rho <=0)
 
 conv_table_wt <- data.frame(rbind(table(converges_wt$name), table(no_convergence_wt$name))) %>% mutate(conv = c("Yes", "No"), .before=1)
-
-#regionsGrid_CCM<- left_join(regionsGrid, max_rho_by_area)
 
 #ggplot(data=pivot_longer(regionsGrid_tp1, cols=4:ncol(regionsGrid_tp1)))+geom_sf(aes(fill=value))+
 #scale_fill_viridis_b()+facet_wrap(~name)
@@ -836,12 +836,6 @@ max_rho_temp_by_area <- RESULTS_ccm_temp_by_area %>% group_by(area) %>%
     max_T_J = max(`temp:jonah`, na.rm = TRUE))
 
 
-regionsGrid <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
-plot(regionsGrid[1])
-regionsGrid <- left_join(regionsGrid, max_rho_temp_by_area)
-regionsGrid <- left_join(regionsGrid, max_rho_by_area)
-
-
 p1 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_R_S))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
   ggtitle('R->S')
 p2 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_S_R))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
@@ -884,14 +878,48 @@ surveyGrid <- surveyGrid %>%
 
 surveyGrid$area <- as.integer(paste0(surveyGrid$Region, surveyGrid$Stratum))
 
-regionsGrid <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
-plot(regionsGrid[1])
+regionsGrid_orig <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
+plot(regionsGrid_orig[1])
+regionsGrid <- left_join(regionsGrid_orig, max_rho_temp_by_area)
+regionsGrid <- left_join(regionsGrid_orig, max_rho_by_area)
 
 scalCatchFall<- catchTidy_seasons %>% mutate(area = as.integer(paste0(Region, Stratum))) %>% filter(Type=="catch", Season=="Fall") %>% group_by(area, Species) %>% summarise(avg = mean(value))
 
-scalCatchFall <- left_join(regionsGrid, scalCatchFall)
+scalCatchFall <- left_join(regionsGrid_orig, scalCatchFall)
+
+scalCatchSpring<- catchTidy_seasons %>% mutate(area = as.integer(paste0(Region, Stratum))) %>% filter(Type=="catch", Season=="Spring") %>% group_by(area, Species) %>% summarise(avg = mean(value))
+
+scalCatchSpring <- left_join(regionsGrid_orig, scalCatchSpring)
 
 ggplot(data=scalCatchFall)+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Species)+
 scale_fill_viridis_c(option="F", name="catch")
 
+ggplot(data=scalCatchFall %>% filter(Species != "scallop"))+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Species)+
+  scale_fill_viridis_c(option="F", name="log catch")
 
+ggplot(data=scalCatchSpring %>% filter(Species != "scallop"))+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Species)+
+  scale_fill_viridis_c(option="F", name="log catch")
+
+jonahCatch <- left_join(regionsGrid_orig, catchTidy_seasons %>% mutate(area = as.integer(paste0(Region, Stratum))) %>% filter(Species=="jonah"))
+                        #%>% group_by(area, Type, Season) %>% summarise(avg = mean(value)))
+
+jonahCatchFall <- jonahCatch %>% filter(Season == "Fall", Type == "catch") %>% rename(valueFall = value) %>% select(-Season)
+jonahCatchSpring <- jonahCatch %>% filter(Season == "Spring", Type == "catch") %>% st_drop_geometry() %>% rename(valueSpring = value) %>% select(-Season)
+
+jonahCatchDiff <- left_join(jonahCatchFall, jonahCatchSpring) %>% arrange(area, Year)
+jonahCatchDiff <- jonahCatchDiff %>% mutate(diff = valueFall -valueSpring)
+
+#difference fall vs spring by year
+ggplot(data = jonahCatchDiff %>% filter(Type=="catch") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
+scale_fill_viridis_b(name="fall catch minus spring catch")+facet_wrap(~Year)
+
+#Fall catch by year
+ggplot(data = jonahCatch %>% filter(Type=="catch", Season=="Fall") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=value))+
+  scale_fill_viridis_b()+facet_wrap(~Year)
+
+#line graph of abundance over time by season, no spatial distinction
+ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+
+
+
+                                                                                                                                                       
