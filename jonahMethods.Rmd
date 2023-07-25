@@ -7,6 +7,7 @@ execute:
 editor_options: 
   chunk_output_type: console
 ---
+Our approach here will be to utilize the multiple spatial scales and different metrics of abundance (weight/biomass, in kg, and catch per tow) to identify recurring patterns/trends in the dynamics of Jonah crab in the Gulf of Maine. We start with univariate analysis to assess the dimensionality, nonlinearity, and predictability of the system, and to evaluate if these characteristics differ across the coastline or at different depths. If the univariate analysis indicates that the system has appropriately low-dimensional, nonlinear dynamics, we move on to exploring the potential drivers of Jonah crab abundance, specifically interspecies interactions with Atlantic rock crabs (primarily a competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey species).
 
 ## Load packages
 ```{r}
@@ -248,6 +249,7 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
 
 As we noted earlier, there appears to be much more variation in Jonah crab abundance compared to the rock crabs, although not in every area.
 
+# EDM - dimensionality and nonlinearity (aggregate)
 We start our EDM analyses by looking at the dynamics of the system in aggregate, averaged across all areas. First we look at embedding dimension using Simplex projection with leave-one-out cross-validation:
 ```{r}
 EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
@@ -451,8 +453,9 @@ findSpeciesTheta_rho <- function(df, season=NULL, type) {
 
 ```
 
+# EDM - dimensionality and nonlinearity (by area)
 Now we apply the functions to the catch data:
-```{r}
+```{r, fig.show='hide'}
 jonah_catchE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch") 
 jonah_catchE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")%>% round(digits=3)
 
@@ -461,7 +464,7 @@ jonah_catch_theta_rho<- findSpeciesTheta_rho(complete_tidy_diff %>% filter(Speci
 ```
 
 And repeat for the weight data:
-```{r}
+```{r, fig.show='hide'}
 jonah_wtE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt") 
 jonah_wtE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")%>% round(digits=3)
 
@@ -484,7 +487,7 @@ jonah_wt_theta
 jonah_wt_theta_rho
 ```
 
-The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho >0.7).
+The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho >0.7). We note that the predictability for individual areas is generally higher than the aggregate results we computed earlier.
 
 The lowered-number regions and strata (further south and closer inshore, respectively) appear to be generally more predictable than the outer strata and more northern regions. This seems reminiscent of the geographical area (in square miles) and number of tows allocated to each region/stratum combination. Let's test this by first creating data frames with the numbers from the ME-NH Inshore Trawl Survey protocols and procedures manual.
 
@@ -523,4 +526,85 @@ Key takeaways:
 (1) Weight E and catch E are positively correlated, as are weight theta and catch theta
 (2) Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping
 (3) Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity
-(4) The size of an area (in sq miles) is not significantly correlated with any of the other metrics. Number of tows per area appeared significantly (using Spearman's method) with catch Simplex rho (positive correlation) and weight nonlinearity (negative correlation), but the strength of the correlations was not very strong, and it is likely that this is a case of statistical significance without practical/biological significance.
+(4) The size of an area is not significantly correlated (using Spearman's method) with any of the other metrics besides number of tows, which is to be expected because tows were specifically allocated to ensure even density in all areas. Number of tows per area appeared correlated  with Simplex rho for catch data (positive correlation) and theta for weight data (negative correlation), but the strength of these correlations was relatively low, and it is likely that this is a case of statistical significance without practical/biological significance.
+
+We will also look at these results when we average across regions or strata. 
+# EDM dimensionality & nonlinearity - by region/stratum
+First, we'll define a function that takes in the name of a group and returns EDM stats on a data frame grouped appropriately:
+```{r}
+findSpeciesGroups_both<- function(df, species, type, g) {
+  df_out <- df %>% na.omit() %>% 
+    filter(Type == type, Species == species) %>% 
+    group_by(!!sym(g), date) %>% 
+    summarise(avg = mean(value)) %>% 
+    group_by(!!sym(g))  %>%
+    summarise(E_opt = findE_v(avg),
+              rho_E = findErho_v(avg),
+              Theta = findTheta_v(avg, E_opt),
+              rho_theta = findThetaRho_v(avg, E_opt))
+  return(df_out)
+}
+```
+
+Now we apply to the catch and weight data, looking at regional differences:
+```{r, fig.show='hide'}
+jonah_catch_regions_stats<- findSpeciesGroups_both(complete_tidy_diff, type="catch", g="Region", species="jonah")
+jonah_wt_regions_stats <- findSpeciesGroups_both(complete_tidy_diff, type="wt", g="Region", species="jonah")
+jonah_catch_regions_stats
+jonah_wt_regions_stats
+```
+
+Dimensionality appears relatively consistent between regions, but predictability and nonlinearity appear to vary widely. As when we looked at individual areas earlier, the lower-numbered regions (further south) seem more predictable than the more northern regions when modeled with the appropriate nonlinear parameter (i.e., s-map with optimal theta). Is there a negative correlation between region and s-map predictability?
+
+We use Spearman's method rather than the default Pearson's because Region is an ordinal variable and Pearson's requires at least interval data.
+
+```{r}
+#Catch - s-map predictive skill
+cor.test(jonah_catch_regions_stats$rho_theta, as.numeric(jonah_catch_regions_stats$Region), method = "spearman", alternative = "less")
+
+# rho = -0.7, p=0.117
+
+#Catch - nonlinearity
+cor.test(jonah_catch_regions_stats$Theta, as.numeric(jonah_catch_regions_stats$Region), method = "spearman", alternative = "less")
+# rho = -0.7, p=0.117
+
+#Weight - s-map predictive skill
+cor.test(jonah_wt_regions_stats$rho_theta, as.numeric(jonah_wt_regions_stats$Region), method = "spearman", alternative = "less")
+# rho = -0.9, p=0.042
+
+#Catch - show corr coefficients
+corrplot(cor(data.frame(jonah_catch_regions_stats %>% mutate(Region = as.integer(Region))), method="spearman"), method="number")
+# Catch - label significant correlations
+corrplot(cor(data.frame(jonah_catch_regions_stats %>% mutate(Region = as.integer(Region)))), p.mat = 
+           cor.mtest(jonah_catch_regions_stats %>% mutate(Region = as.integer(Region)), method="spearman", alternative="less")$p, insig = 'label_sig')
+
+#Weight - show corr coefficients
+corrplot(cor(data.frame(jonah_wt_regions_stats %>% mutate(Region = as.integer(Region))), method="spearman"), method="number")
+# Weight - label significant correlations
+corrplot(cor(data.frame(jonah_wt_regions_stats %>% mutate(Region = as.integer(Region)))), p.mat = 
+           cor.mtest(jonah_wt_regions_stats %>% mutate(Region = as.integer(Region)), method="spearman", alternative="less")$p, insig = 'label_sig')
+
+#both weight and catch, to increase sample size
+corrplot(cor(data.frame(rbind(jonah_wt_regions_stats, jonah_catch_regions_stats) %>% mutate(Region = as.integer(Region))), method="spearman"), method="number")
+corrplot(cor(data.frame(rbind(jonah_wt_regions_stats, jonah_catch_regions_stats) %>% mutate(Region = as.integer(Region)))), p.mat = 
+           cor.mtest(rbind(jonah_wt_regions_stats, jonah_catch_regions_stats) %>% mutate(Region = as.integer(Region)), method="spearman", alternative="less")$p, insig = 'label_sig')
+```
+
+S-map predictability is indeed strongly negatively correlated with region. Although the combined correlation plot also shows a significant negative correlation between E and theta, this is only driven by the catch data and is not present in the weight data. The only clear strong association present in both sets of data is the negative relationship between region and nonlinear predictive skill.
+
+On to strata:
+```{r, fig.show='hide'}
+jonah_catch_strat_stats<- findSpeciesGroups_both(complete_tidy_diff, type="catch", g="Stratum", species="jonah")
+jonah_wt_strat_stats <- findSpeciesGroups_both(complete_tidy_diff, type="wt", g="Stratum", species="jonah")
+jonah_catch_strat_stats
+jonah_wt_strat_stats
+```
+
+For each stratum, the values computed from the weight data were very similar to those computed from the catch data. Simplex projection using the disparate abundance metrics identified identical embedding dimension values, rho values generally within <0.1 of each other, and concurring measures of nonlinearity: theta between 1-1.5 for strata 1, 3, and 4, with theta=9 for stratum 2. This provides a reassuring indication that the method is robust to at least small amounts of observation noise and/or slightly different ways of "viewing" the attractor manifold of the system.
+
+After our analysis of the univariate dynamics of the Jonah crab fishery at multiple spatial scales, we can feel confident that it has the low-dimensional, nonlinear dynamics that make CCM an appropriate method of determining causality.
+
+# Convergent cross-mapping
+As with the univariate analysis, we will start by averaging across all spatial scales. Previously, we identified E=2 to be the optimal embedding dimension for the overall Jonah crab population for both catch and weight, so we will use that value for cross-mapping.
+
+However, since we will also be attempting to predict the target species (scallops or rock crabs) from Jonah crab abundance, we will need to identify the appropriate E and theta for the target populations as well. The CCM function automatically computes cross-map skill in both directions, but we will be repeating the function calls twice: once with E optimized for Jonah and once with E optimized for the target. Hopefully, the two calls will produce similar results, and the combined result will give us a better picture of strong interspecies relationships that are robust to slight misspecifications of the function.

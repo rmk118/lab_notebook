@@ -208,6 +208,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link active" data-scroll-target="#load-packages">Load packages</a></li>
   <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import data</a></li>
+  <li><a href="#edm---dimensionality-and-nonlinearity-aggregate" id="toc-edm---dimensionality-and-nonlinearity-aggregate" class="nav-link" data-scroll-target="#edm---dimensionality-and-nonlinearity-aggregate">EDM - dimensionality and nonlinearity (aggregate)</a></li>
+  <li><a href="#edm---dimensionality-and-nonlinearity-by-area" id="toc-edm---dimensionality-and-nonlinearity-by-area" class="nav-link" data-scroll-target="#edm---dimensionality-and-nonlinearity-by-area">EDM - dimensionality and nonlinearity (by area)</a></li>
+  <li><a href="#convergent-cross-mapping" id="toc-convergent-cross-mapping" class="nav-link" data-scroll-target="#convergent-cross-mapping">Convergent cross-mapping</a></li>
   </ul>
 </nav>
     </div>
@@ -244,8 +247,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate) <span class="co">#date formatting</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#combining plots</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rEDM) <span class="co">#EDM</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spatial data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rEDM) <span class="co">#EDM</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spatial data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="import-data" class="level2">
@@ -277,6 +281,1027 @@ Geodetic CRS:  WGS 84</code></pre>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>surveyGrid<span class="sc">$</span>area <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">paste0</span>(surveyGrid<span class="sc">$</span>Region, surveyGrid<span class="sc">$</span>Stratum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Define function cleanCatch and apply to the three catch data files</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cleanCatch <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(x, df_tows) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(Survey, Tow_Number) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Stratum"</span>, <span class="st">"Subsample_Weight_kg"</span>, <span class="st">"Subsample_Weight_kg_2"</span>, <span class="st">"Male_Wt_kg"</span>, <span class="st">"Female_Wt_kg"</span>,<span class="st">"Date"</span>, <span class="st">"Surface_WaterTemp_DegC"</span>, <span class="st">"Surface_Salinity"</span>, <span class="st">"End_Latitude"</span>,<span class="st">"End_Longitude"</span>, <span class="st">"Air_Temp"</span>, <span class="st">"Tow_Time"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Number_Caught =</span> <span class="fu">replace_na</span>(Number_Caught,<span class="dv">0</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">Weight_kg =</span> <span class="fu">replace_na</span>(Weight_kg,<span class="dv">0</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">Expanded_Catch =</span> <span class="fu">replace_na</span>(Expanded_Catch,<span class="dv">0</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">Expanded_Weight_kg =</span> <span class="fu">replace_na</span>(Expanded_Weight_kg,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Stratum =</span> Depth_Stratum, <span class="at">Date =</span> <span class="fu">date</span>(<span class="fu">ymd_hms</span>(Start_Date)), <span class="at">.keep=</span><span class="st">"unused"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.numeric</span>(<span class="fu">paste0</span>(Region, Stratum)),<span class="at">.before=</span> Survey)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>s_cat_clean_seasons <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_s_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Scallop"</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>r_cat_clean_seasons <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_r_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Rock"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>j_cat_clean_seasons <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_j_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Reorder columns so the dataframes are easier to work with</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Reorder columns</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>colOrder<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Survey"</span>, <span class="st">"Tow_Number"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Expanded_Catch"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Expanded_Weight_kg"</span>, <span class="st">"Date"</span>, <span class="st">"Common_Name"</span>, <span class="st">"Number_Caught"</span>, <span class="st">"Weight_kg"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Start_Latitude"</span>, <span class="st">"Start_Longitude"</span>,<span class="st">"Season"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Year"</span>,<span class="st">"Grid"</span>, <span class="st">"Start_Depth_fathoms"</span>, <span class="st">"End_Depth_fathoms"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Bottom_WaterTemp_DegC"</span>, <span class="st">"Bottom_Salinity"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>j_cat_clean_seasons <span class="ot">&lt;-</span> j_cat_clean_seasons <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>r_cat_clean_seasons <span class="ot">&lt;-</span> r_cat_clean_seasons <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>s_cat_clean_seasons <span class="ot">&lt;-</span> s_cat_clean_seasons <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(colOrder))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Define a function, summaryCatch, to summarize over tows for each area (area = region/stratum combination) and apply to all three species.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>summaryCatch <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area, Season, Year, Region, Stratum) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avgCatch =</span> <span class="fu">mean</span>(Expanded_Catch),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">avgWt =</span> <span class="fu">mean</span>(Expanded_Weight_kg)) </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#computes averages for each study area (area = region-stratum combination)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>j_cat_sum_seasons <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(j_cat_clean_seasons)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>r_cat_sum_seasons <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(r_cat_clean_seasons)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>s_cat_sum_seasons <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(s_cat_clean_seasons)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Combine the three separate dataframes</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>catch_seasons <span class="ot">&lt;-</span> s_cat_sum_seasons <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(j_cat_sum_seasons, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>), <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">"_s"</span>, <span class="st">"_j"</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>catch_seasons <span class="ot">&lt;-</span> catch_seasons <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(r_cat_sum_seasons, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avgCatch_r =</span> avgCatch,<span class="at">avgWt_r =</span> avgWt, <span class="at">.keep=</span><span class="st">"unused"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now make it <sub>tidy</sub> and convert area, Species, Season, Region, and Stratum to factors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>catchTidy_seasons <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(catch_seasons, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cols =</span> <span class="dv">6</span><span class="sc">:</span><span class="fu">ncol</span>(catch_seasons)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name, <span class="st">"avgCatch_"</span>) <span class="sc">~</span><span class="st">"catch"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgWt_"</span>) <span class="sc">~</span><span class="st">"wt"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">case_when</span>(</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"s"</span>) <span class="sc">~</span><span class="st">"scallop"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"r"</span>) <span class="sc">~</span><span class="st">"rock"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"j"</span>) <span class="sc">~</span><span class="st">"jonah"</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>catchTidy_seasons <span class="ot">&lt;-</span> catchTidy_seasons <span class="sc">%&gt;%</span> </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.factor</span>(area), <span class="at">Species =</span> <span class="fu">as.factor</span>(Species),<span class="at">Season =</span> <span class="fu">as.factor</span>(Season),<span class="at">Region =</span> <span class="fu">as.factor</span>(Region), <span class="at">Stratum =</span> <span class="fu">as.factor</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The complete function will turn implicit missing values into explicit ones. In this case, Stratum 4 was not surveyed until 2003, so this will add in the appropriate NA values for 2000-2002. We do this for both the tidy version and the original/long version. Turning Fall/Spring and Year into specific dates makes for easier plotting, although they may be slightly different than the original dates that were associated with individual tows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>catch_complete <span class="ot">&lt;-</span> <span class="fu">complete</span>(<span class="at">data=</span>catch_seasons <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>(), Region, Stratum, Season, Year) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">paste</span>(Region, Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date=</span><span class="fu">paste</span>(Year, <span class="fu">case_when</span>(Season<span class="sc">==</span> <span class="st">"Fall"</span> <span class="sc">~</span> <span class="st">"-11-01"</span>, Season <span class="sc">==</span><span class="st">"Spring"</span> <span class="sc">~</span><span class="st">"-05-01"</span>), <span class="at">sep =</span> <span class="st">""</span>), <span class="at">.before=</span>Region) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">!=</span> <span class="st">"2000-05-01"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>catchTidy_complete<span class="ot">&lt;-</span> <span class="fu">complete</span>(<span class="at">data =</span> catchTidy_seasons <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span>  <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>),  Region, Stratum, Season, Year) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.numeric</span>(<span class="fu">paste0</span>(Region, Stratum))) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">date=</span><span class="fu">paste</span>(Year, <span class="fu">case_when</span>(Season<span class="sc">==</span> <span class="st">"Fall"</span> <span class="sc">~</span> <span class="st">"-11-01"</span>, Season <span class="sc">==</span><span class="st">"Spring"</span> <span class="sc">~</span><span class="st">"-05-01"</span>), <span class="at">sep =</span> <span class="st">""</span>), <span class="at">.before=</span>Region) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(date <span class="sc">!=</span> <span class="st">"2000-05-01"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Parse the date column</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>catch_complete <span class="ot">&lt;-</span> catch_complete <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(date))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>catchTidy_complete <span class="ot">&lt;-</span> catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, we look at trends in overall abundance:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#line graph of abundance over time by season, no spatial distinction</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> catchTidy_seasons <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>, Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Year, Season) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">mean</span>(value)))<span class="sc">+</span><span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>value))<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Season)<span class="sc">+</span><span class="fu">theme_classic</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Abundance (catch/tow)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>For comparison, we also plot the catch time series of Jonah crabs alongside rock crabs, both overall and separated by season:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"catch"</span>, Species <span class="sc">!=</span> <span class="st">"scallop"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date, Species) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="fu">aes</span>(<span class="at">x=</span>date, <span class="at">y=</span>avg))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Species)<span class="sc">+</span><span class="fu">labs</span>(<span class="at">y=</span><span class="st">"catch"</span>)<span class="sc">+</span><span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#a lot more variation in the jonah crabs</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"catch"</span>, Species <span class="sc">!=</span> <span class="st">"scallop"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Year, Season, Species) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>          <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>avg))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">facet_grid</span>(Season<span class="sc">~</span>Species)<span class="sc">+</span><span class="fu">labs</span>(<span class="at">y=</span><span class="st">"catch"</span>)<span class="sc">+</span><span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#a lot more variation in the jonah crabs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Fluctuations in catch of rock crabs appear smaller and more regular than for Jonah crabs.</p>
+<p>Now we’ll incorporate the spatial aspect of the data. We start by looking at abundance of Jonah and rock crabs averaged from 2000-2022,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>regionsGrid_orig <span class="ot">&lt;-</span> surveyGrid <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">num =</span> <span class="fu">n_distinct</span>(GridID))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>regionsGrid <span class="ot">&lt;-</span> <span class="fu">left_join</span>(regionsGrid_orig, catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>,) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area, date, Species) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value)))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>regionsGrid <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">"scallop"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Species, area) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(avg)))<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>avg))<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Species)<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can also separate by seasons:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>regionsGrid_seasons <span class="ot">&lt;-</span> <span class="fu">left_join</span>(regionsGrid_orig, catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>,) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area, date, Species, Season) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value)))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Jonah and rock crabs</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>regionsGrid_seasons <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">"scallop"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area, Species, Season) <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">avg =</span> <span class="fu">mean</span>(avg, <span class="at">na.rm=</span><span class="cn">TRUE</span>)))<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>avg))<span class="sc">+</span><span class="fu">facet_grid</span>(Season<span class="sc">~</span>Species)<span class="sc">+</span><span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"F"</span>, <span class="at">name=</span><span class="st">"avg catch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Jonah crab only</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#ggplot(data=regionsGrid_seasons %&gt;% filter(Species == "jonah") %&gt;% group_by(area, Season) %&gt;% summarize(avg = mean(avg)))+geom_sf(aes(fill=avg))+facet_wrap(~Season)+scale_fill_viridis_c()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We look at seasonal movement by year:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>jonahCatch <span class="ot">&lt;-</span> <span class="fu">left_join</span>(regionsGrid_orig, catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>jonahCatchFall <span class="ot">&lt;-</span> jonahCatch <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"Fall"</span>, Type <span class="sc">==</span> <span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">valueFall =</span> value) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Season"</span>, <span class="st">"date"</span>))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>jonahCatchSpring <span class="ot">&lt;-</span> jonahCatch <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"Spring"</span>, Type <span class="sc">==</span> <span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">valueSpring =</span> value) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Season"</span>, <span class="st">"date"</span>))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>jonahCatchDiff <span class="ot">&lt;-</span> <span class="fu">left_join</span>(jonahCatchFall, jonahCatchSpring) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(area, Year)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>jonahCatchDiff <span class="ot">&lt;-</span> jonahCatchDiff <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">diff =</span> valueFall <span class="sc">-</span>valueSpring)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#difference fall vs spring by year</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> jonahCatchDiff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year <span class="sc">!=</span> <span class="dv">2000</span> <span class="sc">&amp;</span> Year <span class="sc">!=</span> <span class="dv">2020</span>))<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>diff))<span class="sc">+</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_fill_viridis_b</span>(<span class="at">name=</span><span class="st">"fall catch minus spring catch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#difference fall vs spring by year and area</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> jonahCatchDiff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type<span class="sc">==</span><span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Year <span class="sc">!=</span> <span class="dv">2000</span> <span class="sc">&amp;</span> Year <span class="sc">!=</span> <span class="dv">2020</span>))<span class="sc">+</span><span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill=</span>diff))<span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_fill_viridis_b</span>(<span class="at">name=</span><span class="st">"fall catch minus spring catch"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>seasonalDiff_by_area<span class="ot">&lt;-</span> jonahCatchDiff <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(diff, <span class="at">na.rm=</span><span class="cn">TRUE</span>), <span class="at">sd =</span> <span class="fu">sd</span>(diff, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>seasonalDiff_by_area</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 3
+    area     avg    sd
+   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+ 1    11  3.04    7.69
+ 2    12  3.39    4.20
+ 3    13  2.24    4.50
+ 4    14  0.0375  1.90
+ 5    21  2.69    4.08
+ 6    22  4.55    8.68
+ 7    23  1.53   10.7 
+ 8    24  1.14    3.21
+ 9    31  0.816   2.17
+10    32  0.119   2.01
+11    33  0.362   7.83
+12    34 -2.62    4.39
+13    41 -2.28    5.65
+14    42 -3.17   16.4 
+15    43  1.07    9.93
+16    44  1.26   11.9 
+17    51  3.25   10.8 
+18    52 -1.87   16.1 
+19    53  0.829  17.0 
+20    54 -0.326   7.91</code></pre>
+</div>
+</div>
+<p>For EDM, we want the time series to be as long as possible, so instead of considering seasons separately, we utilize the entire time series but take second-differences (i.e., x(t) = x(t)-x(t-2)) to remove the seasonal effect. Unfortunately, because of COVID, we are also going to get rid of the data after the missed Spring 2020 survey, since we can’t take second-differences with NA values and we want to avoid linear interpolation that may obscure nonlinear system dynamics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lag2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  x_lagged <span class="ot">&lt;-</span> (x <span class="sc">-</span> <span class="fu">lag</span>(x, <span class="dv">2</span>))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x_lagged)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>}  <span class="co"># test with lag2(c(1, 3, 3, 5, 6, 9, 12))</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>catch_complete_diff <span class="ot">&lt;-</span> catch_complete <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.double) <span class="sc">&amp;</span> <span class="sc">!</span>date, lag2)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(area) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">!=</span> <span class="st">"2000-11-01"</span> <span class="sc">&amp;</span> date <span class="sc">!=</span> <span class="st">"2001-05-01"</span>) <span class="sc">%&gt;%</span>  <span class="fu">filter</span>(date <span class="sc">&lt;</span> <span class="fu">as.Date</span>(<span class="st">"2020-05-01"</span>))</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Tidy it up</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>complete_tidy_diff <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(catch_complete_diff,<span class="at">cols =</span> <span class="dv">7</span><span class="sc">:</span><span class="fu">ncol</span>(catch_complete)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name, <span class="st">"avgCatch_"</span>) <span class="sc">~</span><span class="st">"catch"</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgWt_"</span>) <span class="sc">~</span><span class="st">"wt"</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogWt"</span>) <span class="sc">~</span><span class="st">"logWt"</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">startsWith</span>(name,<span class="st">"avgLogCatch"</span>) <span class="sc">~</span><span class="st">"logCatch"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">case_when</span>(</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"s"</span>) <span class="sc">~</span><span class="st">"scallop"</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"r"</span>) <span class="sc">~</span><span class="st">"rock"</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">endsWith</span>(name, <span class="st">"j"</span>) <span class="sc">~</span><span class="st">"jonah"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.factor</span>(area), <span class="at">Species =</span> <span class="fu">as.factor</span>(Species),</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">Region =</span> <span class="fu">as.factor</span>(Region), <span class="at">Type =</span> <span class="fu">as.factor</span>(Type),</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">Stratum =</span> <span class="fu">as.factor</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s look at the differenced data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#All areas on one graph, split by species</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> complete_tidy_diff <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"catch"</span>, Species <span class="sc">!=</span> <span class="st">"scallop"</span>), <span class="fu">aes</span>(<span class="at">x=</span>date, <span class="at">y=</span>value, <span class="at">color=</span>area))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Species) <span class="sc">+</span><span class="fu">labs</span>(<span class="at">y=</span><span class="st">"2nd-differenced catch"</span>, <span class="at">x=</span><span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Averaged across areas, split by species</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"catch"</span>, Species <span class="sc">!=</span> <span class="st">"scallop"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date, Species) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="fu">aes</span>(<span class="at">x=</span>date, <span class="at">y=</span>avg))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>Species)<span class="sc">+</span><span class="fu">theme_classic</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">y=</span><span class="st">"2nd-differenced catch"</span>, <span class="at">x=</span><span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Colored by species, split by area</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Type <span class="sc">==</span> <span class="st">"catch"</span>, Species <span class="sc">!=</span> <span class="st">"scallop"</span>), <span class="fu">aes</span>(<span class="at">x=</span>date, <span class="at">y=</span>value, <span class="at">color=</span>Species))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">facet_grid</span>(Region<span class="sc">~</span>Stratum)<span class="sc">+</span><span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Depth stratum"</span>, <span class="at">y=</span><span class="st">"Region"</span>)<span class="sc">+</span><span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">10</span>, <span class="at">r =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">0</span>, <span class="at">l =</span> <span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-17-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As we noted earlier, there appears to be much more variation in Jonah crab abundance compared to the rock crabs, although not in every area.</p>
+</section>
+<section id="edm---dimensionality-and-nonlinearity-aggregate" class="level1">
+<h1>EDM - dimensionality and nonlinearity (aggregate)</h1>
+<p>We start our EDM analyses by looking at the dynamics of the system in aggregate, averaged across all areas. First we look at embedding dimension using Simplex projection with leave-one-out cross-validation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EmbedDimension</span>(<span class="at">dataFrame=</span>complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>, Type<span class="sc">==</span><span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">select</span>(date, avg),  <span class="at">columns =</span><span class="st">"avg"</span>, <span class="at">target=</span><span class="st">"avg"</span>, <span class="at">lib =</span> <span class="st">"1 37"</span>, <span class="at">pred=</span><span class="st">"1 37"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    E         rho
+1   1 -0.05596228
+2   2  0.08077393
+3   3 -0.16863421
+4   4 -0.16647178
+5   5 -0.31101223
+6   6 -0.24214677
+7   7 -0.29832851
+8   8 -0.48913659
+9   9 -0.30460740
+10 10 -0.46544135</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EmbedDimension</span>(<span class="at">dataFrame=</span>complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>, Type<span class="sc">==</span><span class="st">"wt"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">select</span>(date, avg),  <span class="at">columns =</span><span class="st">"avg"</span>, <span class="at">target=</span><span class="st">"avg"</span>, <span class="at">lib =</span> <span class="st">"1 37"</span>, <span class="at">pred=</span><span class="st">"1 37"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    E         rho
+1   1  0.01170876
+2   2  0.32701089
+3   3 -0.07984101
+4   4 -0.14711141
+5   5 -0.35237277
+6   6 -0.31118525
+7   7 -0.41617082
+8   8 -0.51337192
+9   9 -0.40191052
+10 10 -0.44620445</code></pre>
+</div>
+</div>
+<p>The optimal embedding dimension is the one with the highest predictive skill. For both catch and weight, E=2 has the highest rho value, although neither measure of abundance shows particularly high rho values.</p>
+<p>We will also use S-mapping to evaluate nonlinearity, with E=2:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PredictNonlinear</span>(<span class="at">dataFrame=</span>complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>, Type<span class="sc">==</span><span class="st">"catch"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">select</span>(date, avg),  <span class="at">columns =</span><span class="st">"avg"</span>, <span class="at">target=</span><span class="st">"avg"</span>, <span class="at">lib =</span> <span class="st">"1 37"</span>, <span class="at">pred=</span><span class="st">"1 37"</span>, <span class="at">E=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Theta       rho
+1   0.01 0.3989329
+2   0.10 0.4221316
+3   0.30 0.4623918
+4   0.50 0.4839824
+5   0.75 0.4887806
+6   1.00 0.4795676
+7   1.50 0.4501698
+8   2.00 0.4218846
+9   3.00 0.3749288
+10  4.00 0.3397510
+11  5.00 0.3111837
+12  6.00 0.2830714
+13  7.00 0.2520656
+14  8.00 0.2180123
+15  9.00 0.1829936</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PredictNonlinear</span>(<span class="at">dataFrame=</span>complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>, Type<span class="sc">==</span><span class="st">"wt"</span>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">select</span>(date, avg),  <span class="at">columns =</span><span class="st">"avg"</span>, <span class="at">target=</span><span class="st">"avg"</span>, <span class="at">lib =</span> <span class="st">"1 37"</span>, <span class="at">pred=</span><span class="st">"1 37"</span>, <span class="at">E=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Theta       rho
+1   0.01 0.3904568
+2   0.10 0.4208138
+3   0.30 0.4800092
+4   0.50 0.5171723
+5   0.75 0.5311135
+6   1.00 0.5242665
+7   1.50 0.4966586
+8   2.00 0.4711912
+9   3.00 0.4284449
+10  4.00 0.3915121
+11  5.00 0.3579365
+12  6.00 0.3265041
+13  7.00 0.2954545
+14  8.00 0.2630482
+15  9.00 0.2297665</code></pre>
+</div>
+</div>
+<p>We can see that both catch and weight are better represented by a nonlinear model (theta &gt;0) than a linear one. In addition, the predictive skill of the s-map projections is higher than the Simplex models.</p>
+<p>Now we want to see how these characteristics change at different spatial scales. We will first define some useful functions to more efficiently repeat the previous tests:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">############ Find E and rho - vector input -------------------------------------------------</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>findE_v <span class="ot">&lt;-</span> <span class="cf">function</span>(v, <span class="at">maxE =</span> <span class="dv">7</span>) {</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  lib_vec <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="dv">1</span>, <span class="fu">length</span>(v))</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(v))</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(indices,v)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(df)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"index"</span>, <span class="st">"value"</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  rho_E<span class="ot">&lt;-</span> <span class="fu">EmbedDimension</span>(<span class="at">dataFrame =</span> df, <span class="at">lib =</span> lib_vec, <span class="at">pred =</span> lib_vec, <span class="at">columns =</span> <span class="st">"value"</span>,<span class="at">target =</span> <span class="st">"value"</span>, <span class="at">maxE =</span> maxE)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  E_out<span class="ot">&lt;-</span>rho_E[<span class="fu">which.max</span>(rho_E<span class="sc">$</span>rho),<span class="st">"E"</span>][<span class="dv">1</span>]</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(E_out)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>findErho_v <span class="ot">&lt;-</span> <span class="cf">function</span>(v) {</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  lib_vec <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="dv">1</span>, <span class="fu">length</span>(v))</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(v))</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(indices,v)</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(df)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"index"</span>, <span class="st">"value"</span>)</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  rho_E<span class="ot">&lt;-</span> <span class="fu">EmbedDimension</span>(<span class="at">dataFrame =</span> df, <span class="at">lib =</span> lib_vec, <span class="at">pred =</span> lib_vec, <span class="at">columns =</span> <span class="st">"value"</span>,<span class="at">target =</span> <span class="st">"value"</span>, <span class="at">maxE =</span> <span class="dv">7</span>)</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  rho_out<span class="ot">&lt;-</span>rho_E[<span class="fu">which.max</span>(rho_E<span class="sc">$</span>rho),<span class="st">"rho"</span>][<span class="dv">1</span>]</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(rho_out)</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="do">############ Find Theta and rho - vector input -------------------------------------------------</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>findTheta_v <span class="ot">&lt;-</span> <span class="cf">function</span>(v, E) {</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>  lib_vec <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="dv">1</span>, <span class="fu">length</span>(v))</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>  indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(v))</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(indices,v)</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(df)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"index"</span>, <span class="st">"value"</span>)</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>  rho_Theta<span class="ot">&lt;-</span> <span class="fu">PredictNonlinear</span>(<span class="at">dataFrame =</span> df, <span class="at">lib =</span> lib_vec, <span class="at">pred =</span> lib_vec, <span class="at">columns =</span> <span class="st">"value"</span>,<span class="at">target =</span> <span class="st">"value"</span>, <span class="at">E=</span>E)</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>  Theta_out<span class="ot">&lt;-</span>rho_Theta[<span class="fu">which.max</span>(rho_Theta<span class="sc">$</span>rho),<span class="st">"Theta"</span>][<span class="dv">1</span>]</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Theta_out)</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>findThetaRho_v <span class="ot">&lt;-</span> <span class="cf">function</span>(v, E) {</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>  lib_vec <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="dv">1</span>, <span class="fu">length</span>(v))</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>  indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(v))</span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(indices,v)</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(df)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"index"</span>, <span class="st">"value"</span>)</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>  rho_Theta<span class="ot">&lt;-</span> <span class="fu">PredictNonlinear</span>(<span class="at">dataFrame =</span> df, <span class="at">lib =</span> lib_vec, <span class="at">pred =</span> lib_vec, <span class="at">columns =</span> <span class="st">"value"</span>,<span class="at">target =</span> <span class="st">"value"</span>, <span class="at">E=</span>E)</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>  Rho_out<span class="ot">&lt;-</span>rho_Theta[<span class="fu">which.max</span>(rho_Theta<span class="sc">$</span>rho),<span class="st">"rho"</span>][<span class="dv">1</span>]</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Rho_out)</span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a><span class="do">############ findSpeciesE &amp; findSpeciesErho -------------------------------------------------------</span></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a><span class="co">#returns a tibble with the optimal embedding dimension for time series from each region/stratum combination</span></span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Find species E</span></span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>findSpeciesE <span class="ot">&lt;-</span> <span class="cf">function</span>(df, <span class="at">season=</span><span class="cn">NULL</span>, type) {</span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(season)) {</span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>    df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Type <span class="sc">==</span> type) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(Year, value) <span class="sc">%&gt;%</span></span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">E_opt =</span> <span class="fu">findE_v</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> E_opt) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>Region)</span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>  df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Type <span class="sc">==</span> type, Season <span class="sc">==</span> season) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Year, value) <span class="sc">%&gt;%</span></span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">E_opt =</span> <span class="fu">findE_v</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> E_opt) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a><span class="co">#Find predictive skill for Simplex with optimal E</span></span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>findSpeciesErho <span class="ot">&lt;-</span> <span class="cf">function</span>(df, <span class="at">season=</span><span class="cn">NULL</span>, type) {</span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(season)) {</span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a>  df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Type <span class="sc">==</span> type) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Year, value) <span class="sc">%&gt;%</span></span>
+<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">E_opt_rho =</span> <span class="fu">findErho_v</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> E_opt_rho) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>    df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Type <span class="sc">==</span> type, Season <span class="sc">==</span> season) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(Year, value) <span class="sc">%&gt;%</span></span>
+<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">E_opt_rho =</span> <span class="fu">findErho_v</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> E_opt_rho) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>Region)</span>
+<span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a><span class="do">############ findSpeciesTheta -------------------------------------------------------</span></span>
+<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>findSpeciesTheta <span class="ot">&lt;-</span> <span class="cf">function</span>(df, <span class="at">season=</span><span class="cn">NULL</span>, type) {</span>
+<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>  df_E <span class="ot">&lt;-</span> <span class="fu">findSpeciesE</span>(<span class="at">df=</span>df, <span class="at">season=</span>season, <span class="at">type=</span>type)</span>
+<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a>  findE <span class="ot">&lt;-</span> <span class="cf">function</span> (reg, strat) {</span>
+<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a>     E <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_E <span class="sc">%&gt;%</span> <span class="fu">slice</span>(reg) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(strat))</span>
+<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(E) </span>
+<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(season)) {</span>
+<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>    df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Type <span class="sc">==</span> type) <span class="sc">%&gt;%</span></span>
+<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E_row =</span> <span class="fu">as.integer</span>(Region), <span class="at">E_col =</span> <span class="fu">as.integer</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E =</span> <span class="fu">findE</span>(<span class="at">reg=</span>E_row, <span class="at">strat=</span>E_col)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span></span>
+<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">Theta_opt =</span>  <span class="fu">findTheta_v</span>(value, E[<span class="dv">1</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> Theta_opt) <span class="sc">%&gt;%</span></span>
+<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>      df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Type <span class="sc">==</span> type, Season<span class="sc">==</span>season) <span class="sc">%&gt;%</span></span>
+<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">E_row =</span> <span class="fu">as.integer</span>(Region), <span class="at">E_col =</span> <span class="fu">as.integer</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>        <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">E =</span> <span class="fu">findE</span>(<span class="at">reg=</span>E_row, <span class="at">strat=</span>E_col)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span></span>
+<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">Theta_opt =</span>  <span class="fu">findTheta_v</span>(value, E[<span class="dv">1</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> Theta_opt) <span class="sc">%&gt;%</span></span>
+<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>        <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a><span class="co">#Find predictive skill for s-map with optimal E and theta</span></span>
+<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a>findSpeciesTheta_rho <span class="ot">&lt;-</span> <span class="cf">function</span>(df, <span class="at">season=</span><span class="cn">NULL</span>, type) {</span>
+<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>  df_E <span class="ot">&lt;-</span> <span class="fu">findSpeciesE</span>(<span class="at">df=</span>df, <span class="at">season=</span>season, <span class="at">type=</span>type)</span>
+<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>  findE <span class="ot">&lt;-</span> <span class="cf">function</span> (reg, strat) {</span>
+<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>    E <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_E <span class="sc">%&gt;%</span> <span class="fu">slice</span>(reg) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(strat))</span>
+<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(E) </span>
+<span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(season)) {</span>
+<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a>    df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Type <span class="sc">==</span> type) <span class="sc">%&gt;%</span></span>
+<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E_row =</span> <span class="fu">as.integer</span>(Region), <span class="at">E_col =</span> <span class="fu">as.integer</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E =</span> <span class="fu">findE</span>(<span class="at">reg=</span>E_row, <span class="at">strat=</span>E_col)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span></span>
+<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">Theta_opt =</span>  <span class="fu">findThetaRho_v</span>(value, E[<span class="dv">1</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb35-153"><a href="#cb35-153" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> Theta_opt) <span class="sc">%&gt;%</span></span>
+<span id="cb35-154"><a href="#cb35-154" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-155"><a href="#cb35-155" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-156"><a href="#cb35-156" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-157"><a href="#cb35-157" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb35-158"><a href="#cb35-158" aria-hidden="true" tabindex="-1"></a>    df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb35-159"><a href="#cb35-159" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Type <span class="sc">==</span> type, Season<span class="sc">==</span>season) <span class="sc">%&gt;%</span></span>
+<span id="cb35-160"><a href="#cb35-160" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E_row =</span> <span class="fu">as.integer</span>(Region), <span class="at">E_col =</span> <span class="fu">as.integer</span>(Stratum)) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-161"><a href="#cb35-161" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-162"><a href="#cb35-162" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">E =</span> <span class="fu">findE</span>(<span class="at">reg=</span>E_row, <span class="at">strat=</span>E_col)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-163"><a href="#cb35-163" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Region, Stratum) <span class="sc">%&gt;%</span></span>
+<span id="cb35-164"><a href="#cb35-164" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">Theta_opt =</span>  <span class="fu">findThetaRho_v</span>(value, E[<span class="dv">1</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb35-165"><a href="#cb35-165" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stratum, <span class="at">values_from =</span> Theta_opt) <span class="sc">%&gt;%</span></span>
+<span id="cb35-166"><a href="#cb35-166" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-167"><a href="#cb35-167" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>Region) }</span>
+<span id="cb35-168"><a href="#cb35-168" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-169"><a href="#cb35-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb35-170"><a href="#cb35-170" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="edm---dimensionality-and-nonlinearity-by-area" class="level1">
+<h1>EDM - dimensionality and nonlinearity (by area)</h1>
+<p>Now we apply the functions to the catch data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>jonah_catchE <span class="ot">&lt;-</span> <span class="fu">findSpeciesE</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"catch"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>jonah_catchE_rho<span class="ot">&lt;-</span> <span class="fu">findSpeciesErho</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"catch"</span>)<span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="at">digits=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta<span class="ot">&lt;-</span> <span class="fu">findSpeciesTheta</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"catch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta_rho<span class="ot">&lt;-</span> <span class="fu">findSpeciesTheta_rho</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"catch"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And repeat for the weight data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>jonah_wtE <span class="ot">&lt;-</span> <span class="fu">findSpeciesE</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"wt"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>jonah_wtE_rho<span class="ot">&lt;-</span> <span class="fu">findSpeciesErho</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"wt"</span>)<span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="at">digits=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta<span class="ot">&lt;-</span> <span class="fu">findSpeciesTheta</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"wt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta_rho<span class="ot">&lt;-</span> <span class="fu">findSpeciesTheta_rho</span>(complete_tidy_diff <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Species<span class="sc">==</span><span class="st">"jonah"</span>) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(), <span class="at">type=</span><span class="st">"wt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a look:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>jonah_catchE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`   `2`   `3`   `4`
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     2     2     2     1
+2     2     2     2     1
+3     3     5     5     6
+4     2     6     2     3
+5     4     2     4     2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>jonah_catchE_rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`   `2`   `3`    `4`
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 0.714 0.508 0.239  0.202
+2 0.573 0.382 0.464 -0.003
+3 0.385 0.344 0.274  0.572
+4 0.233 0.146 0.525  0.25 
+5 0.045 0.45  0.248  0.154</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`   `2`   `3`   `4`
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     2   1     7     8  
+2     7   1.5   1     9  
+3     1   1     9     3  
+4     9   9     4     3  
+5     1   2     0.3   0.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta_rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+     `1`   `2`   `3`   `4`
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 0.862  0.592 0.658 0.172
+2 0.600  0.801 0.749 0.140
+3 0.533  0.528 0.494 0.588
+4 0.454  0.441 0.456 0.419
+5 0.0915 0.533 0.378 0.742</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>jonah_wtE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`   `2`   `3`   `4`
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     2     3     1     2
+2     3     2     2     1
+3     2     2     2     3
+4     1     6     2     2
+5     6     2     6     3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>jonah_wtE_rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+     `1`   `2`   `3`   `4`
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  0.707 0.227 0.16  0.193
+2  0.616 0.41  0.546 0.03 
+3  0.377 0.411 0.216 0.512
+4 -0.07  0.091 0.369 0.174
+5  0.178 0.645 0.271 0.43 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+    `1`   `2`   `3`   `4`
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  2      0.3  9     9   
+2  1      1.5  1     9   
+3  0.01   1    0.3   9   
+4  0.01   9    0.1   0.75
+5  2      5    0.01  9   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta_rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+      `1`   `2`   `3`     `4`
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1  0.869  0.354 0.139  0.218 
+2  0.747  0.848 0.694 -0.0414
+3  0.605  0.626 0.435  0.576 
+4 -0.0843 0.300 0.420  0.522 
+5  0.398  0.704 0.352  0.662 </code></pre>
+</div>
+</div>
+<p>The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho &gt;0.7). We note that the predictability for individual areas is generally higher than the aggregate results we computed earlier.</p>
+<p>The lowered-number regions and strata (further south and closer inshore, respectively) appear to be generally more predictable than the outer strata and more northern regions. This seems reminiscent of the geographical area (in square miles) and number of tows allocated to each region/stratum combination. Let’s test this by first creating data frames with the numbers from the ME-NH Inshore Trawl Survey protocols and procedures manual.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sq_miles <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="fl">253.27</span>, <span class="fl">279.63</span>, <span class="fl">259.62</span>, <span class="fl">205.3</span>, <span class="fl">138.54</span>), <span class="fu">c</span>(<span class="fl">214.22</span>, <span class="fl">191.23</span>, <span class="fl">262.9</span>, <span class="fl">206.12</span>, <span class="fl">220.49</span>), <span class="fu">c</span>(<span class="fl">227.35</span>, <span class="fl">211.66</span>, <span class="fl">280.03</span>, <span class="fl">310.49</span>, <span class="fl">365.04</span>), <span class="fu">c</span>(<span class="fl">225.65</span>, <span class="fl">263.49</span>, <span class="fl">183.69</span>, <span class="fl">170.72</span>, <span class="fl">196.11</span>))</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(sq_miles)<span class="ot">&lt;-</span> <span class="fu">colnames</span>(jonah_catchE)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>tows_per_area <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>), <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">6</span>), <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>), <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">4</span>))</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tows_per_area)<span class="ot">&lt;-</span> <span class="fu">colnames</span>(jonah_catchE)</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>sq_miles_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(sq_miles))</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>tows_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(tows_per_area))</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>jonah_catchE_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_catchE))</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>jonah_catchE_rho_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_catchE_rho))</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_catch_theta))</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>jonah_catch_theta_rho_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_catch_theta_rho))</span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>jonah_wtE_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_wtE))</span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>jonah_wtE_rho_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_wtE_rho))</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_wt_theta))</span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>jonah_wt_theta_rho_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(jonah_wt_theta_rho))</span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>corDf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sq_miles_v, tows_v, jonah_catchE_v, jonah_catchE_rho_v, jonah_catch_theta_v, jonah_catch_theta_rho_v, jonah_wtE_v, jonah_wtE_rho_v, jonah_wt_theta_v, jonah_wt_theta_rho_v)</span>
+<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a>areaList <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">13</span>, <span class="dv">14</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">23</span>, <span class="dv">24</span>, <span class="dv">31</span>, <span class="dv">32</span>, <span class="dv">33</span>, <span class="dv">34</span>, <span class="dv">41</span>, <span class="dv">42</span>, <span class="dv">43</span>, <span class="dv">44</span>, <span class="dv">51</span>, <span class="dv">52</span>, <span class="dv">53</span>, <span class="dv">54</span>)</span>
+<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(corDf), <span class="at">method =</span> <span class="st">"circle"</span>, <span class="at">order =</span> <span class="st">'hclust'</span>, <span class="at">type=</span><span class="st">"lower"</span>, <span class="at">diag=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>testRes <span class="ot">=</span> <span class="fu">cor.mtest</span>(corDf, <span class="at">conf.level =</span> <span class="fl">0.95</span>, <span class="at">method=</span><span class="st">"spearman"</span>)</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(corDf), <span class="at">method =</span> <span class="st">"circle"</span>, <span class="at">order =</span> <span class="st">'hclust'</span>, <span class="at">type=</span><span class="st">"lower"</span>, <span class="at">diag=</span><span class="cn">FALSE</span>, <span class="at">p.mat =</span> testRes<span class="sc">$</span>p, <span class="at">sig.level =</span> <span class="fu">c</span>(<span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>), <span class="at">pch.cex =</span> <span class="fl">0.9</span>,</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">insig =</span> <span class="st">'label_sig'</span>, <span class="at">pch.col =</span> <span class="st">'grey20'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Key takeaways: (1) Weight E and catch E are positively correlated, as are weight theta and catch theta (2) Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping (3) Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity (4) The size of an area is not significantly correlated (using Spearman’s method) with any of the other metrics besides number of tows, which is to be expected because tows were specifically allocated to ensure even density in all areas. Number of tows per area appeared correlated with Simplex rho for catch data (positive correlation) and theta for weight data (negative correlation), but the strength of these correlations was relatively low, and it is likely that this is a case of statistical significance without practical/biological significance.</p>
+<p>We will also look at these results when we average across regions or strata. # EDM dimensionality &amp; nonlinearity - by region/stratum First, we’ll define a function that takes in the name of a group and returns EDM stats on a data frame grouped appropriately:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>findSpeciesGroups_both<span class="ot">&lt;-</span> <span class="cf">function</span>(df, species, type, g) {</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Type <span class="sc">==</span> type, Species <span class="sc">==</span> species) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="sc">!!</span><span class="fu">sym</span>(g), date) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="sc">!!</span><span class="fu">sym</span>(g))  <span class="sc">%&gt;%</span></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">E_opt =</span> <span class="fu">findE_v</span>(avg),</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">rho_E =</span> <span class="fu">findErho_v</span>(avg),</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">Theta =</span> <span class="fu">findTheta_v</span>(avg, E_opt),</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">rho_theta =</span> <span class="fu">findThetaRho_v</span>(avg, E_opt))</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we apply to the catch and weight data, looking at regional differences:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_regions_stats<span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"catch"</span>, <span class="at">g=</span><span class="st">"Region"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-7.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-8.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-9.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-10.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-11.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-12.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-13.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-14.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-15.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-16.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-17.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-18.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-19.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-20.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_regions_stats <span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"wt"</span>, <span class="at">g=</span><span class="st">"Region"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-21.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-22.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-23.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-24.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-25.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-26.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-27.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-28.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-29.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-30.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-31.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-32.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-33.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-34.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-35.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-36.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-37.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-38.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-39.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-40.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_regions_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  Region E_opt  rho_E Theta rho_theta
+  &lt;fct&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+1 1          2 0.156    9       0.751
+2 2          2 0.121    2       0.679
+3 3          4 0.103    0.3     0.213
+4 4          2 0.0898   1.5     0.101
+5 5          3 0.422    0.5     0.288</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_regions_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  Region E_opt   rho_E Theta rho_theta
+  &lt;fct&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+1 1          2  0.240      9     0.863
+2 2          2  0.249      2     0.695
+3 3          2  0.323      9     0.474
+4 4          1 -0.0667     9     0.206
+5 5          3  0.277      9     0.238</code></pre>
+</div>
+</div>
+<p>Dimensionality appears relatively consistent between regions, but predictability and nonlinearity appear to vary widely. As when we looked at individual areas earlier, the lower-numbered regions (further south) seem more predictable than the more northern regions when modeled with the appropriate nonlinear parameter (i.e., s-map with optimal theta). Is there a negative correlation between region and s-map predictability?</p>
+<p>We use Spearman’s method rather than the default Pearson’s because Region is an ordinal variable and Pearson’s requires at least interval data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Catch - s-map predictive skill</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(jonah_catch_regions_stats<span class="sc">$</span>rho_theta, <span class="fu">as.numeric</span>(jonah_catch_regions_stats<span class="sc">$</span>Region), <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Spearman's rank correlation rho
+
+data:  jonah_catch_regions_stats$rho_theta and as.numeric(jonah_catch_regions_stats$Region)
+S = 34, p-value = 0.1167
+alternative hypothesis: true rho is less than 0
+sample estimates:
+ rho 
+-0.7 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rho = -0.7, p=0.117</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Catch - nonlinearity</span></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(jonah_catch_regions_stats<span class="sc">$</span>Theta, <span class="fu">as.numeric</span>(jonah_catch_regions_stats<span class="sc">$</span>Region), <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Spearman's rank correlation rho
+
+data:  jonah_catch_regions_stats$Theta and as.numeric(jonah_catch_regions_stats$Region)
+S = 34, p-value = 0.1167
+alternative hypothesis: true rho is less than 0
+sample estimates:
+ rho 
+-0.7 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rho = -0.7, p=0.117</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Weight - s-map predictive skill</span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(jonah_wt_regions_stats<span class="sc">$</span>rho_theta, <span class="fu">as.numeric</span>(jonah_wt_regions_stats<span class="sc">$</span>Region), <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Spearman's rank correlation rho
+
+data:  jonah_wt_regions_stats$rho_theta and as.numeric(jonah_wt_regions_stats$Region)
+S = 38, p-value = 0.04167
+alternative hypothesis: true rho is less than 0
+sample estimates:
+ rho 
+-0.9 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rho = -0.9, p=0.042</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Catch - show corr coefficients</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(jonah_catch_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region))), <span class="at">method=</span><span class="st">"spearman"</span>), <span class="at">method=</span><span class="st">"number"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Catch - label significant correlations</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(jonah_catch_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)))), <span class="at">p.mat =</span> </span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">cor.mtest</span>(jonah_catch_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)), <span class="at">method=</span><span class="st">"spearman"</span>, <span class="at">alternative=</span><span class="st">"less"</span>)<span class="sc">$</span>p, <span class="at">insig =</span> <span class="st">'label_sig'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Weight - show corr coefficients</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(jonah_wt_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region))), <span class="at">method=</span><span class="st">"spearman"</span>), <span class="at">method=</span><span class="st">"number"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Weight - label significant correlations</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(jonah_wt_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)))), <span class="at">p.mat =</span> </span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">cor.mtest</span>(jonah_wt_regions_stats <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)), <span class="at">method=</span><span class="st">"spearman"</span>, <span class="at">alternative=</span><span class="st">"less"</span>)<span class="sc">$</span>p, <span class="at">insig =</span> <span class="st">'label_sig'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co">#both weight and catch, to increase sample size</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(<span class="fu">rbind</span>(jonah_wt_regions_stats, jonah_catch_regions_stats) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region))), <span class="at">method=</span><span class="st">"spearman"</span>), <span class="at">method=</span><span class="st">"number"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">data.frame</span>(<span class="fu">rbind</span>(jonah_wt_regions_stats, jonah_catch_regions_stats) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)))), <span class="at">p.mat =</span> </span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>           <span class="fu">cor.mtest</span>(<span class="fu">rbind</span>(jonah_wt_regions_stats, jonah_catch_regions_stats) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Region =</span> <span class="fu">as.integer</span>(Region)), <span class="at">method=</span><span class="st">"spearman"</span>, <span class="at">alternative=</span><span class="st">"less"</span>)<span class="sc">$</span>p, <span class="at">insig =</span> <span class="st">'label_sig'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-27-6.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>S-map predictability is indeed strongly negatively correlated with region. Although the combined correlation plot also shows a significant negative correlation between E and theta, this is only driven by the catch data and is not present in the weight data. The only clear strong association present in both sets of data is the negative relationship between region and nonlinear predictive skill.</p>
+<p>On to strata:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_strat_stats<span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"catch"</span>, <span class="at">g=</span><span class="st">"Stratum"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-7.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-8.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-9.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-10.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-11.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-12.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-13.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-14.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-15.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-16.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_strat_stats <span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"wt"</span>, <span class="at">g=</span><span class="st">"Stratum"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-17.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-18.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-19.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-20.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-21.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-22.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-23.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-24.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-25.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-26.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-27.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-28.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-29.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-30.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-31.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-32.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_strat_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  Stratum E_opt rho_E Theta rho_theta
+  &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+1 1           2 0.225   1.5     0.479
+2 2           3 0.160   9       0.201
+3 3           2 0.341   1.5     0.563
+4 4           2 0.160   1       0.692</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_strat_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  Stratum E_opt rho_E Theta rho_theta
+  &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+1 1           2 0.186   1       0.494
+2 2           3 0.217   9       0.156
+3 3           2 0.276   1       0.542
+4 4           2 0.281   1.5     0.610</code></pre>
+</div>
+</div>
+<p>For each stratum, the values computed from the weight data were very similar to those computed from the catch data. Simplex projection using the disparate abundance metrics identified identical embedding dimension values, rho values generally within &lt;0.1 of each other, and concurring measures of nonlinearity: theta between 1-1.5 for strata 1, 3, and 4, with theta=9 for stratum 2. This provides a reassuring indication that the method is robust to at least small amounts of observation noise and/or slightly different ways of “viewing” the attractor manifold of the system.</p>
+<p>After our analysis of the univariate dynamics of the Jonah crab fishery at multiple spatial scales, we can feel confident that it has the low-dimensional, nonlinear dynamics that make CCM an appropriate method of determining causality.</p>
+</section>
+<section id="convergent-cross-mapping" class="level1">
+<h1>Convergent cross-mapping</h1>
 
 
 </section>
