@@ -240,6 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<p>Our approach here will be to utilize the multiple spatial scales and different metrics of abundance (weight/biomass, in kg, and catch per tow) to identify recurring patterns/trends in the dynamics of Jonah crab in the Gulf of Maine. We start with univariate analysis to assess the dimensionality, nonlinearity, and predictability of the system, and to evaluate if these characteristics differ across the coastline or at different depths. If the univariate analysis indicates that the system has appropriately low-dimensional, nonlinear dynamics, we move on to exploring the potential drivers of Jonah crab abundance, specifically interspecies interactions with Atlantic rock crabs (primarily a competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey species).</p>
 <section id="load-packages" class="level2">
 <h2 class="anchored" data-anchor-id="load-packages">Load packages</h2>
 <div class="cell">
@@ -304,7 +305,7 @@ Geodetic CRS:  WGS 84</code></pre>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>j_cat_clean_seasons <span class="ot">&lt;-</span> <span class="fu">cleanCatch</span>(df_j_cat) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Common_Name =</span> <span class="st">"Jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Reorder columns so the dataframes are easier to work with</p>
+<p>Reorder columns so the data frames are easier to work with</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Reorder columns</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>colOrder<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Survey"</span>, <span class="st">"Tow_Number"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Expanded_Catch"</span>, </span>
@@ -330,7 +331,7 @@ Geodetic CRS:  WGS 84</code></pre>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>r_cat_sum_seasons <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(r_cat_clean_seasons)</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>s_cat_sum_seasons <span class="ot">&lt;-</span> <span class="fu">summaryCatch</span>(s_cat_clean_seasons)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Combine the three separate dataframes</p>
+<p>Combine the three separate data frames</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>catch_seasons <span class="ot">&lt;-</span> s_cat_sum_seasons <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(j_cat_sum_seasons, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"area"</span>, <span class="st">"Season"</span>, <span class="st">"Region"</span>, <span class="st">"Stratum"</span>, <span class="st">"Year"</span>), <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">"_s"</span>, <span class="st">"_j"</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -950,127 +951,7 @@ Geodetic CRS:  WGS 84</code></pre>
 <p>Now we apply to the catch and weight data, looking at regional differences:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_regions_stats<span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"catch"</span>, <span class="at">g=</span><span class="st">"Region"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-4.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-5.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-6.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-7.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-8.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-9.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-10.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-11.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-12.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-13.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-14.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-15.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-16.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-17.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-18.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-19.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-20.png" class="img-fluid" width="672"></p>
-</div>
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_regions_stats <span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"wt"</span>, <span class="at">g=</span><span class="st">"Region"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-21.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-22.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-23.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-24.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-25.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-26.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-27.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-28.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-29.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-30.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-31.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-32.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-33.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-34.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-35.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-36.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-37.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-38.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-39.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-26-40.png" class="img-fluid" width="672"></p>
-</div>
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_regions_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 5
@@ -1179,103 +1060,7 @@ sample estimates:
 <p>On to strata:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_strat_stats<span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"catch"</span>, <span class="at">g=</span><span class="st">"Stratum"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-4.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-5.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-6.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-7.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-8.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-9.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-10.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-11.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-12.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-13.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-14.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-15.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-16.png" class="img-fluid" width="672"></p>
-</div>
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>jonah_wt_strat_stats <span class="ot">&lt;-</span> <span class="fu">findSpeciesGroups_both</span>(complete_tidy_diff, <span class="at">type=</span><span class="st">"wt"</span>, <span class="at">g=</span><span class="st">"Stratum"</span>, <span class="at">species=</span><span class="st">"jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-17.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-18.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-19.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-20.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-21.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-22.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-23.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-24.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-25.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-26.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-27.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-28.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-29.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-30.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-31.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="jonahMethods_files/figure-html/unnamed-chunk-28-32.png" class="img-fluid" width="672"></p>
-</div>
 <div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>jonah_catch_strat_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 5
@@ -1302,6 +1087,39 @@ sample estimates:
 </section>
 <section id="convergent-cross-mapping" class="level1">
 <h1>Convergent cross-mapping</h1>
+<p>As with the univariate analysis, we will start by averaging across all spatial scales. Previously, we identified E=2 to be the optimal embedding dimension for the overall Jonah crab population for both catch and weight, so we will use that value for cross-mapping.</p>
+<p>However, since we will also be attempting to predict the target species (scallops or rock crabs) from Jonah crab abundance, we will need to identify the appropriate E and theta for the target populations as well. The CCM function automatically computes cross-map skill in both directions, but we will be repeating the function calls twice: once with E optimized for Jonah and once with E optimized for the target. Hopefully, the two calls will produce similar results, and the combined result will give us a better picture of strong interspecies relationships that are robust to slight misspecifications of the function.</p>
+<p>First, we’ll define a function that adds a new column with the direction for which we optimized the cross-mapping, and a vector containing the different combinations we’ll be trying.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>addDirection <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">xmap =</span> <span class="fu">case_when</span>(predator<span class="sc">==</span><span class="st">"jonah"</span> <span class="sc">&amp;</span> prey<span class="sc">==</span><span class="st">"scallop"</span> <span class="sc">&amp;</span> direction<span class="sc">==</span><span class="st">"predator -&gt; prey"</span> <span class="sc">~</span> <span class="st">"jonah -&gt; scallop"</span>,</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>                            predator<span class="sc">==</span><span class="st">"jonah"</span> <span class="sc">&amp;</span> prey<span class="sc">==</span><span class="st">"scallop"</span> <span class="sc">&amp;</span> direction<span class="sc">==</span><span class="st">"prey -&gt; predator"</span> <span class="sc">~</span> <span class="st">"scallop -&gt; jonah"</span>,</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>                            predator<span class="sc">==</span><span class="st">"jonah"</span> <span class="sc">&amp;</span> prey<span class="sc">==</span><span class="st">"rock"</span> <span class="sc">&amp;</span> direction<span class="sc">==</span><span class="st">"predator -&gt; prey"</span> <span class="sc">~</span> <span class="st">"jonah -&gt; rock"</span>,</span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>                            predator<span class="sc">==</span><span class="st">"jonah"</span> <span class="sc">&amp;</span> prey<span class="sc">==</span><span class="st">"rock"</span> <span class="sc">&amp;</span> direction<span class="sc">==</span><span class="st">"prey -&gt; predator"</span> <span class="sc">~</span> <span class="st">"rock -&gt; jonah"</span>))</span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_out)</span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>combos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"jonah:scallop"</span>, <span class="st">"scallop:jonah"</span>, <span class="st">"jonah:rock"</span>,<span class="st">"rock:jonah"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, filter the second-differenced data frame to create the more specific data frames needed for CCM analysis:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Catch only</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>catchCCMdf <span class="ot">&lt;-</span> catch_complete_diff <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, Region, Stratum, area, avgCatch_s, avgCatch_r, avgCatch_j) <span class="sc">%&gt;%</span> </span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">rock =</span> avgCatch_r , <span class="at">scallop =</span> avgCatch_s , <span class="at">jonah=</span> avgCatch_j)  <span class="sc">%&gt;%</span> </span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.integer</span>(<span class="fu">paste0</span>(Region, Stratum)))</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Weight only</span></span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>wtCCMdf <span class="ot">&lt;-</span> catch_complete_diff <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, Region, Stratum, area, avgWt_s, avgWt_r, avgWt_j) <span class="sc">%&gt;%</span> </span>
+<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">rock =</span> avgWt_r , <span class="at">scallop =</span> avgWt_s , <span class="at">jonah=</span> avgWt_j)  <span class="sc">%&gt;%</span> </span>
+<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">as.integer</span>(<span class="fu">paste0</span>(Region, Stratum)))</span>
+<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-13"><a href="#cb88-13" aria-hidden="true" tabindex="-1"></a>catchCCMdf_agg <span class="ot">&lt;-</span> catchCCMdf <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, mean))</span>
+<span id="cb88-14"><a href="#cb88-14" aria-hidden="true" tabindex="-1"></a>wtCCMdf_agg <span class="ot">&lt;-</span> wtCCMdf <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We also create</p>
 
 
 </section>

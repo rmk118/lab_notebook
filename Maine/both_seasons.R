@@ -182,6 +182,7 @@ RESULTS_ccm_combos_aggregate <- pmap_dfr(params_ccm_combos,function(predator,pre
   bind_rows(out_1,out_2)
   
 }) %>% addDirection()
+
 RESULTS_ccm_combos_aggregate <- RESULTS_ccm_combos_aggregate %>% select(-c(prey, predator, direction))
 RESULTS_ccm_combos_aggregate %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:7)
 
