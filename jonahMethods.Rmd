@@ -101,7 +101,7 @@ catch_seasons <- catch_seasons %>% left_join(r_cat_sum_seasons, by=c("area", "Se
   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
 ```
 
-Now make it ~tidy~ and convert area, Species, Season, Region, and Stratum to factors.
+Now make it "tidy" and convert area, Species, Season, Region, and Stratum to factors.
 ```{r}
 catchTidy_seasons <- pivot_longer(catch_seasons, 
                           cols = 6:ncol(catch_seasons)) %>% 
@@ -157,7 +157,7 @@ ggplot(data = catchTidy_complete %>% filter(Type == "catch", Species != "scallop
 
 Fluctuations in catch of rock crabs appear smaller and more regular than for Jonah crabs.
 
-Now we'll incorporate the spatial aspect of the data. We start by looking at abundance of Jonah and rock crabs averaged from 2000-2022,
+Now we'll incorporate the spatial aspect of the data. We start by looking at abundance of Jonah and rock crabs averaged from 2000-2022.
 ```{r}
 regionsGrid_orig <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
 regionsGrid <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Type=="catch",) %>% group_by(area, date, Species) %>% summarise(avg = mean(value)))
@@ -188,12 +188,12 @@ jonahCatchSpring <- jonahCatch %>% filter(Season == "Spring", Type == "catch") %
 jonahCatchDiff <- left_join(jonahCatchFall, jonahCatchSpring) %>% arrange(area, Year)
 jonahCatchDiff <- jonahCatchDiff %>% mutate(diff = valueFall -valueSpring)
 
-#difference fall vs spring by year
-ggplot(data = jonahCatchDiff %>% filter(Type=="catch") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
-scale_fill_viridis_b(name="fall catch minus spring catch")
+#difference fall vs spring by area
+ggplot(data = jonahCatchDiff %>% group_by(area) %>% summarise(avg = mean(diff, na.rm=TRUE)))+geom_sf(aes(fill=avg))+
+scale_fill_viridis_b(name="fall catch minus spring catch", option="G")
 
 #difference fall vs spring by year and area
-ggplot(data = jonahCatchDiff %>% filter(Type=="catch") %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
+ggplot(data = jonahCatchDiff %>% filter(Year != 2000 & Year != 2020))+geom_sf(aes(fill=diff))+
 scale_fill_viridis_b(name="fall catch minus spring catch")+facet_wrap(~Year)
 
 seasonalDiff_by_area<- jonahCatchDiff %>% st_drop_geometry() %>% group_by(area) %>% summarise(avg = mean(diff, na.rm=TRUE), sd = sd(diff, na.rm=TRUE))
@@ -613,14 +613,11 @@ First, we'll define a function that adds a new column with the direction for whi
 ```{r}
 addDirection <- function(df) {
   df_out <- df %>% 
-    mutate(xmap = case_when(predator=="jonah" & prey=="scallop" & 
-                              (direction=="predator -> prey" | direction=="jonah -> prey") ~ "jonah -> scallop",
-                            predator=="jonah" & prey=="scallop" & 
-                              (direction=="prey -> predator" | direction=="prey -> jonah") ~ "scallop -> jonah",
-                            predator=="jonah" & prey=="rock" & 
-                              (direction=="predator -> prey" | direction == "jonah -> prey") ~ "jonah -> rock",
-                            predator=="jonah" & prey=="rock" & 
-                              (direction=="prey -> predator" | direction == "prey -> jonah") ~ "rock -> jonah")) %>% select(-c(prey, predator, direction))
+    mutate(xmap = case_when(prey=="scallop" & direction=="jonah -> prey" ~ "jonah -> scallop",
+                            prey=="scallop" & direction=="prey -> jonah" ~ "scallop -> jonah",
+                            prey=="rock" & direction == "jonah -> prey" ~ "jonah -> rock",
+                            prey=="rock" & direction == "prey -> jonah" ~ "rock -> jonah")) %>% 
+    select(-c(prey, jonah, direction))
   return(df_out)
 }
 
@@ -781,7 +778,7 @@ RESULTS_ccm_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, are
 
   bind_rows(out_1,out_2)
   
-}) %>% rename("predator" = "jonah") %>% addDirection()
+}) %>% addDirection()
 
 ```
 
@@ -828,7 +825,7 @@ RESULTS_ccm_wt_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, 
 
   bind_rows(out_1,out_2)
   
-}) %>% rename("predator" = "jonah") %>% addDirection()
+}) %>% addDirection()
 
 ```
 
@@ -928,7 +925,7 @@ RESULTS_ccm_by_reg <- pmap_dfr(params_regions_combos,function(jonah,prey, region
            E = E_out_2)
 
   bind_rows(out_1,out_2)
-}) %>% rename("predator" ="jonah") %>% addDirection()
+}) %>% addDirection()
 
 max_rho_by_reg<- RESULTS_ccm_by_reg %>% group_by(region) %>% find_max()
 
@@ -973,7 +970,7 @@ RESULTS_ccm_wt_by_reg <- pmap_dfr(params_regions_combos,function(jonah,prey, reg
            E = E_out_2)
 
   bind_rows(out_1,out_2)
-}) %>% rename("predator" ="jonah") %>% addDirection()
+}) %>% addDirection()
 
 max_rho_wt_by_reg<- RESULTS_ccm_wt_by_reg %>% group_by(region) %>% find_max()
 
@@ -1024,7 +1021,7 @@ RESULTS_ccm_by_strat <- pmap_dfr(params_strat_combos,function(jonah,prey, stratu
            E = E_out_2)
 
   bind_rows(out_1,out_2)
-}) %>% rename("predator" ="jonah") %>% addDirection()
+}) %>% addDirection()
 
 p5<-ggplot(data = RESULTS_ccm_by_strat %>% ungroup() %>% 
          group_by(LibSize, stratum) %>% 
@@ -1065,7 +1062,7 @@ RESULTS_ccm_wt_by_strat <- pmap_dfr(params_strat_combos,function(jonah,prey, str
            E = E_out_2)
 
   bind_rows(out_1,out_2)
-}) %>% rename("predator" ="jonah") %>% addDirection()
+}) %>% addDirection()
 
 p6<-ggplot(data = RESULTS_ccm_wt_by_strat %>% ungroup() %>% 
          group_by(LibSize, stratum) %>% 
@@ -1216,19 +1213,15 @@ We'll start with multispatial CCM using areas as replicates.
 # Areas as replicates - catch
 RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(jonah,prey){
   
-  out_1 <- do_xmap_ID(catchCCMdf,predictor=jonah,target=prey,ID_col = "area",E_max = 7, tp=1) %>% 
-    mutate(jonah=jonah,
-           prey=prey,
-           direction= paste("jonah","->","prey"))
+  out_1 <- do_xmap_ID(catchCCMdf,predictor=jonah,target=prey,ID_col = "area",E = 7, tp=1) %>% 
+    mutate(direction= paste("jonah","->",prey))
   
-  out_2 <- do_xmap_ID(catchCCMdf,predictor=prey,target=jonah,ID_col = "area",E_max = 7, tp=1) %>% 
-    mutate(predator=predator, 
-           prey=prey,
-           direction= paste("prey","->","jonah"))
+  out_2 <- do_xmap_ID(catchCCMdf,predictor=prey,target=jonah,ID_col = "area",E = 7, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
   
-  bind_rows(out_1,out_2) %>% select(all_of(v_keep_col))
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))
   
-}) %>% addDirection()
+})
 
 ```
 
