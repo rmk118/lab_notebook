@@ -500,3 +500,45 @@ ggplot(data=regionsGrid %>% filter(Species != "scallop"))+geom_sf(aes(fill=avg))
 ggplot(data=regionsGrid_seasons %>% filter(Species != "scallop"))+geom_sf(aes(fill=log(avg+1)))+facet_grid(Season~Species)+ scale_fill_gradientn(colors = viridis_pal(option="F")(9),limits=c(0, 2.5))
 
 ggplot(data=regionsGrid_seasons %>% filter(Species == "jonah"))+geom_sf(aes(fill=log(avg+1)))+facet_wrap(~Season)+ scale_fill_gradientn(colors = viridis_pal(option="D")(9),limits=c(0, 2.1))
+
+#And another approach to looking at differences between regions and between strata:
+  
+ # 8. Multispatial CCM by region, with strata within each region as replicates = run CCM on 5 different ~115-point time series
+# 9. Multispatial CCM by stratum, with regional divisions within each depth stratum as replicates = run CCM on 4 different ~150-point time series
+
+# Function 3: do_xmap with ID col------------------------------------------------
+
+do_xmap_ID_failed <- function(df,predictor,target,ID_col,E_max=2 ,tp=1,keep_preds=FALSE){
+  
+  df_1 <- make_xmap_block_ID(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
+                             E_max,cause_lag=tp) %>% ungroup() %>% filter(complete.cases(.))
+  #df_1 should have the following columns: time index, ID column, target, predictor, lagged predictor
+  
+  lib_vec <- paste(1,nrow(df_1))
+  
+  columns_star <- names(df_1)[4:(E_max+3)] 
+  #return(columns_star)
+  
+  out <- Simplex(dataFrame=df_1,
+                 lib = lib_vec, pred=lib_vec,
+                 Tp=0, # The target has already been "manually" lagged
+                 target="target",
+                 columns=columns_star,
+                 embedded=TRUE,
+                 parameterList = TRUE,
+                 E=E_max)
+  
+  fit_linear <- lm(as.formula(paste0("target ~ ",columns_star[1])),data=df_1)
+  out_linear_predictions <- predict(fit_linear)
+  
+  params <- out$parameters
+  out <- out$predictions %>% filter(complete.cases(.))
+  
+  stats <- compute_stats(out$Observations,out$Predictions)
+  
+  stats_linear <- compute_stats(out$Observations,out_linear_predictions)
+  names(stats_linear) <- paste0(names(stats_linear),"_linear")
+  
+  return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
+  
+}

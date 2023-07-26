@@ -613,10 +613,14 @@ First, we'll define a function that adds a new column with the direction for whi
 ```{r}
 addDirection <- function(df) {
   df_out <- df %>% 
-    mutate(xmap = case_when(predator=="jonah" & prey=="scallop" & direction=="predator -> prey" ~ "jonah -> scallop",
-                            predator=="jonah" & prey=="scallop" & direction=="prey -> predator" ~ "scallop -> jonah",
-                            predator=="jonah" & prey=="rock" & direction=="predator -> prey" ~ "jonah -> rock",
-                            predator=="jonah" & prey=="rock" & direction=="prey -> predator" ~ "rock -> jonah")) %>% select(-c(prey, predator, direction))
+    mutate(xmap = case_when(predator=="jonah" & prey=="scallop" & 
+                              (direction=="predator -> prey" | direction=="jonah -> prey") ~ "jonah -> scallop",
+                            predator=="jonah" & prey=="scallop" & 
+                              (direction=="prey -> predator" | direction=="prey -> jonah") ~ "scallop -> jonah",
+                            predator=="jonah" & prey=="rock" & 
+                              (direction=="predator -> prey" | direction == "jonah -> prey") ~ "jonah -> rock",
+                            predator=="jonah" & prey=="rock" & 
+                              (direction=="prey -> predator" | direction == "prey -> jonah") ~ "rock -> jonah")) %>% select(-c(prey, predator, direction))
   return(df_out)
 }
 
@@ -643,41 +647,41 @@ wtCCMdf_agg <- wtCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, me
 
 We also create a data frame to hold the combinations that we want to test:
 ```{r}
-params_ccm_combos <- data.frame(predator=c("jonah", "jonah"), prey=c("scallop", "rock"))
+params_ccm_combos <- data.frame(jonah=c("jonah", "jonah"), prey=c("scallop", "rock"))
 ```
 
 Now for the actual cross-mapping:
 ```{r}
 par(mfrow=c(2,2), mar=c(1,1,1,1))
 
-RESULTS_ccm_aggregate <- pmap_dfr(params_ccm_combos,function(predator,prey){
+RESULTS_ccm_aggregate <- pmap_dfr(params_ccm_combos,function(jonah,prey){
   lib_vec <- paste(1, nrow(catchCCMdf_agg))
   
-  #find optimal E for predicting scallop or rock from jonah - although the E may be too low, we will use the E identified for univariate prediction of the target species
+  #find optimal E for predicting scallop/rock from jonah (i.e., jonah -> scallop/rock)
   rho_E_1<- EmbedDimension(dataFrame = catchCCMdf_agg, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = prey, maxE = 7, showPlot = FALSE) 
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE) 
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1] #store E
   
   #Run CCM - jonah to rock/scallop
-  out_1 <- CCM(dataFrame= catchCCMdf_agg, columns=predator, target=prey, E = E_out_1, Tp=1,
+  out_1 <- CCM(dataFrame= catchCCMdf_agg, columns=jonah, target=prey, E = E_out_1, Tp=1,
                libSizes = paste(E_out_1+2, nrow(catchCCMdf_agg) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("predator","->","prey"),
+           direction= paste("jonah","->","prey"),
            E = E_out_1)
   
-  #find optimal E for predicting jonah from scallop or rock
+  #find optimal E for predicting jonah from scallop or rock (i.e., scallop/rock -> jonah)
   rho_E_2<- EmbedDimension(dataFrame = catchCCMdf_agg, lib = lib_vec, pred = lib_vec, 
-                           columns = predator,target = predator, maxE = 7, showPlot = FALSE)
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1] #store E
   
   #Run CCM - rock/scallop to jonah
-  out_2 <- CCM(dataFrame= catchCCMdf_agg, columns=prey, target=predator, E = E_out_2, Tp=1, 
+  out_2 <- CCM(dataFrame= catchCCMdf_agg, columns=prey, target=jonah, E = E_out_2, Tp=1, 
                libSizes = paste(E_out_2+2, nrow(catchCCMdf_agg)-E_out_2, "1",sep=" "), 
                sample=100, verbose=FALSE, showPlot = TRUE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("prey","->","predator"),
+           direction= paste("prey","->","jonah"),
            E = E_out_2)
   
   bind_rows(out_1,out_2)
@@ -691,34 +695,34 @@ Both directions gave the same system dimensionality. Jonah and scallop may have 
 ```{r}
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 
-RESULTS_ccm_wt_aggregate <- pmap_dfr(params_ccm_combos,function(predator,prey){
+RESULTS_ccm_wt_aggregate <- pmap_dfr(params_ccm_combos,function(jonah,prey){
   lib_vec <- paste(1, nrow(wtCCMdf_agg))
   
-  #find optimal E for predicting scallop or rock from jonah
+  #find optimal E for predicting scallop or rock from jonah (jonah -> scallop/rock)
   rho_E_1<- EmbedDimension(dataFrame = wtCCMdf_agg, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = prey, maxE = 7, showPlot = FALSE) 
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE) 
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1] #store E
   
   #Run CCM - jonah to rock/scallop
-  out_1 <- CCM(dataFrame= wtCCMdf_agg, columns=predator, target=prey, E = E_out_1, Tp=1,
+  out_1 <- CCM(dataFrame= wtCCMdf_agg, columns=jonah, target=prey, E = E_out_1, Tp=1,
                libSizes = paste(E_out_1+2, nrow(wtCCMdf_agg) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("predator","->","prey"),
+           direction= paste("jonah","->","prey"),
            E = E_out_1)
   
-  #find optimal E for predicting jonah from scallop or rock
+  #find optimal E for predicting jonah from scallop or rock (scallop/rock -> jonah)
   rho_E_2<- EmbedDimension(dataFrame = wtCCMdf_agg, lib = lib_vec, pred = lib_vec, 
-                           columns = predator,target = predator, maxE = 7, showPlot = FALSE)
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1] #store E
   
   #Run CCM - rock/scallop to jonah
-  out_2 <- CCM(dataFrame= wtCCMdf_agg, columns=prey, target=predator, E = E_out_2, Tp=1, 
+  out_2 <- CCM(dataFrame= wtCCMdf_agg, columns=prey, target=jonah, E = E_out_2, Tp=1, 
                libSizes = paste(E_out_2+2, nrow(wtCCMdf_agg)-E_out_2, "1",sep=" "), 
                sample=100, verbose=FALSE, showPlot = TRUE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("prey","->","predator"),
+           direction= paste("prey","->","jonah"),
            E = E_out_2)
   
   bind_rows(out_1,out_2)
@@ -726,7 +730,7 @@ RESULTS_ccm_wt_aggregate <- pmap_dfr(params_ccm_combos,function(predator,prey){
 }) %>% addDirection()
 ```
 
-The Jonah and rock crab results are very similar to the catch results: same E and convergence in the direction of Jonah crabs --> rock crabs but not vice versa, suggesting that rock crabs have a causal influence on Jonah crabs. However, cross-mapping with scallops had very low predictive skill in both directions, with neither direction exhibiting clear convergence.
+The Jonah and rock crab weight results are very similar to the catch results: same E and convergence in the direction of Jonah crabs --> rock crabs but not vice versa, suggesting that rock crabs have a causal influence on Jonah crabs. However, cross-mapping with scallops had very low predictive skill in both directions, with neither direction exhibiting clear convergence.
 
 We can visually compare all four cross-mappings with the following:
 ```{r}
@@ -744,40 +748,40 @@ We will now assess cross-map skill at smaller spatial scales, to see if there ar
 #CATCH
 
 #Create the grid of all combinations we want to test
-params_areas_ccm_combos <- expand.grid(predator=c("jonah"), prey=c("scallop", "rock"), areaInput = areaList,  stringsAsFactors = FALSE) %>% 
+params_areas_ccm_combos <- expand.grid(jonah=c("jonah"), prey=c("scallop", "rock"), areaInput = areaList,  stringsAsFactors = FALSE) %>% 
     mutate(areaInput = as.integer(areaInput))
 
 # By area, each individually - CATCH
-RESULTS_ccm_by_area <- pmap_dfr(params_areas_ccm_combos,function(predator,prey, areaInput){
+RESULTS_ccm_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, areaInput){
   
   df_temp <- catchCCMdf %>% filter(area == areaInput)
   lib_vec <- paste(1, nrow(df_temp))
 
   rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = prey, maxE = 7, showPlot = FALSE)
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
-  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
                libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("predator","->","prey"),
+           direction= paste("jonah","->","prey"),
            area = areaInput, 
            E = E_out_1)
 
   rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = predator,target = predator, maxE = 7, showPlot = FALSE)
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
-  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1, 
                libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("prey","->","predator"),
+           direction= paste("prey","->","jonah"),
            area = areaInput,
            E = E_out_2)
 
   bind_rows(out_1,out_2)
   
-}) %>% addDirection()
+}) %>% rename("predator" = "jonah") %>% addDirection()
 
 ```
 
@@ -785,51 +789,446 @@ Let's try and visualize the results:
 ```{r}
 ccm_col_order <- c("LibSize", "xmap", "area", "E", "jonah:scallop", "scallop:jonah","jonah:rock","rock:jonah")
 
-ggplot(data = RESULTS_ccm_by_area %>% ungroup() %>% group_by(LibSize, area) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 3:6) %>% mutate(Region = substr(area, 1, 1), Stratum = substr(area, 2, 2)) %>% arrange(area))+geom_line(aes(x=LibSize, y=value, color=name))+facet_grid(Region~Stratum)
+p1<-ggplot(data = RESULTS_ccm_by_area %>% ungroup() %>% group_by(LibSize, area) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 3:6) %>% mutate(Region = substr(area, 1, 1), Stratum = substr(area, 2, 2)) %>% arrange(area))+geom_line(aes(x=LibSize, y=value, color=name))+facet_grid(Region~Stratum)
 ```
 
-Just from a preliminary visual analysis, we can see clear spatial heterogeneity in the cross-map results. For example, jonah:scallop shows high predictive skill at max lib size in 22 and 44, but essentially zero predictive skill in the other areas. As one might expect from the aggregate CCM, jonah:rock shows the strongest relationship of the four cross-mappings for most areas, and areas where jonah:scallop was not as strong (e.g., areas 11 and 42) did not show strong relationships for any of the combinations we tested. Stratum (column) 3 is also notable for the close clustering of all four cross-map relationships around 0, while the four relationships generally diverge from each other with increasing library size for areas in the other three strata.
+Just from a preliminary visual analysis, we can see clear spatial heterogeneity in the cross-map results. For example, jonah:scallop shows much higher predictive skill in 22 and 33 compared to the other areas. As one might expect from the aggregate CCM, jonah:rock shows the strongest relationship of the four cross-mappings for most areas, and areas where jonah:scallop was not as strong (e.g., areas 11 and 42) did not show strong relationships for any of the combinations we tested. Stratum (column) 3 is also notable for the close clustering of all four cross-map relationships around 0, while the four relationships generally diverge from each other with increasing library size for areas in the other three strata.
 
 We'll repeat the analysis for the weight data.
 ```{r}
 #WEIGHT
 
 # By area, each individually - WEIGHT
-RESULTS_ccm_wt_by_area <- pmap_dfr(params_areas_ccm_combos,function(predator,prey, areaInput){
+RESULTS_ccm_wt_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, areaInput){
   
   df_temp <- wtCCMdf %>% filter(area == areaInput)
   lib_vec <- paste(1, nrow(df_temp))
 
   rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = prey, maxE = 7, showPlot = FALSE)
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
-  out_1 <- CCM(dataFrame= df_temp, columns=predator, target=prey, E = E_out_1, Tp=1,
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
                libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("predator","->","prey"),
+           direction= paste("jonah","->","prey"),
            area = areaInput, 
            E = E_out_1)
 
   rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = predator,target = predator, maxE = 7, showPlot = FALSE)
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
   E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
-  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=predator, E = E_out_2, Tp=1, 
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1, 
                libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
-    mutate(predator=predator,
+    mutate(jonah=jonah,
            prey=prey,
-           direction= paste("prey","->","predator"),
+           direction= paste("prey","->","jonah"),
            area = areaInput,
            E = E_out_2)
 
   bind_rows(out_1,out_2)
   
-}) %>% addDirection()
+}) %>% rename("predator" = "jonah") %>% addDirection()
 
 ```
 
 Let's try and visualize the results:
 ```{r}
 
-ggplot(data = RESULTS_ccm_wt_by_area %>% ungroup() %>% group_by(LibSize, area) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 3:6) %>% mutate(Region = substr(area, 1, 1), Stratum = substr(area, 2, 2)) %>% arrange(area))+geom_line(aes(x=LibSize, y=value, color=name))+facet_grid(Region~Stratum)
+p2<-ggplot(data = RESULTS_ccm_wt_by_area %>% ungroup() %>% 
+         group_by(LibSize, area) %>% 
+         summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% 
+         pivot_longer(cols = 3:6) %>% mutate(Region = substr(area, 1, 1), Stratum = substr(area, 2, 2))) +
+         geom_line(aes(x=LibSize, y=value, color=name))+facet_grid(Region~Stratum)
+
+(p1+ggtitle("catch"))+(p2+ggtitle("weight"))
 ```
+
+Evaluate where there is convergence; i.e., where predictive skill increases with increasing lib size.
+```{r}
+find_delta = function(x) {
+  delta_rho = last(x)-first(x)
+ return(delta_rho)
+}
+
+min_max_lib <- RESULTS_ccm_by_area %>% group_by(area, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta))
+
+converges<- pivot_longer(min_max_lib, cols=3:6) %>% na.omit() %>% mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
+
+#no_convergence <- pivot_longer(min_max_lib, cols=3:6) %>% na.omit() %>% 
+  #mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% 
+  #summarise(delta_rho = mean(value)) %>% 
+ # filter(delta_rho <=0)
+
+table(converges$area, converges$name)
+colSums(table(converges$area, converges$name))
+
+min_max_lib_wt <- RESULTS_ccm_wt_by_area %>% group_by(area, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta))
+
+converges_wt<- pivot_longer(min_max_lib_wt, cols=3:6) %>% na.omit() %>% mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
+
+table(converges_wt$area, converges_wt$name)
+colSums(table(converges_wt$area, converges_wt$name))
+```
+
+```{r}
+find_max <- function(df) {
+  df_out <- df %>% summarise(
+    max_J_S = max(`jonah:scallop`, na.rm = TRUE),
+    max_S_J = max(`scallop:jonah`, na.rm = TRUE),
+    max_J_R = max(`jonah:rock`, na.rm = TRUE),
+    max_R_J = max(`rock:jonah`, na.rm = TRUE))
+  return(df_out)
+}
+```
+
+```{r}
+RESULTS_ccm_by_area %>% group_by(area) %>% find_max() #
+RESULTS_ccm_wt_by_area %>% group_by(area) %>% find_max() #
+
+colSums(((RESULTS_ccm_by_area %>% group_by(area) %>% find_max()) >0))
+colSums(((RESULTS_ccm_wt_by_area %>% group_by(area) %>% find_max()) >0))
+```
+
+We can see that for catchm max rho for J->S was >0 for all area and max rho for J->R was >0 for 18/20 areas. For weight, max rho for J->S was >0 for 18/20 areas and max rho for J->R was >0 for 19/20 areas. S->J was 6 and 7 and R->J was 10 and 8 for catch and weight, respectively.
+
+Let's look at regions:
+```{r}
+params_regions_combos<- expand.grid(jonah=c("jonah"), prey=c("scallop", "rock"),
+                                      region=c(1:5), stringsAsFactors = FALSE)
+
+# By region, each individually - CATCH
+catchCCMdf_reg <- catchCCMdf %>% group_by(Region, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_by_reg <- pmap_dfr(params_regions_combos,function(jonah,prey, region){
+  df_temp <- catchCCMdf_reg %>% filter(Region == region)
+  lib_vec <- paste(1, nrow(df_temp))
+  #jonah -> prey
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("jonah","->","prey"),
+           region=region,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("prey","->","jonah"),
+           region=region,
+           E = E_out_2)
+
+  bind_rows(out_1,out_2)
+}) %>% rename("predator" ="jonah") %>% addDirection()
+
+max_rho_by_reg<- RESULTS_ccm_by_reg %>% group_by(region) %>% find_max()
+
+p3<-ggplot(data = RESULTS_ccm_by_reg %>% ungroup() %>% 
+         group_by(LibSize, region) %>% 
+         summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% 
+         pivot_longer(cols = 3:6)) +
+         geom_line(aes(x=LibSize, y=value, color=name))+facet_wrap(~region)
+
+#compare the 5 plots on the right (regions) to the 5 rows on the left
+(p1+ggtitle("catch"))+p3
+```
+
+Again, we repeat for weight
+```{r}
+# By region, each individually - WEIGHT
+wtCCMdf_reg <- wtCCMdf %>% group_by(Region, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_wt_by_reg <- pmap_dfr(params_regions_combos,function(jonah,prey, region){
+  df_temp <- wtCCMdf_reg %>% filter(Region == region)
+  lib_vec <- paste(1, nrow(df_temp))
+  #jonah -> prey
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("jonah","->","prey"),
+           region=region,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("prey","->","jonah"),
+           region=region,
+           E = E_out_2)
+
+  bind_rows(out_1,out_2)
+}) %>% rename("predator" ="jonah") %>% addDirection()
+
+max_rho_wt_by_reg<- RESULTS_ccm_wt_by_reg %>% group_by(region) %>% find_max()
+
+p4<-ggplot(data = RESULTS_ccm_wt_by_reg %>% ungroup() %>% 
+         group_by(LibSize, region) %>% 
+         summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% 
+         pivot_longer(cols = 3:6)) +
+         geom_line(aes(x=LibSize, y=value, color=name))+facet_wrap(~region)
+
+#compare the 5 plots on the right (regions) to the 5 rows on the left
+(p2+ggtitle("wt"))+p4
+(p3+ggtitle("catch"))+(p4+ggtitle("wt"))
+```
+
+Catch and weight are pretty similar for regions 3, 4, and 5, but somewhat opposite for regions 1 and 2.
+
+Now on to strata:
+```{r}
+params_strat_combos<- expand.grid(jonah=c("jonah"), prey=c("scallop", "rock"),
+                                      stratum=c(1:4), stringsAsFactors = FALSE)
+
+# By depth stratum, each individually - CATCH
+catchCCMdf_strat <- catchCCMdf %>% group_by(Stratum, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_by_strat <- pmap_dfr(params_strat_combos,function(jonah,prey, stratum){
+  df_temp <- catchCCMdf_strat %>% filter(Stratum == stratum)
+  lib_vec <- paste(1, nrow(df_temp))
+  #jonah -> prey
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("jonah","->","prey"),
+           stratum=stratum,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("prey","->","jonah"),
+           stratum=stratum,
+           E = E_out_2)
+
+  bind_rows(out_1,out_2)
+}) %>% rename("predator" ="jonah") %>% addDirection()
+
+p5<-ggplot(data = RESULTS_ccm_by_strat %>% ungroup() %>% 
+         group_by(LibSize, stratum) %>% 
+         summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% 
+         pivot_longer(cols = 3:6)) +
+         geom_line(aes(x=LibSize, y=value, color=name))+facet_wrap(~stratum)
+p5
+```
+
+And for weight:
+```{r}
+# By depth stratum, each individually - WEIGHT
+wtCCMdf_strat <- wtCCMdf %>% group_by(Stratum, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
+
+RESULTS_ccm_wt_by_strat <- pmap_dfr(params_strat_combos,function(jonah,prey, stratum){
+  df_temp <- wtCCMdf_strat %>% filter(Stratum == stratum)
+  lib_vec <- paste(1, nrow(df_temp))
+  #jonah -> prey
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("jonah","->","prey"),
+           stratum=stratum,
+           E = E_out_1)
+  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
+  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1,
+               libSizes = paste(E_out_2+2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("prey","->","jonah"),
+           stratum=stratum,
+           E = E_out_2)
+
+  bind_rows(out_1,out_2)
+}) %>% rename("predator" ="jonah") %>% addDirection()
+
+p6<-ggplot(data = RESULTS_ccm_wt_by_strat %>% ungroup() %>% 
+         group_by(LibSize, stratum) %>% 
+         summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% 
+         pivot_longer(cols = 3:6)) +
+         geom_line(aes(x=LibSize, y=value, color=name))+facet_wrap(~stratum)
+p6
+```
+
+At this point it is helpful to review where we've been and where we plan to go. We've done cross-mapping at four different scales so far: 
+1. aggregate (average everything) = run CCM on 1 37-point time series
+  
+2. by area (no averaging except for tows in an area) = run CCM on 20 different ~37-point time series INDIVIDUALLY
+
+3. by region (average across all areas in a region; i.e., across the different depth strata at a given latitude) to get 1 time series for each of the 5 regions = run CCM on 5 different ~37-point time series INDIVIDUALLY)
+
+4. by stratum (average across all areas in a depth stratum; i.e., across the different latitude groupings at a given depth) to get 1 time series for each of the 4 depth strata = run CCM on 4 different ~37-point time series INDIVIDUALLY)
+
+Now, we're going to take a different approach. Instead of utilizing the different scales of spatial replication by running CCM on them individually to identify similarities and differences, we're going to do multispatial CCM, where we treat each spatial area as a replicate and concatenate the areas to create a longer time series, discarding rows where lags cross time series. This will give us 3 more versions of CCM to investigate overall system dynamics:
+
+5. Multispatial CCM (aggregate) with areas as replicates = run CCM on 1 >500-point time series
+6. Multispatial CCM (aggregate) with regions (averaged across strata) as replicates = run CCM on 1 ~150-point time series
+7. Multispatial CCM (aggregate) with strata (averaged across regions) as replicates = run CCM on 1 ~115-point time series
+
+Once we perform CCM on these 7 different scales, we will see which relationships demonstrate significant CCM, which is considered to occur if:
+(1) Cross-map prediction skill at max lib size is statistically significant based on a randomized null distribution: i.e., cross-map skill is greater than 95% of cross-map values obtained from 100 random rearrangements of the Jonah crab data while holding the order of the other species constant, destroying any dynamic relationship between the two time series.
+(2) The time series demonstrates convergence, meaning prediction skill increases with increasing library size (e.g., more information about the other species makes Jonah crab predictions better because they are causally related), quantified as a delta rho (rho at max lib size minus rho at min lib size) greater than zero.
+
+Finally, we will make our investigation of inter-area dynamics more comprehensive by using a geographic permutation approach where we compute cross-map skill for a given area as the mean cross-map skill for 100 different "extended" areas created by adding a random sample of neighboring tows to the tows within the area, so we get slightly different results when averaging across tows for each area. This approach has two benefits: first, it creates distributions of rho values so we can perform statistical comparisons between areas more easily than comparing single values. Second, averaging across more tows for each area decreases the likelihood that all tows in an area will have caught none of the target species. As having many zeros tends to decrease the performance of Simplex models, this spatial extension approach may improve model performance simply by lowering the number of zeros in a given time series. We will also use the significance-testing functions we develop to test significance for each of these 100 extensions, giving us a number (out of 100) of significant permutations as an additional method of comparison between areas.
+
+Let's jump into the multispatial CCM.
+
+```{r}
+#There are the columns that we will want to keep from the CCM output
+v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
+                "rmse_linear","perc_linear","p_val_linear")
+```
+
+First, we'll need a basic delay function:
+```{r}
+delay <- function(x,n){
+  if(n>=0) 
+    lead(x,n) 
+  else 
+    lag(x,abs(n))}
+```
+
+Now, we need to make the embedding block for the CCM. The rEDM package has a function ("MakeBlock") that does this, but it cannot handle embedding concatenated replicates, since we can't lag the beginning of one replicate's time series based on the end of another replicate's time series. Instead, we create a function that lags after grouping by an ID column, then binding the individually-lagged replicates. Incomplete rows will then conveniently have NAs in them, making them easy to identify and remove.
+
+```{r}
+# Function 2B: make_xmap_block_ID ---------------------------------------------
+
+make_xmap_block_ID <- function(df,predictor,target,ID_col,E_max,cause_lag){
+  
+  v_delays <- 0:-(E_max-1)
+  
+  df_ccm <- df %>%
+    select({{ID_col}},{{target}}) %>%
+    group_by({{ID_col}}) %>%
+    transmute(target=delay({{target}},cause_lag))
+  
+  df_lags <- map_dfc(v_delays,function(d_i){
+    df %>%
+      group_by({{ID_col}}) %>%
+      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
+      ungroup({{ID_col}}) %>% select(-{{ID_col}})
+  })
+  
+  df_out <- bind_cols(df_ccm,df_lags) %>% 
+    ungroup() %>%
+    mutate(index=row_number()) %>%
+    select(index,everything())
+  
+  return(df_out)
+  
+}
+```
+
+Now we will define a helper function to make the multispatial CCM more efficient. For consistency with the normal CCM we performed earlier, we will use E=2.
+
+```{r}
+
+do_xmap_ID <- function(df,predictor,target,ID_col,E,tp=1){
+
+  df_1 <- make_xmap_block_ID(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
+                          E_max=E,cause_lag=tp) %>% ungroup() %>% filter(complete.cases(.))
+  
+  lib_1 <- paste(1,nrow(df_1))
+ 
+  columns_star <- names(df_1)[4:(E+3)]
+
+  out <- Simplex(dataFrame=df_1,
+                 lib=lib_1,pred=lib_1,Tp=0, # The target has already been "manually" lagged
+                 target="target",
+                 columns=columns_star,
+                 embedded=TRUE,
+                 parameterList = TRUE,
+                 E=E)
+
+  fit_linear <- lm(as.formula(paste0("target ~ ",columns_star[1])),data=df_1)
+  out_linear_predictions <- predict(fit_linear)
+
+  params <- out$parameters
+  out <- out$predictions %>% filter(complete.cases(.))
+
+  stats <- compute_stats(out$Observations,out$Predictions)
+
+  stats_linear <- compute_stats(out$Observations,out_linear_predictions)
+  names(stats_linear) <- paste0(names(stats_linear),"_linear")
+
+    return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
+}
+```
+
+Let's test our functions with some toy data:
+```{r}
+data("sardine_anchovy_sst")
+set.seed(7)
+
+test_block1 <- sardine_anchovy_sst %>% select(year, anchovy, np_sst) %>% slice(1:35) %>% mutate(ID = 1)
+test_block2 <- test_block1 %>% mutate(across(anchovy:np_sst, ~jitter(.x*2, factor=1))) %>% mutate(ID = 2)
+test_1 <- rbind(test_block1, test_block2)
+
+test_block <- make_xmap_block_ID(test_1,target=np_sst,predictor = anchovy,ID_col = ID,E_max=3,cause_lag=1) 
+test_block %>% group_by(ID) %>% slice_head(n=5) #works as expected
+
+#Test with only one replicate
+do_xmap_ID(df=test_block1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+CCM(dataFrame = sardine_anchovy_sst %>% slice(1:35), E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "32 32 1", sample = 100) #Traditional CCM gives essentially the same answer— it is unable to recover the true causal interactions from the short time series
+
+#Test with the two replicates, the second being a slightly altered version of the first
+do_xmap_ID(df=test_1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+do_xmap_ID(df=test_1,predictor = "np_sst", target="anchovy",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+CCM(dataFrame = sardine_anchovy_sst, E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "70 70 1", sample = 100, seed=7) #compare with normal CCM on the 78-year data set with a library size of 70, the same length as our test_1 concatenated time series
+
+
+```
+
+Our functions appear to work as we want them to. The embedded block is constructed correctly, with the NAs where appropriate. Originally when we select only 35 observations of the data, the predictive skill is negative for our do_xmap_ID function, which is essentially doing exactly the same Simplex call as normal CCM and equally struggling with the short time series.
+
+However, when we concatenate the replicates, the predictive skill vastly improves and we can identify the true causal relationship between sea surface temperature and anchovy abundance, with a positive rho for anchovy->SST and a negative rho for SST->anchovy. Since the multispatial model can use the past states of replicate 1 from time point t when it is predicting the same time point t for replicate 2 with leave-one-out cross-validation (and vice versa), adding a slightly different version of the 35 time point data as a replicate brought cross-map skill to an even higher rho than normal CCM for anchovy->SST with a library size of 70.
+
+We'll start with multispatial CCM using areas as replicates.
+```{r}
+# Areas as replicates - catch
+RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(catchCCMdf,predictor=jonah,target=prey,ID_col = "area",E_max = 7, tp=1) %>% 
+    mutate(jonah=jonah,
+           prey=prey,
+           direction= paste("jonah","->","prey"))
+  
+  out_2 <- do_xmap_ID(catchCCMdf,predictor=prey,target=jonah,ID_col = "area",E_max = 7, tp=1) %>% 
+    mutate(predator=predator, 
+           prey=prey,
+           direction= paste("prey","->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(all_of(v_keep_col))
+  
+}) %>% addDirection()
+
+```
+

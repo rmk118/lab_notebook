@@ -557,7 +557,7 @@ no_convergence <- pivot_longer(min_max_lib, cols=3:8) %>% na.omit() %>%
   mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% 
   summarise(delta_rho = mean(value)) %>% 
   filter(delta_rho <=0)
-
+ 
 conv_table <- data.frame(rbind(table(converges$name), table(no_convergence$name))) %>% 
   mutate(conv = c("Yes", "No"), .before=1)
 
