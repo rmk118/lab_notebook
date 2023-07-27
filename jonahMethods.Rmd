@@ -1,15 +1,32 @@
 ---
 title: 'Methods - Jonah Crab'
-date-modified: '2023-07-24'
+date-modified: '2023-07-27'
 execute: 
   message: false
   warning: false
 editor_options: 
   chunk_output_type: console
+editor: 
+  markdown: 
+    wrap: 72
 ---
-Our approach here will be to utilize the multiple spatial scales and different metrics of abundance (weight/biomass, in kg, and catch per tow) to identify recurring patterns/trends in the dynamics of Jonah crab in the Gulf of Maine. We start with univariate analysis to assess the dimensionality, nonlinearity, and predictability of the system, and to evaluate if these characteristics differ across the coastline or at different depths. If the univariate analysis indicates that the system has appropriately low-dimensional, nonlinear dynamics, we move on to exploring the potential drivers of Jonah crab abundance, specifically interspecies interactions with Atlantic rock crabs (primarily a competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey species).
 
-## Load packages
+# Intro
+Our approach here will be to utilize the multiple spatial scales and
+different metrics of abundance (weight/biomass, in kg, and catch per
+tow) to identify recurring patterns/trends in the dynamics of Jonah crab
+in the Gulf of Maine. We start with univariate analysis to assess the
+dimensionality, nonlinearity, and predictability of the system, and to
+evaluate if these characteristics differ across the coastline or at
+different depths. If the univariate analysis indicates that the system
+has appropriately low-dimensional, nonlinear dynamics, we move on to
+exploring the potential drivers of Jonah crab abundance, specifically
+interspecies interactions with Atlantic rock crabs (primarily a
+competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey
+species). The results for weight generally (but not always) are similar to those for the catch data, so here we focus only on catch.
+
+### Load packages
+
 ```{r}
 #Load packages
 library(tidyverse)
@@ -20,7 +37,8 @@ library(rEDM) #EDM
 library(sf) #for spatial data
 ```
 
-## Import data
+### Import and clean data
+
 ```{r}
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
@@ -31,6 +49,7 @@ surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Su
 ```
 
 Rename and add variables to survey grid
+
 ```{r}
 surveyGrid <- surveyGrid %>% 
   mutate(Region = region_id,
@@ -41,6 +60,7 @@ surveyGrid$area <- as.numeric(paste0(surveyGrid$Region, surveyGrid$Stratum))
 ```
 
 Define function cleanCatch and apply to the three catch data files
+
 ```{r}
 cleanCatch <- function(x) {
   full_join(x, df_tows) %>%
@@ -66,6 +86,7 @@ j_cat_clean_seasons <- cleanCatch(df_j_cat) %>%
 ```
 
 Reorder columns so the data frames are easier to work with
+
 ```{r}
 #Reorder columns
 colOrder<-c("area", "Survey", "Tow_Number", "Region", "Stratum", "Expanded_Catch", 
@@ -79,7 +100,9 @@ r_cat_clean_seasons <- r_cat_clean_seasons %>% select(all_of(colOrder))
 s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 ```
 
-Define a function, summaryCatch, to summarize over tows for each area (area = region/stratum combination) and apply to all three species.
+Define a function, summaryCatch, to summarize over tows for each area
+(area = region/stratum combination) and apply to all three species.
+
 ```{r}
 summaryCatch <- function(df) {
   df %>% group_by(area, Season, Year, Region, Stratum) %>%
@@ -94,6 +117,7 @@ s_cat_sum_seasons <- summaryCatch(s_cat_clean_seasons)
 ```
 
 Combine the three separate data frames
+
 ```{r}
 catch_seasons <- s_cat_sum_seasons %>% left_join(j_cat_sum_seasons, by=c("area", "Season", "Region", "Stratum", "Year"), suffix = c("_s", "_j"))
 
@@ -101,7 +125,9 @@ catch_seasons <- catch_seasons %>% left_join(r_cat_sum_seasons, by=c("area", "Se
   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
 ```
 
-Now make it "tidy" and convert area, Species, Season, Region, and Stratum to factors.
+Now make it "tidy" and convert area, Species, Season, Region, and
+Stratum to factors.
+
 ```{r}
 catchTidy_seasons <- pivot_longer(catch_seasons, 
                           cols = 6:ncol(catch_seasons)) %>% 
@@ -118,7 +144,14 @@ catchTidy_seasons <- catchTidy_seasons %>%
   select(-name)
 ```
 
-The complete function will turn implicit missing values into explicit ones. In this case, Stratum 4 was not surveyed until 2003, so this will add in the appropriate NA values for 2000-2002. We do this for both the tidy version and the original/long version. Turning Fall/Spring and Year into specific dates makes for easier plotting, although they may be slightly different than the original dates that were associated with individual tows.
+The complete function will turn implicit missing values into explicit
+ones. In this case, Stratum 4 was not surveyed until 2003, so this will
+add in the appropriate NA values for 2000-2002. We do this for both the
+tidy version and the original/long version. Turning Fall/Spring and Year
+into specific dates makes for easier plotting, although they may be
+slightly different than the original dates that were associated with
+individual tows.
+
 ```{r}
 catch_complete <- complete(data=catch_seasons %>% ungroup(), Region, Stratum, Season, Year) %>% 
   mutate(area = paste(Region, Stratum)) %>% 
@@ -132,18 +165,24 @@ catchTidy_complete<- complete(data = catchTidy_seasons %>% ungroup() %>%  filter
 ```
 
 Parse the date column
+
 ```{r}
 catch_complete <- catch_complete %>% mutate(date = lubridate::ymd(date))
 catchTidy_complete <- catchTidy_complete %>% mutate(date = lubridate::ymd(date))
 ```
 
+# General trends
+
 First, we look at trends in overall abundance:
+
 ```{r}
 #line graph of abundance over time by season, no spatial distinction
 ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
 ```
 
-For comparison, we also plot the catch time series of Jonah crabs alongside rock crabs, both overall and separated by season:
+For comparison, we also plot the catch time series of Jonah crabs
+alongside rock crabs, both overall and separated by season:
+
 ```{r}
 ggplot(data = catchTidy_complete %>% filter(Type == "catch", Species != "scallop") %>% group_by(date, Species) %>% 
          summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)+labs(y="catch")+theme_classic()
@@ -155,9 +194,12 @@ ggplot(data = catchTidy_complete %>% filter(Type == "catch", Species != "scallop
 #a lot more variation in the jonah crabs
 ```
 
-Fluctuations in catch of rock crabs appear smaller and more regular than for Jonah crabs.
+Fluctuations in catch of rock crabs appear smaller and more regular than
+for Jonah crabs.
 
-Now we'll incorporate the spatial aspect of the data. We start by looking at abundance of Jonah and rock crabs averaged from 2000-2022.
+Now we'll incorporate the spatial aspect of the data. We start by
+looking at abundance of Jonah and rock crabs averaged from 2000-2022.
+
 ```{r}
 regionsGrid_orig <- surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID))
 regionsGrid <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Type=="catch",) %>% group_by(area, date, Species) %>% summarise(avg = mean(value)))
@@ -167,6 +209,7 @@ ggplot(data=regionsGrid %>% filter(Species != "scallop") %>% group_by(Species, a
 ```
 
 We can also separate by seasons:
+
 ```{r}
 regionsGrid_seasons <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Type=="catch",) %>% group_by(area, date, Species, Season) %>% summarise(avg = mean(value)))
 
@@ -179,6 +222,7 @@ ggplot(data=regionsGrid_seasons %>% filter(Species != "scallop") %>% group_by(ar
 ```
 
 We look at seasonal movement by year:
+
 ```{r}
 jonahCatch <- left_join(regionsGrid_orig, catchTidy_complete %>% filter(Species=="jonah"))
 
@@ -201,7 +245,14 @@ seasonalDiff_by_area
 
 ```
 
-For EDM, we want the time series to be as long as possible, so instead of considering seasons separately, we utilize the entire time series but take second-differences (i.e., x(t) = x(t)-x(t-2)) to remove the seasonal effect. Unfortunately, because of COVID, we are also going to get rid of the data after the missed Spring 2020 survey, since we can't take second-differences with NA values and we want to avoid linear interpolation that may obscure nonlinear system dynamics.
+# Second differencing
+For EDM, we want the time series to be as long as possible, so instead
+of considering seasons separately, we utilize the entire time series but
+take second-differences (i.e., x(t) = x(t)-x(t-2)) to remove the
+seasonal effect. Unfortunately, because of COVID, we are also going to
+get rid of the data after the missed Spring 2020 survey, since we can't
+take second-differences with NA values and we want to avoid linear
+interpolation that may obscure nonlinear system dynamics.
 
 ```{r}
 lag2 <- function(x) {
@@ -232,6 +283,7 @@ complete_tidy_diff <- pivot_longer(catch_complete_diff,cols = 7:ncol(catch_compl
 ```
 
 Let's look at the differenced data:
+
 ```{r}
 #All areas on one graph, split by species
 ggplot(data = complete_tidy_diff %>% 
@@ -247,10 +299,15 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
 
 ```
 
-As we noted earlier, there appears to be much more variation in Jonah crab abundance compared to the rock crabs, although not in every area.
+As we noted earlier, there appears to be much more variation in Jonah
+crab abundance compared to the rock crabs, although not in every area.
 
-# EDM - dimensionality and nonlinearity (aggregate)
-We start our EDM analyses by looking at the dynamics of the system in aggregate, averaged across all areas. First we look at embedding dimension using Simplex projection with leave-one-out cross-validation:
+# E and θ (aggregate)
+
+We start our EDM analyses by looking at the dynamics of the system in
+aggregate, averaged across all areas. First we look at embedding
+dimension using Simplex projection with leave-one-out cross-validation:
+
 ```{r}
 EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
                  summarise(avg = mean(value, na.rm = TRUE)) %>% 
@@ -262,9 +319,13 @@ EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="
                  ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37")
 ```
 
-The optimal embedding dimension is the one with the highest predictive skill. For both catch and weight, E=2 has the highest rho value, although neither measure of abundance shows particularly high rho values.
+The optimal embedding dimension is the one with the highest predictive
+skill. For both catch and weight, E=2 has the highest rho value,
+although neither measure of abundance shows particularly high rho
+values.
 
 We will also use S-mapping to evaluate nonlinearity, with E=2:
+
 ```{r}
 PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
                    summarise(avg = mean(value, na.rm = TRUE)) %>% 
@@ -275,10 +336,15 @@ PredictNonlinear(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=
                    ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 37", pred="1 37", E=2)
 ```
 
-We can see that both catch and weight are better represented by a nonlinear model (theta >0) than a linear one. In addition, the predictive skill of the s-map projections is higher than the Simplex models.
+We can see that both catch is better represented by a
+nonlinear model (theta >0) than a linear one. In addition, the
+predictive skill of the s-map projections is much higher than the Simplex
+models.
 
-Now we want to see how these characteristics change at different spatial scales.
-We will first define some useful functions to more efficiently repeat the previous tests:
+Now we want to see how these characteristics change at different spatial
+scales. We will first define some useful functions to more efficiently
+repeat the previous tests:
+
 ```{r}
 ############ Find E and rho - vector input -------------------------------------------------
 
@@ -453,8 +519,10 @@ findSpeciesTheta_rho <- function(df, season=NULL, type) {
 
 ```
 
-# EDM - dimensionality and nonlinearity (by area)
+# E and θ (by area)
+
 Now we apply the functions to the catch data:
+
 ```{r, fig.show='hide'}
 jonah_catchE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch") 
 jonah_catchE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")%>% round(digits=3)
@@ -470,9 +538,11 @@ jonah_wtE_rho<- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") 
 
 jonah_wt_theta<- findSpeciesTheta(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")
 jonah_wt_theta_rho<- findSpeciesTheta_rho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt")
+
 ```
 
 Let's take a look:
+
 ```{r}
 jonah_catchE
 jonah_catchE_rho
@@ -487,9 +557,25 @@ jonah_wt_theta
 jonah_wt_theta_rho
 ```
 
-The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho >0.7). We note that the predictability for individual areas is generally higher than the aggregate results we computed earlier.
+There is clear spatial heterogeneity: some areas have an optimal
+embedding dimension of only 1, while others reach 6; some areas display
+essentially linear dynamics, with theta=0.01, but most areas appear to
+be highly nonlinear.
 
-The lowered-number regions and strata (further south and closer inshore, respectively) appear to be generally more predictable than the outer strata and more northern regions. This seems reminiscent of the geographical area (in square miles) and number of tows allocated to each region/stratum combination. Let's test this by first creating data frames with the numbers from the ME-NH Inshore Trawl Survey protocols and procedures manual.
+The predictive skill also ranges widely. For example, Region 2, Stratum
+4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03,
+and catch Simplex and weight s-map have negative rho), whereas Region 1,
+Stratum 1 appears to be among the most predictable (all 4 models have
+rho \>0.7). We note that the predictability for individual areas is
+generally higher than the aggregate results we computed earlier.
+
+The lowered-number regions and strata (further south and closer inshore,
+respectively) appear to be generally more predictable than the outer
+strata and more northern regions. This seems reminiscent of the
+geographical area (in square miles) and number of tows allocated to each
+region/stratum combination. Let's test this by first creating data
+frames with the numbers from the ME-NH Inshore Trawl Survey protocols
+and procedures manual.
 
 ```{r}
 sq_miles <- data.frame(c(253.27, 279.63, 259.62, 205.3, 138.54), c(214.22, 191.23, 262.9, 206.12, 220.49), c(227.35, 211.66, 280.03, 310.49, 365.04), c(225.65, 263.49, 183.69, 170.72, 196.11))
@@ -522,15 +608,37 @@ corrplot(cor(corDf), method = "circle", order = 'hclust', type="lower", diag=FAL
          insig = 'label_sig', pch.col = 'grey20')
 ```
 
-Key takeaways: 
-(1) Weight E and catch E are positively correlated, as are weight theta and catch theta
-(2) Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping
-(3) Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity
-(4) The size of an area is not significantly correlated (using Spearman's method) with any of the other metrics besides number of tows, which is to be expected because tows were specifically allocated to ensure even density in all areas. Number of tows per area appeared correlated  with Simplex rho for catch data (positive correlation) and theta for weight data (negative correlation), but the strength of these correlations was relatively low, and it is likely that this is a case of statistical significance without practical/biological significance.
+Key takeaways:
 
-We will also look at these results when we average across regions or strata. 
-# EDM dimensionality & nonlinearity - by region/stratum
-First, we'll define a function that takes in the name of a group and returns EDM stats on a data frame grouped appropriately:
+1.  Weight E and catch E are positively correlated, as are weight theta
+    and catch theta
+
+2.  Areas that were highly predictable using Simplex are more likely to
+    be highly predictable using s-mapping
+
+3.  Within an abundance metric (catch or weight), the predictability of
+    a system is not significantly correlated with its complexity
+    (dimensionality) or linearity
+
+4.  The size of an area is not significantly correlated (using
+    Spearman's method) with any of the other metrics besides number of
+    tows, which is to be expected because tows were specifically
+    allocated to ensure even density in all areas.
+
+5.  Number of tows per area appeared correlated with Simplex rho for
+    catch data (positive correlation) and theta for weight data
+    (negative correlation), but the strength of these correlations was
+    relatively low, and it is likely that this is a case of statistical
+    significance without practical/biological significance.
+
+We will also look at these results when we average across regions or
+strata.
+
+# E and θ (by region/stratum)
+
+First, we'll define a function that takes in the name of a group and
+returns EDM stats on a data frame grouped appropriately:
+
 ```{r}
 findSpeciesGroups_both<- function(df, species, type, g) {
   df_out <- df %>% na.omit() %>% 
@@ -546,7 +654,9 @@ findSpeciesGroups_both<- function(df, species, type, g) {
 }
 ```
 
-Now we apply to the catch and weight data, looking at regional differences:
+Now we apply to the catch and weight data, looking at regional
+differences:
+
 ```{r, fig.show='hide'}
 jonah_catch_regions_stats<- findSpeciesGroups_both(complete_tidy_diff, type="catch", g="Region", species="jonah")
 jonah_wt_regions_stats <- findSpeciesGroups_both(complete_tidy_diff, type="wt", g="Region", species="jonah")
@@ -554,9 +664,16 @@ jonah_catch_regions_stats
 jonah_wt_regions_stats
 ```
 
-Dimensionality appears relatively consistent between regions, but predictability and nonlinearity appear to vary widely. As when we looked at individual areas earlier, the lower-numbered regions (further south) seem more predictable than the more northern regions when modeled with the appropriate nonlinear parameter (i.e., s-map with optimal theta). Is there a negative correlation between region and s-map predictability?
+Dimensionality appears relatively consistent between regions, but
+predictability and nonlinearity appear to vary widely. As when we looked
+at individual areas earlier, the lower-numbered regions (further south)
+seem more predictable than the more northern regions when modeled with
+the appropriate nonlinear parameter (i.e., s-map with optimal theta). Is
+there a negative correlation between region and s-map predictability?
 
-We use Spearman's method rather than the default Pearson's because Region is an ordinal variable and Pearson's requires at least interval data.
+We use Spearman's method rather than the default Pearson's because
+Region is an ordinal variable and Pearson's requires at least interval
+data. TEST THIS ON INDIVIDUAL AREAS
 
 ```{r}
 #Catch - s-map predictive skill
@@ -590,9 +707,15 @@ corrplot(cor(data.frame(rbind(jonah_wt_regions_stats, jonah_catch_regions_stats)
            cor.mtest(rbind(jonah_wt_regions_stats, jonah_catch_regions_stats) %>% mutate(Region = as.integer(Region)), method="spearman", alternative="less")$p, insig = 'label_sig')
 ```
 
-S-map predictability is indeed strongly negatively correlated with region. Although the combined correlation plot also shows a significant negative correlation between E and theta, this is only driven by the catch data and is not present in the weight data. The only clear strong association present in both sets of data is the negative relationship between region and nonlinear predictive skill.
+S-map predictability is indeed strongly negatively correlated with
+region. Although the combined correlation plot also shows a significant
+negative correlation between E and theta, this is only driven by the
+catch data and is not present in the weight data. The only clear strong
+association present in both sets of data is the negative relationship
+between region and nonlinear predictive skill.
 
 On to strata:
+
 ```{r, fig.show='hide'}
 jonah_catch_strat_stats<- findSpeciesGroups_both(complete_tidy_diff, type="catch", g="Stratum", species="jonah")
 jonah_wt_strat_stats <- findSpeciesGroups_both(complete_tidy_diff, type="wt", g="Stratum", species="jonah")
@@ -600,16 +723,43 @@ jonah_catch_strat_stats
 jonah_wt_strat_stats
 ```
 
-For each stratum, the values computed from the weight data were very similar to those computed from the catch data. Simplex projection using the disparate abundance metrics identified identical embedding dimension values, rho values generally within <0.1 of each other, and concurring measures of nonlinearity: theta between 1-1.5 for strata 1, 3, and 4, with theta=9 for stratum 2. This provides a reassuring indication that the method is robust to at least small amounts of observation noise and/or slightly different ways of "viewing" the attractor manifold of the system.
+For each stratum, the values computed from the weight data were very
+similar to those computed from the catch data. Simplex projection using
+the disparate abundance metrics identified identical embedding dimension
+values, rho values generally within \<0.1 of each other, and concurring
+measures of nonlinearity: theta between 1-1.5 for strata 1, 3, and 4,
+with theta=9 for stratum 2. This provides a reassuring indication that
+the method is robust to at least small amounts of observation noise
+and/or slightly different ways of "viewing" the attractor manifold of
+the system.
 
-After our analysis of the univariate dynamics of the Jonah crab fishery at multiple spatial scales, we can feel confident that it has the low-dimensional, nonlinear dynamics that make CCM an appropriate method of determining causality.
+After our analysis of the univariate dynamics of the Jonah crab fishery
+at multiple spatial scales, we can feel confident that it has the
+low-dimensional, nonlinear dynamics that make CCM an appropriate method
+of determining causality.
 
 # Convergent cross-mapping
-As with the univariate analysis, we will start by averaging across all spatial scales. Previously, we identified E=2 to be the optimal embedding dimension for the overall Jonah crab population for both catch and weight, so we will use that value for cross-mapping.
 
-However, since we will also be attempting to predict the target species (scallops or rock crabs) from Jonah crab abundance, we will need to identify the appropriate E and theta for the target populations as well. The CCM function automatically computes cross-map skill in both directions, but we will be repeating the function calls twice: once with E optimized for Jonah and once with E optimized for the target. Hopefully, the two calls will produce similar results, and the combined result will give us a better picture of strong interspecies relationships that are robust to slight misspecifications of the function.
+As with the univariate analysis, we will start by averaging across all
+spatial scales. Previously, we identified E=2 to be the optimal
+embedding dimension for the overall Jonah crab population for both catch
+and weight, so we will use that value for cross-mapping.
 
-First, we'll define a function that adds a new column with the direction for which we optimized the cross-mapping, and a vector containing the different combinations we'll be trying.
+However, since we will also be attempting to predict the target species
+(scallops or rock crabs) from Jonah crab abundance, we will need to
+identify the appropriate E and theta for the target populations as well.
+The CCM function automatically computes cross-map skill in both
+directions, but we will be repeating the function calls twice: once with
+E optimized for Jonah and once with E optimized for the target.
+Hopefully, the two calls will produce similar results, and the combined
+result will give us a better picture of strong interspecies
+relationships that are robust to slight misspecifications of the
+function.
+
+First, we'll define a function that adds a new column with the direction
+for which we optimized the cross-mapping, and a vector containing the
+different combinations we'll be trying.
+
 ```{r}
 addDirection <- function(df) {
   df_out <- df %>% 
@@ -624,7 +774,9 @@ addDirection <- function(df) {
 combos <- c("jonah:scallop", "scallop:jonah", "jonah:rock","rock:jonah")
 ```
 
-First, filter the second-differenced data frame to create the more specific data frames needed for CCM analysis:
+First, filter the second-differenced data frame to create the more
+specific data frames needed for CCM analysis:
+
 ```{r}
 # Catch only
 catchCCMdf <- catch_complete_diff %>% ungroup() %>% na.omit() %>% 
@@ -642,12 +794,16 @@ catchCCMdf_agg <- catchCCMdf %>% group_by(date) %>% summarise(across(scallop:jon
 wtCCMdf_agg <- wtCCMdf %>% group_by(date) %>% summarise(across(scallop:jonah, mean))
 ```
 
-We also create a data frame to hold the combinations that we want to test:
+We also create a data frame to hold the combinations that we want to
+test:
+
 ```{r}
 params_ccm_combos <- data.frame(jonah=c("jonah", "jonah"), prey=c("scallop", "rock"))
 ```
 
 Now for the actual cross-mapping:
+## Aggregate CCM - catch
+
 ```{r}
 par(mfrow=c(2,2), mar=c(1,1,1,1))
 
@@ -687,8 +843,14 @@ RESULTS_ccm_aggregate <- pmap_dfr(params_ccm_combos,function(jonah,prey){
 
 ```
 
-Both directions gave the same system dimensionality. Jonah and scallop may have bidirectional causality, with faster convergence for scallop:jonah compared to jonah:scallop. Rock crab abundance could be effectively cross-mapped from Jonah crabs but not vice versa, suggesting unidirectional influence from rock crabs to Jonah crabs. We will repeat with the weight data to see if the results are the same:
+Both directions gave the same system dimensionality. Jonah and scallop
+may have bidirectional causality, with faster convergence for
+scallop:jonah compared to jonah:scallop. Rock crab abundance could be
+effectively cross-mapped from Jonah crabs but not vice versa, suggesting
+unidirectional influence from rock crabs to Jonah crabs. We will repeat
+with the weight data to see if the results are the same.
 
+## Aggregate CCM - weight
 ```{r}
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 
@@ -727,9 +889,15 @@ RESULTS_ccm_wt_aggregate <- pmap_dfr(params_ccm_combos,function(jonah,prey){
 }) %>% addDirection()
 ```
 
-The Jonah and rock crab weight results are very similar to the catch results: same E and convergence in the direction of Jonah crabs --> rock crabs but not vice versa, suggesting that rock crabs have a causal influence on Jonah crabs. However, cross-mapping with scallops had very low predictive skill in both directions, with neither direction exhibiting clear convergence.
+The Jonah and rock crab weight results are very similar to the catch
+results: same E and convergence in the direction of Jonah crabs --\>
+rock crabs but not vice versa, suggesting that rock crabs have a causal
+influence on Jonah crabs. However, cross-mapping with scallops had very
+low predictive skill in both directions, with neither direction
+exhibiting clear convergence.
 
 We can visually compare all four cross-mappings with the following:
+
 ```{r}
 #Overall xmap skill - catch
 ggplot(data = RESULTS_ccm_aggregate %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:5)) +geom_line(aes(x=LibSize, y=value, color=name))
@@ -738,9 +906,11 @@ ggplot(data = RESULTS_ccm_aggregate %>% ungroup() %>% group_by(LibSize) %>% summ
 ggplot(data = RESULTS_ccm_wt_aggregate %>% ungroup() %>% group_by(LibSize) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 2:5)) +geom_line(aes(x=LibSize, y=value, color=name))
 ```
 
+We will now assess cross-map skill at smaller spatial scales, to see if
+there are causal relationships in specific areas, strata, or regions
+that are obscured when we average across all survey data.
 
-We will now assess cross-map skill at smaller spatial scales, to see if there are causal relationships in specific areas, strata, or regions that are obscured when we average across all survey data.
-
+## CCM by area - catch
 ```{r}
 #CATCH
 
@@ -783,15 +953,29 @@ RESULTS_ccm_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, are
 ```
 
 Let's try and visualize the results:
+
 ```{r}
 ccm_col_order <- c("LibSize", "xmap", "area", "E", "jonah:scallop", "scallop:jonah","jonah:rock","rock:jonah")
 
 p1<-ggplot(data = RESULTS_ccm_by_area %>% ungroup() %>% group_by(LibSize, area) %>% summarise(across(all_of(combos), ~mean(.x, na.rm = TRUE))) %>% pivot_longer(cols = 3:6) %>% mutate(Region = substr(area, 1, 1), Stratum = substr(area, 2, 2)) %>% arrange(area))+geom_line(aes(x=LibSize, y=value, color=name))+facet_grid(Region~Stratum)
+p1
 ```
 
-Just from a preliminary visual analysis, we can see clear spatial heterogeneity in the cross-map results. For example, jonah:scallop shows much higher predictive skill in 22 and 33 compared to the other areas. As one might expect from the aggregate CCM, jonah:rock shows the strongest relationship of the four cross-mappings for most areas, and areas where jonah:scallop was not as strong (e.g., areas 11 and 42) did not show strong relationships for any of the combinations we tested. Stratum (column) 3 is also notable for the close clustering of all four cross-map relationships around 0, while the four relationships generally diverge from each other with increasing library size for areas in the other three strata.
+Just from a preliminary visual analysis, we can see clear spatial
+heterogeneity in the cross-map results. For example, jonah:scallop shows
+much higher predictive skill in 22 and 33 compared to the other areas.
+As one might expect from the aggregate CCM, jonah:rock shows the
+strongest relationship of the four cross-mappings for most areas, and
+areas where jonah:scallop was not as strong (e.g., areas 11 and 42) did
+not show strong relationships for any of the combinations we tested.
+Stratum (column) 3 is also notable for the close clustering of all four
+cross-map relationships around 0, while the four relationships generally
+diverge from each other with increasing library size for areas in the
+other three strata.
 
 We'll repeat the analysis for the weight data.
+
+## CCM by area - weight
 ```{r}
 #WEIGHT
 
@@ -830,6 +1014,7 @@ RESULTS_ccm_wt_by_area <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, 
 ```
 
 Let's try and visualize the results:
+
 ```{r}
 
 p2<-ggplot(data = RESULTS_ccm_wt_by_area %>% ungroup() %>% 
@@ -841,34 +1026,6 @@ p2<-ggplot(data = RESULTS_ccm_wt_by_area %>% ungroup() %>%
 (p1+ggtitle("catch"))+(p2+ggtitle("weight"))
 ```
 
-Evaluate where there is convergence; i.e., where predictive skill increases with increasing lib size.
-```{r}
-find_delta = function(x) {
-  delta_rho = last(x)-first(x)
- return(delta_rho)
-}
-
-min_max_lib <- RESULTS_ccm_by_area %>% group_by(area, xmap) %>% 
-  summarise(across(.cols=all_of(combos), find_delta))
-
-converges<- pivot_longer(min_max_lib, cols=3:6) %>% na.omit() %>% mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
-
-#no_convergence <- pivot_longer(min_max_lib, cols=3:6) %>% na.omit() %>% 
-  #mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% 
-  #summarise(delta_rho = mean(value)) %>% 
- # filter(delta_rho <=0)
-
-table(converges$area, converges$name)
-colSums(table(converges$area, converges$name))
-
-min_max_lib_wt <- RESULTS_ccm_wt_by_area %>% group_by(area, xmap) %>% 
-  summarise(across(.cols=all_of(combos), find_delta))
-
-converges_wt<- pivot_longer(min_max_lib_wt, cols=3:6) %>% na.omit() %>% mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
-
-table(converges_wt$area, converges_wt$name)
-colSums(table(converges_wt$area, converges_wt$name))
-```
 
 ```{r}
 find_max <- function(df) {
@@ -889,9 +1046,15 @@ colSums(((RESULTS_ccm_by_area %>% group_by(area) %>% find_max()) >0))
 colSums(((RESULTS_ccm_wt_by_area %>% group_by(area) %>% find_max()) >0))
 ```
 
-We can see that for catchm max rho for J->S was >0 for all area and max rho for J->R was >0 for 18/20 areas. For weight, max rho for J->S was >0 for 18/20 areas and max rho for J->R was >0 for 19/20 areas. S->J was 6 and 7 and R->J was 10 and 8 for catch and weight, respectively.
+We can see that for catchm max rho for J-\>S was \>0 for all area and
+max rho for J-\>R was \>0 for 18/20 areas. For weight, max rho for J-\>S
+was \>0 for 18/20 areas and max rho for J-\>R was \>0 for 19/20 areas.
+S-\>J was 6 and 7 and R-\>J was 10 and 8 for catch and weight,
+respectively.
 
 Let's look at regions:
+
+## CCM by region - catch
 ```{r}
 params_regions_combos<- expand.grid(jonah=c("jonah"), prey=c("scallop", "rock"),
                                       region=c(1:5), stringsAsFactors = FALSE)
@@ -939,7 +1102,9 @@ p3<-ggplot(data = RESULTS_ccm_by_reg %>% ungroup() %>%
 (p1+ggtitle("catch"))+p3
 ```
 
-Again, we repeat for weight
+Again, we repeat for weight.
+
+## CCM by region - weight
 ```{r}
 # By region, each individually - WEIGHT
 wtCCMdf_reg <- wtCCMdf %>% group_by(Region, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
@@ -985,9 +1150,12 @@ p4<-ggplot(data = RESULTS_ccm_wt_by_reg %>% ungroup() %>%
 (p3+ggtitle("catch"))+(p4+ggtitle("wt"))
 ```
 
-Catch and weight are pretty similar for regions 3, 4, and 5, but somewhat opposite for regions 1 and 2.
+Catch and weight are pretty similar for regions 3, 4, and 5, but
+somewhat opposite for regions 1 and 2.
 
 Now on to strata:
+
+## CCM by stratum - catch
 ```{r}
 params_strat_combos<- expand.grid(jonah=c("jonah"), prey=c("scallop", "rock"),
                                       stratum=c(1:4), stringsAsFactors = FALSE)
@@ -1032,6 +1200,8 @@ p5
 ```
 
 And for weight:
+
+## CCM by stratum - weight
 ```{r}
 # By depth stratum, each individually - WEIGHT
 wtCCMdf_strat <- wtCCMdf %>% group_by(Stratum, date) %>% summarise(scallop = mean(scallop), rock = mean(rock), jonah = mean(jonah))
@@ -1072,156 +1242,190 @@ p6<-ggplot(data = RESULTS_ccm_wt_by_strat %>% ungroup() %>%
 p6
 ```
 
-At this point it is helpful to review where we've been and where we plan to go. We've done cross-mapping at four different scales so far: 
-1. aggregate (average everything) = run CCM on 1 37-point time series
-  
-2. by area (no averaging except for tows in an area) = run CCM on 20 different ~37-point time series INDIVIDUALLY
+At this point it is helpful to review where we've been and where we plan
+to go. We've done cross-mapping at four different scales:
 
-3. by region (average across all areas in a region; i.e., across the different depth strata at a given latitude) to get 1 time series for each of the 5 regions = run CCM on 5 different ~37-point time series INDIVIDUALLY)
+1.  aggregate (average everything) = run CCM on 1 37-point time series
 
-4. by stratum (average across all areas in a depth stratum; i.e., across the different latitude groupings at a given depth) to get 1 time series for each of the 4 depth strata = run CCM on 4 different ~37-point time series INDIVIDUALLY)
+2.  by area (no averaging except for tows in an area) = run CCM on 20
+    different \~37-point time series INDIVIDUALLY
 
-Now, we're going to take a different approach. Instead of utilizing the different scales of spatial replication by running CCM on them individually to identify similarities and differences, we're going to do multispatial CCM, where we treat each spatial area as a replicate and concatenate the areas to create a longer time series, discarding rows where lags cross time series. This will give us 3 more versions of CCM to investigate overall system dynamics:
+3.  by region (average across all areas in a region; i.e., across the
+    different depth strata at a given latitude) to get 1 time series for
+    each of the 5 regions = run CCM on 5 different \~37-point time
+    series INDIVIDUALLY)
 
-5. Multispatial CCM (aggregate) with areas as replicates = run CCM on 1 >500-point time series
-6. Multispatial CCM (aggregate) with regions (averaged across strata) as replicates = run CCM on 1 ~150-point time series
-7. Multispatial CCM (aggregate) with strata (averaged across regions) as replicates = run CCM on 1 ~115-point time series
+4.  by stratum (average across all areas in a depth stratum; i.e.,
+    across the different latitude groupings at a given depth) to get 1
+    time series for each of the 4 depth strata = run CCM on 4 different
+    \~37-point time series INDIVIDUALLY)
 
-Once we perform CCM on these 7 different scales, we will see which relationships demonstrate significant CCM, which is considered to occur if:
-(1) Cross-map prediction skill at max lib size is statistically significant based on a randomized null distribution: i.e., cross-map skill is greater than 95% of cross-map values obtained from 100 random rearrangements of the Jonah crab data while holding the order of the other species constant, destroying any dynamic relationship between the two time series.
-(2) The time series demonstrates convergence, meaning prediction skill increases with increasing library size (e.g., more information about the other species makes Jonah crab predictions better because they are causally related), quantified as a delta rho (rho at max lib size minus rho at min lib size) greater than zero.
+We will now see which relationships demonstrate significant CCM, which is considered to occur
+if: (1) Cross-map prediction skill at max lib size is statistically
+significant based on a randomized null distribution: i.e., cross-map
+skill is greater than 95% of cross-map values obtained from 100 random
+rearrangements of the Jonah crab data while holding the order of the
+other species constant, destroying any dynamic relationship between the
+two time series. (2) The time series demonstrates convergence, meaning
+prediction skill increases with increasing library size (e.g., more
+information about the other species makes Jonah crab predictions better
+because they are causally related), quantified as a delta rho (rho at
+max lib size minus rho at min lib size) greater than zero.
 
-Finally, we will make our investigation of inter-area dynamics more comprehensive by using a geographic permutation approach where we compute cross-map skill for a given area as the mean cross-map skill for 100 different "extended" areas created by adding a random sample of neighboring tows to the tows within the area, so we get slightly different results when averaging across tows for each area. This approach has two benefits: first, it creates distributions of rho values so we can perform statistical comparisons between areas more easily than comparing single values. Second, averaging across more tows for each area decreases the likelihood that all tows in an area will have caught none of the target species. As having many zeros tends to decrease the performance of Simplex models, this spatial extension approach may improve model performance simply by lowering the number of zeros in a given time series. We will also use the significance-testing functions we develop to test significance for each of these 100 extensions, giving us a number (out of 100) of significant permutations as an additional method of comparison between areas.
+Finally, we will make our investigation of inter-area dynamics more
+comprehensive by using a geographic permutation approach where we
+compute cross-map skill for a given area as the mean cross-map skill for
+100 different "extended" areas created by adding a random sample of
+neighboring tows to the tows within the area, so we get slightly
+different results when averaging across tows for each area. This
+approach has two benefits: first, it creates distributions of rho values
+so we can perform statistical comparisons between areas more easily than
+comparing single values. Second, averaging across more tows for each
+area decreases the likelihood that all tows in an area will have caught
+none of the target species. As having many zeros tends to decrease the
+performance of Simplex models, this spatial extension approach may
+improve model performance simply by lowering the number of zeros in a
+given time series. We will also use the significance-testing functions
+we develop to test significance for each of these 100 extensions, giving
+us a number (out of 100) of significant permutations as an additional
+method of comparison between areas.
 
-Let's jump into the multispatial CCM.
+# Significance testing
+
+## Convergence
+The first criteria for determining significant CCM is convergence, which we determine to be present when predictive skill at maximum library size is larger than predictive skill at minimum library size.
+First we define a helper function:
 
 ```{r}
-#There are the columns that we will want to keep from the CCM output
-v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
-                "rmse_linear","perc_linear","p_val_linear")
-```
-
-First, we'll need a basic delay function:
-```{r}
-delay <- function(x,n){
-  if(n>=0) 
-    lead(x,n) 
-  else 
-    lag(x,abs(n))}
-```
-
-Now, we need to make the embedding block for the CCM. The rEDM package has a function ("MakeBlock") that does this, but it cannot handle embedding concatenated replicates, since we can't lag the beginning of one replicate's time series based on the end of another replicate's time series. Instead, we create a function that lags after grouping by an ID column, then binding the individually-lagged replicates. Incomplete rows will then conveniently have NAs in them, making them easy to identify and remove.
-
-```{r}
-# Function 2B: make_xmap_block_ID ---------------------------------------------
-
-make_xmap_block_ID <- function(df,predictor,target,ID_col,E_max,cause_lag){
-  
-  v_delays <- 0:-(E_max-1)
-  
-  df_ccm <- df %>%
-    select({{ID_col}},{{target}}) %>%
-    group_by({{ID_col}}) %>%
-    transmute(target=delay({{target}},cause_lag))
-  
-  df_lags <- map_dfc(v_delays,function(d_i){
-    df %>%
-      group_by({{ID_col}}) %>%
-      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
-      ungroup({{ID_col}}) %>% select(-{{ID_col}})
-  })
-  
-  df_out <- bind_cols(df_ccm,df_lags) %>% 
-    ungroup() %>%
-    mutate(index=row_number()) %>%
-    select(index,everything())
-  
-  return(df_out)
-  
+find_delta = function(x) {
+  delta_rho = last(x)-first(x)
+ return(delta_rho)
 }
 ```
 
-Now we will define a helper function to make the multispatial CCM more efficient. For consistency with the normal CCM we performed earlier, we will use E=2.
-
+Let's revisit our aggregate CCM results:
 ```{r}
+RESULTS_ccm_aggregate
 
-do_xmap_ID <- function(df,predictor,target,ID_col,E,tp=1){
-
-  df_1 <- make_xmap_block_ID(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
-                          E_max=E,cause_lag=tp) %>% ungroup() %>% filter(complete.cases(.))
-  
-  lib_1 <- paste(1,nrow(df_1))
- 
-  columns_star <- names(df_1)[4:(E+3)]
-
-  out <- Simplex(dataFrame=df_1,
-                 lib=lib_1,pred=lib_1,Tp=0, # The target has already been "manually" lagged
-                 target="target",
-                 columns=columns_star,
-                 embedded=TRUE,
-                 parameterList = TRUE,
-                 E=E)
-
-  fit_linear <- lm(as.formula(paste0("target ~ ",columns_star[1])),data=df_1)
-  out_linear_predictions <- predict(fit_linear)
-
-  params <- out$parameters
-  out <- out$predictions %>% filter(complete.cases(.))
-
-  stats <- compute_stats(out$Observations,out$Predictions)
-
-  stats_linear <- compute_stats(out$Observations,out_linear_predictions)
-  names(stats_linear) <- paste0(names(stats_linear),"_linear")
-
-    return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
-}
+conv_agg <- RESULTS_ccm_aggregate %>% group_by(xmap) %>% summarize(across(all_of(combos),find_delta))
+conv_agg %>% pivot_longer(cols=2:5) %>% na.omit()
 ```
 
-Let's test our functions with some toy data:
+Okay, so we can see that the only direction that does not converge is rock:jonah, which decreases in predictive skill with increasing library size regardless of if the CCM is using the optimal E for rock or for Jonah crabs. Now let's revisit our CCM-by-area results
+
 ```{r}
-data("sardine_anchovy_sst")
-set.seed(7)
+min_max_lib <- RESULTS_ccm_by_area %>% group_by(area, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta))
 
-test_block1 <- sardine_anchovy_sst %>% select(year, anchovy, np_sst) %>% slice(1:35) %>% mutate(ID = 1)
-test_block2 <- test_block1 %>% mutate(across(anchovy:np_sst, ~jitter(.x*2, factor=1))) %>% mutate(ID = 2)
-test_1 <- rbind(test_block1, test_block2)
+converges<- pivot_longer(min_max_lib, cols=3:6) %>% na.omit() %>% 
+ # mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% 
+  group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
 
-test_block <- make_xmap_block_ID(test_1,target=np_sst,predictor = anchovy,ID_col = ID,E_max=3,cause_lag=1) 
-test_block %>% group_by(ID) %>% slice_head(n=5) #works as expected
+table(converges$area, converges$name)
+colSums(table(converges$area, converges$name))
 
-#Test with only one replicate
-do_xmap_ID(df=test_block1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+#WEIGHT
+min_max_lib_wt <- RESULTS_ccm_wt_by_area %>% group_by(area, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta))
 
-CCM(dataFrame = sardine_anchovy_sst %>% slice(1:35), E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "32 32 1", sample = 100) #Traditional CCM gives essentially the same answer— it is unable to recover the true causal interactions from the short time series
+converges_wt<- pivot_longer(min_max_lib_wt, cols=3:6) %>% na.omit() %>% 
+ # mutate(optE = substr(xmap, 1, 3)==substr(name, 1, 3)) %>% 
+  group_by(area, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0)
 
-#Test with the two replicates, the second being a slightly altered version of the first
-do_xmap_ID(df=test_1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+table(converges_wt$area, converges_wt$name)
+colSums(table(converges_wt$area, converges_wt$name))
+```
 
-do_xmap_ID(df=test_1,predictor = "np_sst", target="anchovy",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+We can see that jonah:rock and jonah:scallop converge for at least 18/20 areas. We will revisit the spatial distribution of the less-frequently converging relationships later. We will also add these results to our convergence table, assigning "TRUE" if a relationship converged for over half of the 20 areas.
 
-CCM(dataFrame = sardine_anchovy_sst, E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "70 70 1", sample = 100, seed=7) #compare with normal CCM on the 78-year data set with a library size of 70, the same length as our test_1 concatenated time series
+Now let's revisit our region and stratum results. We will assign "TRUE" in our table if a relationship converges for 3 or more of the 5 regions or 4 strata.
 
+```{r}
+RESULTS_ccm_by_reg %>% group_by(region, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta)) %>% 
+  pivot_longer(cols=3:6) %>% na.omit() %>% 
+  group_by(region, name) %>% summarise(delta_rho = mean(value)) #%>% filter(delta_rho >0)
+```
+
+We can see that jonah:rock and jonah:scallop converged for all 5 regions, while cross-maps in the opposite directions did not converge for any regions.
+
+```{r}
+RESULTS_ccm_wt_by_reg %>% group_by(region, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta)) %>% 
+  pivot_longer(cols=3:6) %>% na.omit() %>% 
+  group_by(region, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0) %>% group_by(name) %>% summarise(num = length(name))
+```
+
+Again, only jonah:rock and jonah:scallop converge for over half of the regions.
+
+We move on to strata:
+
+```{r}
+#CATCH
+RESULTS_ccm_by_strat %>% group_by(stratum, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta)) %>% 
+  pivot_longer(cols=3:6) %>% na.omit() %>% 
+  group_by(stratum, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0) %>% group_by(name) %>% summarise(num = length(name))
+
+#WEIGHT
+RESULTS_ccm_wt_by_strat %>% group_by(stratum, xmap) %>% 
+  summarise(across(.cols=all_of(combos), find_delta)) %>% 
+  pivot_longer(cols=3:6) %>% na.omit() %>% 
+  group_by(stratum, name) %>% summarise(delta_rho = mean(value)) %>% filter(delta_rho >0) %>% group_by(name) %>% summarise(num = length(name))
+```
+
+For catch (unsurprisingly), jonah:rock and jonah:scallop converge for all four regions. Cross-mapping from rock:jonah converges for 3, while scallop:jonah converges for 2. However, for weight, only jonah:rock converges for more than 2/4 strata.
+
+Let's create a new data frame to summarize the convergence results.
+
+```{r}
+#AGGREGATE
+conv_res <- data.frame(xmap = combos, method="agg", metric="catch", conv=TRUE)
+conv_res <- rbind(conv_res, conv_res %>% mutate(metric="wt"))
+conv_res[conv_res$xmap=="rock:jonah","conv"]<- FALSE
+
+#BY AREA - catch
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="area", metric="catch", conv=TRUE))
+conv_res[c(10, 12),"conv"]<- FALSE
+
+#BY AREA - wt
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="area", metric="wt", conv=TRUE))
+conv_res[14,"conv"]<- FALSE
+
+#BY REG - catch
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="reg", metric="catch", conv=TRUE))
+conv_res <- conv_res %>% mutate(conv = ifelse(
+  metric =="catch" & method =="reg" & 
+    (xmap %in% c("scallop:jonah", "rock:jonah")), FALSE, conv))
+
+#BY REG - wt
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="reg", metric="wt", conv=TRUE))
+conv_res <- conv_res %>% mutate(conv = ifelse(
+  metric =="wt" & method =="reg" & 
+    (xmap %in% c("scallop:jonah", "rock:jonah")), FALSE, conv))
+
+#BY STRAT - catch
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="strat", metric="catch", conv=TRUE))
+conv_res <- conv_res %>% mutate(conv = ifelse(
+  metric =="catch" & method =="strat" & 
+    (xmap %in% c("scallop:jonah")), FALSE, conv))
+
+#BY STRAT - wt
+conv_res <- rbind(conv_res, data.frame(xmap = combos, method="strat", metric="wt", conv=FALSE))
+conv_res <- conv_res %>% mutate(conv = ifelse(
+  metric =="wt" & method =="strat" & 
+    (xmap %in% c("jonah:rock")), TRUE, conv))
+
+conv_res
+
+ggplot(data=conv_res %>% filter(conv==TRUE))+geom_bar(aes(x=xmap,fill=metric), position="dodge")+labs(x="Cross-map direction", y="Count")+scale_fill_manual(values=c("#D98880", "black"))+theme(axis.text=element_text(size=10),
+        axis.title.x=element_text(size=12, margin = margin(t=10)), axis.title.y = element_text(margin = margin(r=10)))
+#+ggtitle("Num CCM methods with \U0394\U03C1 >0 for over half of trials")
 
 ```
 
-Our functions appear to work as we want them to. The embedded block is constructed correctly, with the NAs where appropriate. Originally when we select only 35 observations of the data, the predictive skill is negative for our do_xmap_ID function, which is essentially doing exactly the same Simplex call as normal CCM and equally struggling with the short time series.
+# Cross-map skill at max lib size
 
-However, when we concatenate the replicates, the predictive skill vastly improves and we can identify the true causal relationship between sea surface temperature and anchovy abundance, with a positive rho for anchovy->SST and a negative rho for SST->anchovy. Since the multispatial model can use the past states of replicate 1 from time point t when it is predicting the same time point t for replicate 2 with leave-one-out cross-validation (and vice versa), adding a slightly different version of the 35 time point data as a replicate brought cross-map skill to an even higher rho than normal CCM for anchovy->SST with a library size of 70.
+The second criteria for significant convergence is statistically significant cross-map skill at maximum library size. Although we got p-values for max lib size above using the compute_stats function, the validity of these p-values is questionable. The standard method of determining significance is with randomization tests, where you randomly rearrange the predictor time series to destroy the dynamic relationship between variables and perform CCM between the shuffled time series and the original target time series. This randomization is repeated 100 (or 1000) times to generate a null distribution of cross-map skill, against which the actual value can be compared.
 
-We'll start with multispatial CCM using areas as replicates.
-```{r}
-# Areas as replicates - catch
-RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(jonah,prey){
-  
-  out_1 <- do_xmap_ID(catchCCMdf,predictor=jonah,target=prey,ID_col = "area",E = 7, tp=1) %>% 
-    mutate(direction= paste("jonah","->",prey))
-  
-  out_2 <- do_xmap_ID(catchCCMdf,predictor=prey,target=jonah,ID_col = "area",E = 7, tp=1) %>% 
-    mutate(direction= paste(prey,"->","jonah"))
-  
-  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))
-  
-})
-
-```
-
+We will use the "surrogate" function from the package tseries, which will create surrogate data with the same spectrum as the input time series (x) by randomizing the phases of the Fourier coefficients of x.

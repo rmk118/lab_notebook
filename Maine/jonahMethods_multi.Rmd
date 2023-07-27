@@ -1,0 +1,289 @@
+
+
+Now, we're going to take a different approach. Instead of utilizing the
+different scales of spatial replication by running CCM on them
+individually to identify similarities and differences, we're going to do
+multispatial CCM, where we treat each spatial area as a replicate and
+concatenate the areas to create a longer time series, discarding rows
+where lags cross time series. This will give us 3 more versions of CCM
+to investigate overall system dynamics:
+
+5.  Multispatial CCM (aggregate) with areas as replicates = run CCM on 1
+    \>500-point time series
+6.  Multispatial CCM (aggregate) with regions (averaged across strata)
+    as replicates = run CCM on 1 \~150-point time series
+7.  Multispatial CCM (aggregate) with strata (averaged across regions)
+    as replicates = run CCM on 1 \~115-point time series
+
+
+
+Let's jump into the multispatial CCM.
+
+```{r}
+#There are the columns that we will want to keep from the CCM output
+v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
+                "rmse_linear","perc_linear","p_val_linear")
+```
+
+First, we'll need a basic delay function:
+
+```{r}
+delay <- function(x,n){
+  if(n>=0) 
+    lead(x,n) 
+  else 
+    lag(x,abs(n))}
+```
+
+Now, we need to make the embedding block for the CCM. The rEDM package
+has a function ("MakeBlock") that does this, but it cannot handle
+embedding concatenated replicates, since we can't lag the beginning of
+one replicate's time series based on the end of another replicate's time
+series. Instead, we create a function that lags after grouping by an ID
+column, then binding the individually-lagged replicates. Incomplete rows
+will then conveniently have NAs in them, making them easy to identify
+and remove.
+
+```{r}
+# Function 2B: make_xmap_block_ID ---------------------------------------------
+
+make_xmap_block_ID <- function(df,predictor,target,ID_col,E_max,cause_lag){
+  
+  v_delays <- 0:-(E_max-1)
+  
+  df_ccm <- df %>%
+    select({{ID_col}},{{target}}) %>%
+    group_by({{ID_col}}) %>%
+    transmute(target=delay({{target}},cause_lag))
+  
+  df_lags <- map_dfc(v_delays,function(d_i){
+    df %>%
+      group_by({{ID_col}}) %>%
+      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
+      ungroup({{ID_col}}) %>% select(-{{ID_col}})
+  })
+  
+  df_out <- bind_cols(df_ccm,df_lags) %>% 
+    ungroup() %>%
+    mutate(index=row_number()) %>%
+    select(index,everything())
+  
+  return(df_out)
+  
+}
+```
+
+Now we will define a helper function to make the multispatial CCM more
+efficient. For consistency with the normal CCM we performed earlier, we
+will use E=2.
+
+```{r}
+
+do_xmap_ID <- function(df,predictor,target,ID_col,E,tp=1){
+
+  df_1 <- make_xmap_block_ID(df,!!sym(predictor),!!sym(target),!!sym(ID_col),
+                          E_max=E,cause_lag=tp) %>% ungroup() %>% filter(complete.cases(.))
+  
+  lib_1 <- paste(1,nrow(df_1))
+ 
+  columns_star <- names(df_1)[4:(E+3)]
+
+  out <- Simplex(dataFrame=df_1,
+                 lib=lib_1,pred=lib_1,Tp=0, # The target has already been "manually" lagged
+                 target="target",
+                 columns=columns_star,
+                 embedded=TRUE,
+                 parameterList = TRUE,
+                 E=E)
+
+  fit_linear <- lm(as.formula(paste0("target ~ ",columns_star[1])),data=df_1)
+  out_linear_predictions <- predict(fit_linear)
+
+  params <- out$parameters
+  out <- out$predictions %>% filter(complete.cases(.))
+
+  stats <- compute_stats(out$Observations,out$Predictions)
+
+  stats_linear <- compute_stats(out$Observations,out_linear_predictions)
+  names(stats_linear) <- paste0(names(stats_linear),"_linear")
+
+    return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
+}
+```
+
+Let's test our functions with some toy data:
+
+```{r}
+data("sardine_anchovy_sst")
+set.seed(7)
+
+test_block1 <- sardine_anchovy_sst %>% select(year, anchovy, np_sst) %>% slice(1:35) %>% mutate(ID = 1)
+test_block2 <- test_block1 %>% mutate(across(anchovy:np_sst, ~jitter(.x*2, factor=1))) %>% mutate(ID = 2)
+test_1 <- rbind(test_block1, test_block2)
+
+test_block <- make_xmap_block_ID(test_1,target=np_sst,predictor = anchovy,ID_col = ID,E_max=3,cause_lag=1) 
+test_block %>% group_by(ID) %>% slice_head(n=5) #works as expected
+
+#Test with only one replicate
+do_xmap_ID(df=test_block1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+CCM(dataFrame = sardine_anchovy_sst %>% slice(1:35), E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "32 32 1", sample = 100) #Traditional CCM gives essentially the same answer— it is unable to recover the true causal interactions from the short time series
+
+#Test with the two replicates, the second being a slightly altered version of the first
+do_xmap_ID(df=test_1,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+do_xmap_ID(df=test_1,predictor = "np_sst", target="anchovy",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+CCM(dataFrame = sardine_anchovy_sst, E = 3, Tp = 1, columns = "anchovy", target = "np_sst", libSizes = "70 70 1", sample = 100, seed=7) #compare with normal CCM on the 78-year data set with a library size of 70, the same length as our test_1 concatenated time series
+
+
+```
+
+Our functions appear to work as we want them to. The embedded block is
+constructed correctly, with the NAs where appropriate. Originally when
+we select only 35 observations of the data, the predictive skill is
+negative for our do_xmap_ID function, which is essentially doing exactly
+the same Simplex call as normal CCM and equally struggling with the
+short time series.
+
+However, when we concatenate the replicates, the predictive skill vastly
+improves and we can identify the true causal relationship between sea
+surface temperature and anchovy abundance, with a positive rho for
+anchovy->SST and a negative rho for SST->anchovy. Since the
+multispatial model can use the past states of replicate 1 from time
+point t when it is predicting the same time point t for replicate 2 with
+leave-one-out cross-validation (and vice versa), adding a slightly
+different version of the 35 time point data as a replicate brought
+cross-map skill to an even higher rho than normal CCM for anchovy->SST
+with a library size of 70.
+
+If we change the second replicate to be less similar to the first, the predictive skill should decrease
+```{r}
+# Multiply the original by 3 instead of 2 and increase factor from 1 to 3
+test_block3 <- test_block1 %>% mutate(across(anchovy:np_sst, ~jitter(.x*3, factor=3))) %>% mutate(ID = 2)
+test_2 <- rbind(test_block1, test_block3)
+
+#Test with the two replicates, the second being a slightly altered version of the first
+do_xmap_ID(df=test_2,predictor = "anchovy", target="np_sst",ID_col = "ID", E=3) %>% select(all_of(v_keep_col))
+
+```
+
+Rho decreased from 0.38 to 0.13, reflecting the fact that including overly heterogeneous replicates may not improve model performance.
+
+We'll start with multispatial CCM using areas as replicates. For simplicity and consistency with our original aggregate CCM, we will use an embedding dimension of 2.
+
+```{r}
+# Areas as replicates - catch
+RESULTS_ccm_combos_areas <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(catchCCMdf,predictor=jonah,target=prey,ID_col = "area",E = 2, tp=1) %>% 
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(catchCCMdf,predictor=prey,target=jonah,ID_col = "area",E = 2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))
+  
+}) %>% mutate(type="catch", replicate = "area")
+
+# Areas as replicates - weight
+RESULTS_ccm_wt_combos_areas <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(wtCCMdf,predictor=jonah,target=prey,ID_col = "area",E = 2, tp=1) %>% 
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(wtCCMdf,predictor=prey,target=jonah,ID_col = "area",E = 2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))  %>% mutate(type="wt", replicate = "area")
+  
+})
+
+```
+
+Now we move on to using regions as replicates
+```{r}
+regionsDf<- catchCCMdf %>% ungroup() %>% 
+  group_by(Region, date) %>% 
+  summarise(across(scallop:jonah, ~ mean(.x, na.rm = TRUE)))
+
+regionsDf_wt<- wtCCMdf %>% ungroup() %>% 
+  group_by(Region, date) %>% 
+  summarise(across(scallop:jonah, ~ mean(.x, na.rm = TRUE)))
+
+# Regions as replicates
+RESULTS_ccm_combos_regions <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(regionsDf,predictor=jonah,target=prey,ID_col="Region",E=2, tp=1)  %>%
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(regionsDf,predictor=prey,target=jonah,ID_col="Region",E=2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))  %>% mutate(type="catch", replicate = "region")
+  
+})
+
+# Regions as replicates
+RESULTS_ccm_wt_combos_regions <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(regionsDf_wt,predictor=jonah,target=prey,ID_col="Region",E=2, tp=1)  %>%
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(regionsDf_wt,predictor=prey,target=jonah,ID_col="Region",E=2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))  %>% mutate(type="wt", replicate = "region")
+})
+
+
+```
+
+And strata:
+```{r}
+strataDf<- catchCCMdf %>% ungroup() %>% 
+  group_by(Stratum, date) %>% 
+  summarise(across(scallop:jonah, ~ mean(.x, na.rm = TRUE)))
+
+# Strata as replicates
+RESULTS_ccm_combos_strata <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(strataDf,predictor=jonah,target=prey,ID_col="Stratum",E=2, tp=1)  %>%
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(strataDf,predictor=prey,target=jonah,ID_col="Stratum",E=2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))  %>% mutate(type="catch", replicate = "stratum")
+  })
+  
+#WEIGHT
+strataDf_wt<- wtCCMdf %>% ungroup() %>% 
+  group_by(Stratum, date) %>% 
+  summarise(across(scallop:jonah, ~ mean(.x, na.rm = TRUE)))
+
+# Strata as replicates - weight
+RESULTS_ccm_wt_combos_strata <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+  
+  out_1 <- do_xmap_ID(strataDf_wt,predictor=jonah,target=prey,ID_col="Stratum",E=2, tp=1)  %>%
+    mutate(direction= paste("jonah","->",prey))
+  
+  out_2 <- do_xmap_ID(strataDf_wt,predictor=prey,target=jonah,ID_col="Stratum",E=2, tp=1) %>% 
+    mutate(direction= paste(prey,"->","jonah"))
+  
+  bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col)) %>% mutate(type="wt", replicate = "stratum")
+  
+})
+```
+
+Let's compare
+```{r}
+rbind(RESULTS_ccm_combos_areas,
+      RESULTS_ccm_combos_regions,
+      RESULTS_ccm_combos_strata,
+      RESULTS_ccm_wt_combos_areas,
+      RESULTS_ccm_wt_combos_regions,
+      RESULTS_ccm_wt_combos_strata) %>% select(c("type", "replicate", "direction", "num_pred", "rho", "rho_linear", "p_val"))
+```
+
+These are all pretty bad, only rarely doing better than the linear model and never exceeding a rho of 0.24. The clear spatial heterogeneity we saw earlier may mean that the manifolds represented by the different replicates are too dissimilar to yield accurate predictions when combined.

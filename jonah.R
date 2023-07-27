@@ -24,8 +24,6 @@ jonah_theta_rho_long <- jonah_theta_rho %>% pivot_longer(cols=2:5, names_to = "s
 jonah_E_rho_long <- jonah_catchE_rho %>% pivot_longer(cols=2:5, names_to = "stratum", values_to = "rho")
 
 
-
-
 jonahGeom <- left_join(regionsGrid_orig, catchCCMdf) %>% select(-c("scallop", "rock"))
 
 ggplot(data = complete_tidy_diff %>% 
@@ -49,9 +47,7 @@ catchTidy_seasons_complete<- complete(data = catchTidy_seasons %>% ungroup() %>%
         mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>% filter(date != "2000-05-01")
 #%>% select(-c("Species", "Type", "Year", "Season", "Region", "Stratum")) %>% arrange(date) %>% group_by(area)
  
-
 cor(c(as.matrix(sq_miles)), c(as.matrix(jonah_catchE)))
-
 
 sq_miles_v <- c(as.matrix(sq_miles))
 tows_v <- c(as.matrix(tows_per_area))
@@ -75,3 +71,54 @@ corrplot(cor(corDf), method = "circle", order = 'hclust', type="lower")
 testRes = cor.mtest(corDf, conf.level = 0.95)
 corrplot(cor(corDf), method = "circle", order = 'hclust', type="lower", diag=FALSE, p.mat = testRes$p, sig.level = c(0.001, 0.01, 0.05), pch.cex = 0.9,
          insig = 'label_sig', pch.col = 'grey20')
+
+
+
+# Testing imputed data ----------------------------------------------------
+library(zoo)
+fixCOVID <- function(df) {
+  df_out <- df %>% mutate(across(starts_with("avg"), na.approx))
+}
+
+catch_complete_imp <- catch_complete %>% arrange(across(c("area", "Season", "Year"))) %>% 
+  fixCOVID()
+
+catch_complete_diff_imp <- catch_complete_imp %>% arrange(date) %>% group_by(area) %>% 
+  mutate(across(where(is.double) & !date, lag2)) %>% 
+  arrange(area) %>% 
+  filter(date != "2000-11-01" & date != "2001-05-01")
+
+#Tidy it up
+complete_tidy_diff_imp <- pivot_longer(catch_complete_diff_imp,cols = starts_with("avg")) %>% 
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt",
+    startsWith(name,"avgLogWt") ~"logWt",
+    startsWith(name,"avgLogCatch") ~"logCatch")) %>% 
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah")) %>%
+  mutate(area = as.factor(area), Species = as.factor(Species),
+         Region = as.factor(Region), Type = as.factor(Type),
+         Stratum = as.factor(Stratum)) %>% 
+  select(-name)
+
+#All areas on one graph, split by species
+ggplot(data = complete_tidy_diff_imp %>% 
+         filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) +labs(y="2nd-differenced catch", x="Year")
+
+#Averaged across areas, split by species
+ggplot(data = complete_tidy_diff_imp %>% filter(Type == "catch", Species != "scallop") %>% group_by(date, Species) %>% 
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)+theme_classic()+labs(y="2nd-differenced catch", x="Year")
+
+#Colored by species, split by area
+ggplot(data = complete_tidy_diff_imp %>% filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=Species))+geom_line()+facet_grid(Region~Stratum)+labs(x="Depth stratum", y="Region")+theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
+
+EmbedDimension(dataFrame=complete_tidy_diff_imp %>% filter(Species=="jonah", Type=="wt") %>% group_by(date) %>% 
+                 summarise(avg = mean(value, na.rm = TRUE)) %>% 
+                 ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 43", pred="1 43")
+
+rm(complete_tidy_diff_imp)
+rm(catch_complete_diff_imp)
+rm(catch_complete_imp)

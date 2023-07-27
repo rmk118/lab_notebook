@@ -206,10 +206,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#load-packages" id="toc-load-packages" class="nav-link active" data-scroll-target="#load-packages">Load packages</a></li>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import data</a></li>
+  <li><a href="#intro" id="toc-intro" class="nav-link active" data-scroll-target="#intro">Intro</a>
+  <ul class="collapse">
+  <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">Load packages</a></li>
+  <li><a href="#import-and-clean-data" id="toc-import-and-clean-data" class="nav-link" data-scroll-target="#import-and-clean-data">Import and clean data</a></li>
+  </ul></li>
+  <li><a href="#general-trends" id="toc-general-trends" class="nav-link" data-scroll-target="#general-trends">General trends</a></li>
+  <li><a href="#second-differencing" id="toc-second-differencing" class="nav-link" data-scroll-target="#second-differencing">Second differencing</a></li>
   <li><a href="#edm---dimensionality-and-nonlinearity-aggregate" id="toc-edm---dimensionality-and-nonlinearity-aggregate" class="nav-link" data-scroll-target="#edm---dimensionality-and-nonlinearity-aggregate">EDM - dimensionality and nonlinearity (aggregate)</a></li>
-  <li><a href="#edm---dimensionality-and-nonlinearity-by-area" id="toc-edm---dimensionality-and-nonlinearity-by-area" class="nav-link" data-scroll-target="#edm---dimensionality-and-nonlinearity-by-area">EDM - dimensionality and nonlinearity (by area)</a></li>
+  <li><a href="#edm---dimensionality-and-nonlinearity-by-area" id="toc-edm---dimensionality-and-nonlinearity-by-area" class="nav-link" data-scroll-target="#edm---dimensionality-and-nonlinearity-by-area">EDM - dimensionality and nonlinearity (by area)</a>
+  <ul class="collapse">
+  <li><a href="#edm-dimensionality-nonlinearity---by-regionstratum" id="toc-edm-dimensionality-nonlinearity---by-regionstratum" class="nav-link" data-scroll-target="#edm-dimensionality-nonlinearity---by-regionstratum">EDM dimensionality &amp; nonlinearity - by region/stratum</a></li>
+  </ul></li>
   <li><a href="#convergent-cross-mapping" id="toc-convergent-cross-mapping" class="nav-link" data-scroll-target="#convergent-cross-mapping">Convergent cross-mapping</a></li>
   </ul>
 </nav>
@@ -231,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">July 24, 2023</p>
+      <p class="date-modified">July 27, 2023</p>
     </div>
   </div>
     
@@ -240,9 +248,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>Our approach here will be to utilize the multiple spatial scales and different metrics of abundance (weight/biomass, in kg, and catch per tow) to identify recurring patterns/trends in the dynamics of Jonah crab in the Gulf of Maine. We start with univariate analysis to assess the dimensionality, nonlinearity, and predictability of the system, and to evaluate if these characteristics differ across the coastline or at different depths. If the univariate analysis indicates that the system has appropriately low-dimensional, nonlinear dynamics, we move on to exploring the potential drivers of Jonah crab abundance, specifically interspecies interactions with Atlantic rock crabs (primarily a competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey species).</p>
-<section id="load-packages" class="level2">
-<h2 class="anchored" data-anchor-id="load-packages">Load packages</h2>
+<section id="intro" class="level1">
+<h1>Intro</h1>
+<p>Our approach here will be to utilize the multiple spatial scales and different metrics of abundance (weight/biomass, in kg, and catch per tow) to identify recurring patterns/trends in the dynamics of Jonah crab in the Gulf of Maine. We start with univariate analysis to assess the dimensionality, nonlinearity, and predictability of the system, and to evaluate if these characteristics differ across the coastline or at different depths. If the univariate analysis indicates that the system has appropriately low-dimensional, nonlinear dynamics, we move on to exploring the potential drivers of Jonah crab abundance, specifically interspecies interactions with Atlantic rock crabs (primarily a competitor with Jonah crabs) and Atlantic sea scallops (primarily a prey species). The results for weight generally (but not always) are similar to those for the catch data, so here we focus only on catch.</p>
+<section id="load-packages" class="level3">
+<h3 class="anchored" data-anchor-id="load-packages">Load packages</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -253,8 +263,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="co">#for spatial data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="import-data" class="level2">
-<h2 class="anchored" data-anchor-id="import-data">Import data</h2>
+<section id="import-and-clean-data" class="level3">
+<h3 class="anchored" data-anchor-id="import-and-clean-data">Import and clean data</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_tows<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MEtows.csv"</span>) <span class="co">#tow data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_s_cat<span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Maine_inshore_trawl/MEscallopCatch.csv"</span>) <span class="co">#scallop catch</span></span>
@@ -370,6 +380,10 @@ Geodetic CRS:  WGS 84</code></pre>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>catch_complete <span class="ot">&lt;-</span> catch_complete <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(date))</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>catchTidy_complete <span class="ot">&lt;-</span> catchTidy_complete <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+</section>
+<section id="general-trends" class="level1">
+<h1>General trends</h1>
 <p>First, we look at trends in overall abundance:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#line graph of abundance over time by season, no spatial distinction</span></span>
@@ -468,6 +482,9 @@ Geodetic CRS:  WGS 84</code></pre>
 20    54 -0.326   7.91</code></pre>
 </div>
 </div>
+</section>
+<section id="second-differencing" class="level1">
+<h1>Second differencing</h1>
 <p>For EDM, we want the time series to be as long as possible, so instead of considering seasons separately, we utilize the entire time series but take second-differences (i.e., x(t) = x(t)-x(t-2)) to remove the seasonal effect. Unfortunately, because of COVID, we are also going to get rid of the data after the missed Spring 2020 survey, since we can’t take second-differences with NA values and we want to avoid linear interpolation that may obscure nonlinear system dynamics.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lag2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
@@ -613,7 +630,7 @@ Geodetic CRS:  WGS 84</code></pre>
 15  9.00 0.2297665</code></pre>
 </div>
 </div>
-<p>We can see that both catch and weight are better represented by a nonlinear model (theta &gt;0) than a linear one. In addition, the predictive skill of the s-map projections is higher than the Simplex models.</p>
+<p>We can see that both catch is better represented by a nonlinear model (theta &gt;0) than a linear one. In addition, the predictive skill of the s-map projections is higher than the Simplex models.</p>
 <p>Now we want to see how these characteristics change at different spatial scales. We will first define some useful functions to more efficiently repeat the previous tests:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">############ Find E and rho - vector input -------------------------------------------------</span></span>
@@ -895,7 +912,8 @@ Geodetic CRS:  WGS 84</code></pre>
 5  0.398  0.704 0.352  0.662 </code></pre>
 </div>
 </div>
-<p>The results for catch and weight are similar, but not identical. There is also clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear. The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho &gt;0.7). We note that the predictability for individual areas is generally higher than the aggregate results we computed earlier.</p>
+<p>There is clear spatial heterogeneity: some areas have an optimal embedding dimension of only 1, while others reach 6; some areas display essentially linear dynamics, with theta=0.01, but most areas appear to be highly nonlinear.</p>
+<p>The predictive skill also ranges widely. For example, Region 2, Stratum 4 appears especially low (catch s-map is 0.14, weight Simplex is 0.03, and catch Simplex and weight s-map have negative rho), whereas Region 1, Stratum 1 appears to be among the most predictable (all 4 models have rho &gt;0.7). We note that the predictability for individual areas is generally higher than the aggregate results we computed earlier.</p>
 <p>The lowered-number regions and strata (further south and closer inshore, respectively) appear to be generally more predictable than the outer strata and more northern regions. This seems reminiscent of the geographical area (in square miles) and number of tows allocated to each region/stratum combination. Let’s test this by first creating data frames with the numbers from the ME-NH Inshore Trawl Survey protocols and procedures manual.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sq_miles <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="fl">253.27</span>, <span class="fl">279.63</span>, <span class="fl">259.62</span>, <span class="fl">205.3</span>, <span class="fl">138.54</span>), <span class="fu">c</span>(<span class="fl">214.22</span>, <span class="fl">191.23</span>, <span class="fl">262.9</span>, <span class="fl">206.12</span>, <span class="fl">220.49</span>), <span class="fu">c</span>(<span class="fl">227.35</span>, <span class="fl">211.66</span>, <span class="fl">280.03</span>, <span class="fl">310.49</span>, <span class="fl">365.04</span>), <span class="fu">c</span>(<span class="fl">225.65</span>, <span class="fl">263.49</span>, <span class="fl">183.69</span>, <span class="fl">170.72</span>, <span class="fl">196.11</span>))</span>
@@ -932,8 +950,18 @@ Geodetic CRS:  WGS 84</code></pre>
 <p><img src="jonahMethods_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Key takeaways: (1) Weight E and catch E are positively correlated, as are weight theta and catch theta (2) Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping (3) Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity (4) The size of an area is not significantly correlated (using Spearman’s method) with any of the other metrics besides number of tows, which is to be expected because tows were specifically allocated to ensure even density in all areas. Number of tows per area appeared correlated with Simplex rho for catch data (positive correlation) and theta for weight data (negative correlation), but the strength of these correlations was relatively low, and it is likely that this is a case of statistical significance without practical/biological significance.</p>
-<p>We will also look at these results when we average across regions or strata. # EDM dimensionality &amp; nonlinearity - by region/stratum First, we’ll define a function that takes in the name of a group and returns EDM stats on a data frame grouped appropriately:</p>
+<p>Key takeaways:</p>
+<ol type="1">
+<li><p>Weight E and catch E are positively correlated, as are weight theta and catch theta</p></li>
+<li><p>Areas that were highly predictable using Simplex are more likely to be highly predictable using s-mapping</p></li>
+<li><p>Within an abundance metric (catch or weight), the predictability of a system is not significantly correlated with its complexity (dimensionality) or linearity</p></li>
+<li><p>The size of an area is not significantly correlated (using Spearman’s method) with any of the other metrics besides number of tows, which is to be expected because tows were specifically allocated to ensure even density in all areas.</p></li>
+<li><p>Number of tows per area appeared correlated with Simplex rho for catch data (positive correlation) and theta for weight data (negative correlation), but the strength of these correlations was relatively low, and it is likely that this is a case of statistical significance without practical/biological significance.</p></li>
+</ol>
+<p>We will also look at these results when we average across regions or strata.</p>
+<section id="edm-dimensionality-nonlinearity---by-regionstratum" class="level2">
+<h2 class="anchored" data-anchor-id="edm-dimensionality-nonlinearity---by-regionstratum">EDM dimensionality &amp; nonlinearity - by region/stratum</h2>
+<p>First, we’ll define a function that takes in the name of a group and returns EDM stats on a data frame grouped appropriately:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>findSpeciesGroups_both<span class="ot">&lt;-</span> <span class="cf">function</span>(df, species, type, g) {</span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  df_out <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
@@ -976,7 +1004,7 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 <p>Dimensionality appears relatively consistent between regions, but predictability and nonlinearity appear to vary widely. As when we looked at individual areas earlier, the lower-numbered regions (further south) seem more predictable than the more northern regions when modeled with the appropriate nonlinear parameter (i.e., s-map with optimal theta). Is there a negative correlation between region and s-map predictability?</p>
-<p>We use Spearman’s method rather than the default Pearson’s because Region is an ordinal variable and Pearson’s requires at least interval data.</p>
+<p>We use Spearman’s method rather than the default Pearson’s because Region is an ordinal variable and Pearson’s requires at least interval data. TEST THIS ON INDIVIDUAL AREAS</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Catch - s-map predictive skill</span></span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(jonah_catch_regions_stats<span class="sc">$</span>rho_theta, <span class="fu">as.numeric</span>(jonah_catch_regions_stats<span class="sc">$</span>Region), <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1084,6 +1112,7 @@ sample estimates:
 </div>
 <p>For each stratum, the values computed from the weight data were very similar to those computed from the catch data. Simplex projection using the disparate abundance metrics identified identical embedding dimension values, rho values generally within &lt;0.1 of each other, and concurring measures of nonlinearity: theta between 1-1.5 for strata 1, 3, and 4, with theta=9 for stratum 2. This provides a reassuring indication that the method is robust to at least small amounts of observation noise and/or slightly different ways of “viewing” the attractor manifold of the system.</p>
 <p>After our analysis of the univariate dynamics of the Jonah crab fishery at multiple spatial scales, we can feel confident that it has the low-dimensional, nonlinear dynamics that make CCM an appropriate method of determining causality.</p>
+</section>
 </section>
 <section id="convergent-cross-mapping" class="level1">
 <h1>Convergent cross-mapping</h1>
@@ -1375,7 +1404,7 @@ sample estimates:
   11          0             1          0             1
   12          1             1          0             0
   13          1             0          1             0
-  14          1             1          1             1
+  14          1             1          0             1
   21          1             1          1             0
   22          1             1          1             1
   23          1             1          0             0
@@ -1396,7 +1425,7 @@ sample estimates:
 <div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">table</span>(converges_wt<span class="sc">$</span>area, converges_wt<span class="sc">$</span>name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   jonah:rock jonah:scallop    rock:jonah scallop:jonah 
-           19            18            11             7 </code></pre>
+           19            18            10             7 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1413,64 +1442,64 @@ sample estimates:
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_by_area <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">find_max</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 20 × 5
-    area max_J_S  max_S_J max_J_R   max_R_J
-   &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
- 1    11  0.240  -0.0780  -0.0874  0.205   
- 2    12  0.224   0.148    0.0521 -0.0284  
- 3    13  0.305  -0.0370   0.243  -0.000386
- 4    14  0.0953  0.0490   0.329   0.0781  
- 5    21  0.119  -0.0752   0.0112  0.120   
- 6    22  0.676   0.129    0.130   0.138   
- 7    23  0.329   0.0863   0.0897  0.0856  
- 8    24  0.158  -0.132    0.0598 -0.0223  
- 9    31  0.205  -0.177   -0.0400 -0.105   
-10    32  0.0694  0.159    0.0359 -0.199   
-11    33  0.443  -0.0963   0.167   0.00332 
-12    34  0.0129 -0.190    0.480  -0.0229  
-13    41  0.242  -0.146    0.465   0.280   
-14    42  0.239  -0.0358   0.458  -0.0740  
-15    43  0.0718 -0.0409   0.0963  0.0935  
-16    44  0.248  -0.0115   0.565  -0.0464  
-17    51  0.133  -0.0348   0.458  -0.116   
-18    52  0.249  -0.0501   0.200   0.0904  
-19    53  0.0364  0.165    0.167   0.0855  
-20    54  0.239  -0.00553  0.0178 -0.118   </code></pre>
+    area max_J_S  max_S_J  max_J_R   max_R_J
+   &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1    11  0.239  -0.0568  -0.0956   0.211   
+ 2    12  0.220   0.147    0.0500  -0.0284  
+ 3    13  0.302  -0.0370   0.241   -0.000386
+ 4    14  0.0953  0.0489   0.323    0.0871  
+ 5    21  0.119  -0.0752  -0.00448  0.118   
+ 6    22  0.676   0.131    0.130    0.149   
+ 7    23  0.331   0.0995   0.0897   0.0856  
+ 8    24  0.158  -0.106    0.0565  -0.0409  
+ 9    31  0.205  -0.179   -0.0562  -0.105   
+10    32  0.0543  0.159    0.0359  -0.198   
+11    33  0.443  -0.0662   0.173    0.00332 
+12    34  0.0129 -0.215    0.473   -0.0145  
+13    41  0.240  -0.139    0.469    0.280   
+14    42  0.239  -0.0358   0.459   -0.0487  
+15    43  0.0718 -0.0656   0.0877   0.0935  
+16    44  0.245  -0.0125   0.564   -0.0448  
+17    51  0.134  -0.0348   0.458   -0.116   
+18    52  0.243  -0.0501   0.202    0.0904  
+19    53  0.0422  0.165    0.167    0.0855  
+20    54  0.239  -0.00553  0.00727 -0.119   </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_wt_by_area <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">find_max</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 20 × 5
     area  max_J_S  max_S_J  max_J_R  max_R_J
    &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
- 1    11  0.321    0.300   -0.00592 -0.0283 
- 2    12  0.124   -0.146    0.343   -0.0239 
- 3    13 -0.0657  -0.0488   0.286    0.110  
- 4    14  0.0667  -0.00379  0.0599  -0.143  
- 5    21  0.0645  -0.0855   0.0663   0.180  
+ 1    11  0.321    0.289   -0.00592 -0.0283 
+ 2    12  0.125   -0.146    0.342   -0.0239 
+ 3    13 -0.0669  -0.0488   0.287    0.110  
+ 4    14  0.0667  -0.00645  0.0599  -0.157  
+ 5    21  0.0638  -0.0855   0.0663   0.180  
  6    22  0.631    0.289    0.0408   0.0223 
- 7    23  0.490   -0.00213  0.230   -0.0878 
- 8    24  0.182   -0.0685   0.136   -0.126  
- 9    31  0.116    0.0877   0.0181  -0.117  
-10    32  0.171   -0.158    0.0171  -0.125  
-11    33  0.231   -0.116    0.0796  -0.0290 
-12    34 -0.0130  -0.0344   0.500    0.111  
-13    41  0.0749  -0.138    0.378    0.322  
-14    42  0.181   -0.0741   0.414   -0.00338
-15    43  0.122   -0.0641   0.102   -0.109  
-16    44  0.120   -0.0687   0.587   -0.0502 
-17    51  0.00826  0.0189   0.396    0.0527 
-18    52  0.0213   0.281    0.237    0.244  
-19    53  0.0797   0.307    0.192    0.108  
-20    54  0.211   -0.0667   0.0195  -0.123  </code></pre>
+ 7    23  0.490    0.0165   0.226   -0.0878 
+ 8    24  0.182   -0.100    0.136   -0.121  
+ 9    31  0.117    0.0877   0.0181  -0.117  
+10    32  0.171   -0.158    0.0171  -0.124  
+11    33  0.234   -0.123    0.0797  -0.0290 
+12    34 -0.0161  -0.0344   0.501    0.111  
+13    41  0.0912  -0.105    0.384    0.322  
+14    42  0.185   -0.0741   0.414   -0.00352
+15    43  0.119   -0.0641   0.102   -0.109  
+16    44  0.120   -0.0711   0.587   -0.0478 
+17    51  0.00826  0.0189   0.394    0.0516 
+18    52  0.0213   0.281    0.237    0.243  
+19    53  0.0797   0.301    0.199    0.110  
+20    54  0.211   -0.0667   0.0195  -0.122  </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(((RESULTS_ccm_by_area <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">find_max</span>()) <span class="sc">&gt;</span><span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   area max_J_S max_S_J max_J_R max_R_J 
-     20      20       6      18      10 </code></pre>
+     20      20       6      17      10 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(((RESULTS_ccm_wt_by_area <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(area) <span class="sc">%&gt;%</span> <span class="fu">find_max</span>()) <span class="sc">&gt;</span><span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   area max_J_S max_S_J max_J_R max_R_J 
-     20      18       6      19       8 </code></pre>
+     20      18       7      19       8 </code></pre>
 </div>
 </div>
 <p>We can see that for catchm max rho for J-&gt;S was &gt;0 for all area and max rho for J-&gt;R was &gt;0 for 18/20 areas. For weight, max rho for J-&gt;S was &gt;0 for 18/20 areas and max rho for J-&gt;R was &gt;0 for 19/20 areas. S-&gt;J was 6 and 7 and R-&gt;J was 10 and 8 for catch and weight, respectively.</p>
@@ -1793,7 +1822,7 @@ sample estimates:
 <div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CCM</span>(<span class="at">dataFrame =</span> sardine_anchovy_sst <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">35</span>), <span class="at">E =</span> <span class="dv">3</span>, <span class="at">Tp =</span> <span class="dv">1</span>, <span class="at">columns =</span> <span class="st">"anchovy"</span>, <span class="at">target =</span> <span class="st">"np_sst"</span>, <span class="at">libSizes =</span> <span class="st">"32 32 1"</span>, <span class="at">sample =</span> <span class="dv">100</span>) <span class="co">#Traditional CCM gives essentially the same answer— it is unable to recover the true causal interactions from the short time series</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  LibSize anchovy:np_sst np_sst:anchovy
-1      32     -0.1252798     -0.3334738</code></pre>
+1      32     -0.1178243     -0.3362404</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test with the two replicates, the second being a slightly altered version of the first</span></span>
 <span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a><span class="fu">do_xmap_ID</span>(<span class="at">df=</span>test_1,<span class="at">predictor =</span> <span class="st">"anchovy"</span>, <span class="at">target=</span><span class="st">"np_sst"</span>,<span class="at">ID_col =</span> <span class="st">"ID"</span>, <span class="at">E=</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(v_keep_col))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1818,21 +1847,184 @@ sample estimates:
 </div>
 <p>Our functions appear to work as we want them to. The embedded block is constructed correctly, with the NAs where appropriate. Originally when we select only 35 observations of the data, the predictive skill is negative for our do_xmap_ID function, which is essentially doing exactly the same Simplex call as normal CCM and equally struggling with the short time series.</p>
 <p>However, when we concatenate the replicates, the predictive skill vastly improves and we can identify the true causal relationship between sea surface temperature and anchovy abundance, with a positive rho for anchovy-&gt;SST and a negative rho for SST-&gt;anchovy. Since the multispatial model can use the past states of replicate 1 from time point t when it is predicting the same time point t for replicate 2 with leave-one-out cross-validation (and vice versa), adding a slightly different version of the 35 time point data as a replicate brought cross-map skill to an even higher rho than normal CCM for anchovy-&gt;SST with a library size of 70.</p>
-<p>We’ll start with multispatial CCM using areas as replicates.</p>
+<p>If we change the second replicate to be less similar to the first, the predictive skill should decrease</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Areas as replicates - catch</span></span>
-<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_combos_areas <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
-<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(catchCCMdf,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">7</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
-<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(catchCCMdf,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">7</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
-<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))</span>
-<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiply the original by 3 instead of 2 and increase factor from 1 to 3</span></span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>test_block3 <span class="ot">&lt;-</span> test_block1 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(anchovy<span class="sc">:</span>np_sst, <span class="sc">~</span><span class="fu">jitter</span>(.x<span class="sc">*</span><span class="dv">3</span>, <span class="at">factor=</span><span class="dv">3</span>))) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="dv">2</span>)</span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>test_2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(test_block1, test_block3)</span>
+<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Test with the two replicates, the second being a slightly altered version of the first</span></span>
+<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="fu">do_xmap_ID</span>(<span class="at">df=</span>test_2,<span class="at">predictor =</span> <span class="st">"anchovy"</span>, <span class="at">target=</span><span class="st">"np_sst"</span>,<span class="at">ID_col =</span> <span class="st">"ID"</span>, <span class="at">E=</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(v_keep_col))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  E Tp num_pred       rho      mae     rmse     perc     p_val rho_linear
+1 3  0       64 0.1237272 2.072298 2.628255 0.484375 0.1656951  0.2334975
+  mae_linear rmse_linear perc_linear p_val_linear
+1   1.774022    2.431176         0.5   0.03158841</code></pre>
 </div>
+</div>
+<p>Rho decreased from 0.38 to 0.13, reflecting the fact that including overly heterogeneous replicates may not improve model performance.</p>
+<p>We’ll start with multispatial CCM using areas as replicates. For simplicity and consistency with our original aggregate CCM, we will use an embedding dimension of 2.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Areas as replicates - catch</span></span>
+<span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_combos_areas <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb138-3"><a href="#cb138-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-4"><a href="#cb138-4" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(catchCCMdf,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb138-5"><a href="#cb138-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb138-6"><a href="#cb138-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-7"><a href="#cb138-7" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(catchCCMdf,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb138-8"><a href="#cb138-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb138-9"><a href="#cb138-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-10"><a href="#cb138-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))</span>
+<span id="cb138-11"><a href="#cb138-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-12"><a href="#cb138-12" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"catch"</span>, <span class="at">replicate =</span> <span class="st">"area"</span>)</span>
+<span id="cb138-13"><a href="#cb138-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb138-14"><a href="#cb138-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Areas as replicates - weight</span></span>
+<span id="cb138-15"><a href="#cb138-15" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_wt_combos_areas <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb138-16"><a href="#cb138-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-17"><a href="#cb138-17" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(wtCCMdf,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb138-18"><a href="#cb138-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb138-19"><a href="#cb138-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-20"><a href="#cb138-20" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(wtCCMdf,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col =</span> <span class="st">"area"</span>,<span class="at">E =</span> <span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb138-21"><a href="#cb138-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb138-22"><a href="#cb138-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-23"><a href="#cb138-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))  <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"wt"</span>, <span class="at">replicate =</span> <span class="st">"area"</span>)</span>
+<span id="cb138-24"><a href="#cb138-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb138-25"><a href="#cb138-25" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we move on to using regions as replicates</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>regionsDf<span class="ot">&lt;-</span> catchCCMdf <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Region, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb139-4"><a href="#cb139-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb139-5"><a href="#cb139-5" aria-hidden="true" tabindex="-1"></a>regionsDf_wt<span class="ot">&lt;-</span> wtCCMdf <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb139-6"><a href="#cb139-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Region, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb139-7"><a href="#cb139-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb139-8"><a href="#cb139-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb139-9"><a href="#cb139-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Regions as replicates</span></span>
+<span id="cb139-10"><a href="#cb139-10" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_combos_regions <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb139-11"><a href="#cb139-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-12"><a href="#cb139-12" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(regionsDf,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col=</span><span class="st">"Region"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb139-13"><a href="#cb139-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb139-14"><a href="#cb139-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-15"><a href="#cb139-15" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(regionsDf,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col=</span><span class="st">"Region"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb139-16"><a href="#cb139-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb139-17"><a href="#cb139-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-18"><a href="#cb139-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))  <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"catch"</span>, <span class="at">replicate =</span> <span class="st">"region"</span>)</span>
+<span id="cb139-19"><a href="#cb139-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-20"><a href="#cb139-20" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb139-21"><a href="#cb139-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb139-22"><a href="#cb139-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Regions as replicates</span></span>
+<span id="cb139-23"><a href="#cb139-23" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_wt_combos_regions <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb139-24"><a href="#cb139-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-25"><a href="#cb139-25" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(regionsDf_wt,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col=</span><span class="st">"Region"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb139-26"><a href="#cb139-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb139-27"><a href="#cb139-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-28"><a href="#cb139-28" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(regionsDf_wt,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col=</span><span class="st">"Region"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb139-29"><a href="#cb139-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb139-30"><a href="#cb139-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb139-31"><a href="#cb139-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))  <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"wt"</span>, <span class="at">replicate =</span> <span class="st">"region"</span>)</span>
+<span id="cb139-32"><a href="#cb139-32" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And strata:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a>strataDf<span class="ot">&lt;-</span> catchCCMdf <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Stratum, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-5"><a href="#cb140-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Strata as replicates</span></span>
+<span id="cb140-6"><a href="#cb140-6" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_combos_strata <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb140-7"><a href="#cb140-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-8"><a href="#cb140-8" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(strataDf,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col=</span><span class="st">"Stratum"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb140-9"><a href="#cb140-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb140-10"><a href="#cb140-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-11"><a href="#cb140-11" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(strataDf,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col=</span><span class="st">"Stratum"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-12"><a href="#cb140-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb140-13"><a href="#cb140-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-14"><a href="#cb140-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col))  <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"catch"</span>, <span class="at">replicate =</span> <span class="st">"stratum"</span>)</span>
+<span id="cb140-15"><a href="#cb140-15" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb140-16"><a href="#cb140-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-17"><a href="#cb140-17" aria-hidden="true" tabindex="-1"></a><span class="co">#WEIGHT</span></span>
+<span id="cb140-18"><a href="#cb140-18" aria-hidden="true" tabindex="-1"></a>strataDf_wt<span class="ot">&lt;-</span> wtCCMdf <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb140-19"><a href="#cb140-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Stratum, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-20"><a href="#cb140-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(scallop<span class="sc">:</span>jonah, <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb140-21"><a href="#cb140-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-22"><a href="#cb140-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Strata as replicates - weight</span></span>
+<span id="cb140-23"><a href="#cb140-23" aria-hidden="true" tabindex="-1"></a>RESULTS_ccm_wt_combos_strata <span class="ot">&lt;-</span> <span class="fu">pmap_dfr</span>(params_ccm_combos,<span class="cf">function</span>(jonah,prey){</span>
+<span id="cb140-24"><a href="#cb140-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-25"><a href="#cb140-25" aria-hidden="true" tabindex="-1"></a>  out_1 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(strataDf_wt,<span class="at">predictor=</span>jonah,<span class="at">target=</span>prey,<span class="at">ID_col=</span><span class="st">"Stratum"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb140-26"><a href="#cb140-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(<span class="st">"jonah"</span>,<span class="st">"-&gt;"</span>,prey))</span>
+<span id="cb140-27"><a href="#cb140-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-28"><a href="#cb140-28" aria-hidden="true" tabindex="-1"></a>  out_2 <span class="ot">&lt;-</span> <span class="fu">do_xmap_ID</span>(strataDf_wt,<span class="at">predictor=</span>prey,<span class="at">target=</span>jonah,<span class="at">ID_col=</span><span class="st">"Stratum"</span>,<span class="at">E=</span><span class="dv">2</span>, <span class="at">tp=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-29"><a href="#cb140-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">direction=</span> <span class="fu">paste</span>(prey,<span class="st">"-&gt;"</span>,<span class="st">"jonah"</span>))</span>
+<span id="cb140-30"><a href="#cb140-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-31"><a href="#cb140-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(out_1,out_2) <span class="sc">%&gt;%</span> <span class="fu">select</span>(direction, <span class="fu">all_of</span>(v_keep_col)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type=</span><span class="st">"wt"</span>, <span class="at">replicate =</span> <span class="st">"stratum"</span>)</span>
+<span id="cb140-32"><a href="#cb140-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb140-33"><a href="#cb140-33" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s compare</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(RESULTS_ccm_combos_areas,</span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>      RESULTS_ccm_combos_regions,</span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>      RESULTS_ccm_combos_strata,</span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a>      RESULTS_ccm_wt_combos_areas,</span>
+<span id="cb141-5"><a href="#cb141-5" aria-hidden="true" tabindex="-1"></a>      RESULTS_ccm_wt_combos_regions,</span>
+<span id="cb141-6"><a href="#cb141-6" aria-hidden="true" tabindex="-1"></a>      RESULTS_ccm_wt_combos_strata) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"type"</span>, <span class="st">"replicate"</span>, <span class="st">"direction"</span>, <span class="st">"num_pred"</span>, <span class="st">"rho"</span>, <span class="st">"rho_linear"</span>, <span class="st">"p_val"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    type replicate        direction num_pred           rho  rho_linear
+1  catch      area jonah -&gt; scallop      664  0.0229789146 0.041541708
+2  catch      area scallop -&gt; jonah      664  0.0031473475 0.039666951
+3  catch      area    jonah -&gt; rock      664  0.0556361019 0.091375693
+4  catch      area    rock -&gt; jonah      664  0.0114892485 0.026881274
+5  catch    region jonah -&gt; scallop      175  0.1983326508 0.100141514
+6  catch    region scallop -&gt; jonah      175  0.0839884649 0.038874387
+7  catch    region    jonah -&gt; rock      175  0.0950072641 0.131597358
+8  catch    region    rock -&gt; jonah      175 -0.1513594220 0.015069500
+9  catch   stratum jonah -&gt; scallop      135  0.0333450574 0.026674740
+10 catch   stratum scallop -&gt; jonah      135 -0.0189469408 0.025439434
+11 catch   stratum    jonah -&gt; rock      135 -0.0185742205 0.012765554
+12 catch   stratum    rock -&gt; jonah      135 -0.0792231823 0.047177241
+13    wt      area jonah -&gt; scallop      664  0.0041663255 0.053120386
+14    wt      area scallop -&gt; jonah      664  0.0121325541 0.080890588
+15    wt      area    jonah -&gt; rock      664  0.0888651098 0.088088876
+16    wt      area    rock -&gt; jonah      664  0.0436977676 0.053318041
+17    wt    region jonah -&gt; scallop      175  0.1085589747 0.115285913
+18    wt    region scallop -&gt; jonah      175  0.0954302545 0.114321660
+19    wt    region    jonah -&gt; rock      175 -0.0004094959 0.147928824
+20    wt    region    rock -&gt; jonah      175  0.0117473872 0.013762561
+21    wt   stratum jonah -&gt; scallop      135  0.0589286557 0.037840929
+22    wt   stratum scallop -&gt; jonah      135  0.2423091224 0.119691712
+23    wt   stratum    jonah -&gt; rock      135 -0.0292424952 0.004490624
+24    wt   stratum    rock -&gt; jonah      135 -0.1754257051 0.121817143
+         p_val
+1  0.277297037
+2  0.467753455
+3  0.076089318
+4  0.383843914
+5  0.004193965
+6  0.134775006
+7  0.105690326
+8  0.977273133
+9  0.350768083
+10 0.586172398
+11 0.584502685
+12 0.819146307
+13 0.457348272
+14 0.377542185
+15 0.010988716
+16 0.130467907
+17 0.076448896
+18 0.104671107
+19 0.502142505
+20 0.438776236
+21 0.248941634
+22 0.002252791
+23 0.631589642
+24 0.979152584</code></pre>
+</div>
+</div>
+<p>These are all pretty bad, only rarely doing better than the linear model and never exceeding a rho of 0.24. The clear spatial heterogeneity we saw earlier may mean that the manifolds represented by the different replicates are too dissimilar to yield accurate predictions when combined.</p>
+<p>We’re going to focus on assessing the significance of our non-multispatial CCM: catch and weight for aggregate, by area, by region, and by stratum.</p>
 
 
 </section>
