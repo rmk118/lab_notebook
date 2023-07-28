@@ -569,6 +569,8 @@ do_xmap_ID_failed <- function(df,predictor,target,ID_col,E_max=2 ,tp=1,keep_pred
 # 
 # y<-surrogate(x, ns=50, fft=TRUE, statistic=theta_fun) 
 
+# , which will create surrogate data with the same spectrum as the input time series (x) by randomizing the phases of the Fourier coefficients of x, and we'll set "amplitude=TRUE" to preserve the amplitude distribution of the original series
+
 ccm_agg_surr <- cbind(catchCCMdf_agg, surrogate(catchCCMdf_agg$jonah, ns=100)) %>% select(-jonah)
 
 ccm_agg_surr <- rename_with(ccm_agg_surr,.cols=!any_of(c("date", "scallop", "rock")),~ paste0("jonah_", .x, recycle0 = TRUE))
