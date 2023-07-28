@@ -543,24 +543,37 @@ do_xmap_ID_failed <- function(df,predictor,target,ID_col,E_max=2 ,tp=1,keep_pred
   
 }
 
+# The two calls will produce similar results, and the combined
+# result will give us a better picture of strong interspecies
+# relationships that are robust to slight misspecifications of the
+# function.
 
 #testing surrogate function
-library(tseries)
-x <- 1:10  # Simple example
-surrogate(x, ns=10, fft=TRUE, amplitude = TRUE)
+# library(tseries)
+# x <- 1:10  # Simple example
+# surrogate(x, ns=10, fft=TRUE, amplitude = TRUE)
+# 
+# 
+# n <- 500  # Generate AR(1) process
+# e <- rnorm(n)  
+# x <- double(n)
+# x[1] <- rnorm(1)
+# for(i in 2:n) {
+#   x[i] <- 0.4 * x[i-1] + e[i]
+# }
+# x <- ts(x)
+# 
+# theta_fun <- function(x) { # Autocorrelations up to lag 10
+#   return(acf(x, plot=FALSE)$acf[2:11])
+# }
+# 
+# y<-surrogate(x, ns=50, fft=TRUE, statistic=theta_fun) 
 
+ccm_agg_surr <- cbind(catchCCMdf_agg, surrogate(catchCCMdf_agg$jonah, ns=100)) %>% select(-jonah)
 
-n <- 500  # Generate AR(1) process
-e <- rnorm(n)  
-x <- double(n)
-x[1] <- rnorm(1)
-for(i in 2:n) {
-  x[i] <- 0.4 * x[i-1] + e[i]
-}
-x <- ts(x)
+ccm_agg_surr <- rename_with(ccm_agg_surr,.cols=!any_of(c("date", "scallop", "rock")),~ paste0("jonah_", .x, recycle0 = TRUE))
 
-theta_fun <- function(x) { # Autocorrelations up to lag 10
-  return(acf(x, plot=FALSE)$acf[2:11])
-}
+params_ccm_combos_surr <- map_dfr(seq_len(100), ~params_ccm_combos)
+params_ccm_combos_surr <- params_ccm_combos_surr %>% mutate(surr_trial = rep(1:100, each=2))
 
-y<-surrogate(x, ns=50, fft=TRUE, statistic=theta_fun) 
+paste("jonah", 2, sep="_")

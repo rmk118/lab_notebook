@@ -764,25 +764,6 @@ for (i in 1:5) {
 corrOut_areas <- corrOut_areas %>% slice(-1)
 corrOut_areas_wt <- corrOut_areas_wt %>% slice(-1)
 
-########## CCM randomization #################
-# compute_perm <- function(df, predictor,target,E,tp,keep_preds=FALSE){
-#   
-#   df_2 <- df %>% filter(complete.cases(.)) %>% slice_sample(prop=1)
-#   L <- paste(1,nrow(df_2))
-#   out <- Simplex(dataFrame=df_2, lib=L,pred=L, Tp=1,target=target,columns=predictor, embedded=FALSE,parameterList = TRUE,E=E)
-#   
-#   params <- out$parameters
-#   out <- out$predictions %>% filter(complete.cases(.))
-#   
-#   stats <- compute_stats(out$Observations,out$Predictions)
-#   stats$lib_size = L
-#   stats$E=E
-#   stats$Tp=1
-#   
-#   return(stats)
-# }
-
-
 ########## Environment #################
 
 envi_df <- df_tows %>%
@@ -921,6 +902,68 @@ ggplot(data = jonahCatch %>% filter(Type=="catch", Season=="Fall") %>% filter(Ye
 #line graph of abundance over time by season, no spatial distinction
 ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
 
+########## CCM randomization #################
 
+#agg weight
+
+RESULTS_ccm_wt_aggregate %>% group_by(xmap) %>% summarize(across(all_of(combos),last)) %>% pivot_longer(cols=all_of(combos)) %>% na.omit() %>% filter(substr(xmap, 1, 1)==substr(name, 1, 1))
+
+set.seed(7)
+ccm_agg_wt_surr <- cbind(wtCCMdf_agg, surrogate(wtCCMdf_agg$jonah, ns=1000)) %>% select(-jonah)
+ccm_agg_wt_surr <- rename_with(ccm_agg_wt_surr,.cols=!any_of(c("date", "scallop", "rock")),~ paste0("jonah_", .x, recycle0 = TRUE))
+
+#Create the data frame that will store the combinations we want to test
+params_ccm_combos_surr_1000 <- map_dfr(seq_len(1000), ~params_ccm_combos %>% select(-"jonah"))
+params_ccm_combos_surr_1000 <- params_ccm_combos_surr_1000 %>% mutate(surr_trial = rep(1:1000, each=2))
+
+RESULTS_ccm_agg_wt_surr <- pmap_dfr(params_ccm_combos_surr_1000,function(prey, surr_trial){
+  
+  lib_vec <- paste(1, nrow(ccm_agg_wt_surr))
+  jonah_col = paste("jonah",surr_trial, sep="_" )
+  
+  #The only difference for finding E opt is that the column name for jonah is now jonah_n, 
+  #where n is the surrogate trial number
+  rho_E_1<- EmbedDimension(dataFrame = ccm_agg_wt_surr, lib = lib_vec, pred = lib_vec, 
+                           columns = jonah_col,target = prey, maxE = 7, showPlot = FALSE) 
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1] #store E
+  
+  #Run CCM - jonah to rock/scallop
+  #We are only running the CCM at max lib size
+  out_1 <- CCM(dataFrame= ccm_agg_wt_surr, columns=jonah_col, target=prey, E = E_out_1, Tp=1,
+               libSizes = paste(nrow(ccm_agg_wt_surr) - E_out_1, nrow(ccm_agg_wt_surr) - E_out_1, 
+                                "1",sep=" "), sample=1, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(prey=prey,
+           direction= paste("jonah","->","prey"),
+           E = E_out_1, trial_num = surr_trial) %>% 
+    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
+    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
+  
+  #find optimal E for predicting jonah from scallop or rock (i.e., scallop/rock -> jonah)
+  rho_E_2<- EmbedDimension(dataFrame = ccm_agg_wt_surr, lib = lib_vec, pred = lib_vec, 
+                           columns = prey,target = jonah_col, maxE = 7, showPlot = FALSE)
+  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1] #store E
+  
+  #Run CCM - rock/scallop to jonah
+  out_2 <- CCM(dataFrame= ccm_agg_wt_surr, columns=prey, target=jonah_col, E = E_out_2, Tp=1, 
+               libSizes = paste(nrow(ccm_agg_wt_surr)-E_out_2, nrow(ccm_agg_wt_surr)-E_out_2, "1",sep=" "), 
+               sample=1, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(prey=prey,
+           direction= paste("prey","->","jonah"),
+           E = E_out_2, trial_num = surr_trial)  %>% 
+    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
+    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
+  
+  bind_rows(out_1,out_2)
+  
+}) %>% mutate("jonah"=NA) %>% addDirection()
+
+
+hist(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"))
+ggplot(data=data.frame(x=null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock")), aes(x)) +
+  stat_ecdf(geom = "step")
+
+ggplot()+geom_histogram(aes(x=null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock")))+geom_vline(xintercept = 0.262)
+quantile(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"), 0.95)
+1-ecdf(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"))(0.262) #p=0.276
 
                                                                                                                                                        
