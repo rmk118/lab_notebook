@@ -966,4 +966,5 @@ ggplot()+geom_histogram(aes(x=null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock")
 quantile(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"), 0.95)
 1-ecdf(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"))(0.262) #p=0.276
 
+## regions weight
                                                                                                                                                        
