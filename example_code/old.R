@@ -542,3 +542,25 @@ do_xmap_ID_failed <- function(df,predictor,target,ID_col,E_max=2 ,tp=1,keep_pred
   return(bind_cols(Filter(function(x) length(x)==1,params),stats,stats_linear))
   
 }
+
+
+#testing surrogate function
+library(tseries)
+x <- 1:10  # Simple example
+surrogate(x, ns=10, fft=TRUE, amplitude = TRUE)
+
+
+n <- 500  # Generate AR(1) process
+e <- rnorm(n)  
+x <- double(n)
+x[1] <- rnorm(1)
+for(i in 2:n) {
+  x[i] <- 0.4 * x[i-1] + e[i]
+}
+x <- ts(x)
+
+theta_fun <- function(x) { # Autocorrelations up to lag 10
+  return(acf(x, plot=FALSE)$acf[2:11])
+}
+
+y<-surrogate(x, ns=50, fft=TRUE, statistic=theta_fun) 

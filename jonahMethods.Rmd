@@ -1428,4 +1428,10 @@ ggplot(data=conv_res %>% filter(conv==TRUE))+geom_bar(aes(x=xmap,fill=metric), p
 
 The second criteria for significant convergence is statistically significant cross-map skill at maximum library size. Although we got p-values for max lib size above using the compute_stats function, the validity of these p-values is questionable. The standard method of determining significance is with randomization tests, where you randomly rearrange the predictor time series to destroy the dynamic relationship between variables and perform CCM between the shuffled time series and the original target time series. This randomization is repeated 100 (or 1000) times to generate a null distribution of cross-map skill, against which the actual value can be compared.
 
-We will use the "surrogate" function from the package tseries, which will create surrogate data with the same spectrum as the input time series (x) by randomizing the phases of the Fourier coefficients of x.
+We will use the "surrogate" function from the package tseries, which will create surrogate data with the same spectrum as the input time series (x) by randomizing the phases of the Fourier coefficients of x, and we'll set "amplitude=TRUE" to preserve the amplitude distribution of the original series.
+
+We'll start with the aggregate CCM:
+```{r}
+
+```
+
