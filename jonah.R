@@ -121,38 +121,21 @@
 # rm(catch_complete_diff_imp)
 # rm(catch_complete_imp)
 
+map_reg_rho <- left_join(surveyGrid %>% group_by(Region) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_by_reg_max %>% rename(Region=region))
 
-# By area, each individually - CATCH, max lib size
-RESULTS_ccm_by_area_max <- pmap_dfr(params_areas_ccm_combos,function(jonah,prey, areaInput){
-  
-  df_temp <- catchCCMdf %>% filter(area == areaInput)
-  lib_vec <- paste(1, nrow(df_temp))
-  
-  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = jonah,target = prey, maxE = 7, showPlot = FALSE)
-  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
-  out_1 <- CCM(dataFrame= df_temp, columns=jonah, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(nrow(df_temp) - E_out_1, nrow(df_temp) - E_out_1, "1",sep=" "), 
-  sample=100, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(jonah=jonah,
-           prey=prey,
-           direction= paste("jonah","->","prey"),
-           area = areaInput, 
-           E = E_out_1)
-  
-  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = jonah, maxE = 7, showPlot = FALSE)
-  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
-  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah, E = E_out_2, Tp=1, 
-               libSizes = paste(nrow(df_temp)-E_out_2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE)  %>%
-    mutate(jonah=jonah,
-           prey=prey,
-           direction= paste("prey","->","jonah"),
-           area = areaInput,
-           E = E_out_2)
-  
-  bind_rows(out_1,out_2)
-  
-}) %>% addDirection()
+# reg_cols <- pivot_wider(RESULTS_ccm_by_reg_max, names_from = name, values_from = value) %>%
+#        group_by(region) %>% select(-c(xmap, E, LibSize)) %>% rename(Region = region) %>% 
+#        fill(everything(), .direction = "downup") %>% slice(1)
+
+(ggplot(data=map_reg_rho)+geom_sf(aes(fill=value))+scale_fill_viridis_c(option="F"))+facet_wrap(~name)
+
+(ggplot(data=left_join(surveyGrid %>% group_by(Region) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_wt_by_reg_max %>% rename(Region=region)))+geom_sf(aes(fill=value))+scale_fill_viridis_c(option="F"))+facet_wrap(~name)
+
+ggplot(data=left_join(surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_by_strat_max %>% rename(Stratum=stratum)))+geom_sf(aes(fill=value))+facet_wrap(~name)
+
+ggplot(data=left_join(surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_wt_by_strat_max %>% rename(Stratum=stratum)))+geom_sf(aes(fill=value))+facet_wrap(~name)
 
 
+ggplot(data=left_join(surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_by_area_max %>% rename(area=areaInput)))+geom_sf(aes(fill=value))+facet_wrap(~name) #+scale_fill_viridis_c(option="F")
+
+ggplot(data=left_join(surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_wt_by_area_max %>% rename(area=areaInput)))+geom_sf(aes(fill=value))+facet_wrap(~name)

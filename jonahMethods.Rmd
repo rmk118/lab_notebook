@@ -674,7 +674,7 @@ there a negative correlation between region and s-map predictability?
 
 We use Spearman's method rather than the default Pearson's because
 Region is an ordinal variable and Pearson's requires at least interval
-data. TEST THIS ON INDIVIDUAL AREAS
+data.
 
 ```{r}
 #Catch - s-map predictive skill
@@ -1277,6 +1277,8 @@ RESULTS_ccm_aggregate
 
 conv_agg <- RESULTS_ccm_aggregate %>% group_by(xmap) %>% summarize(across(all_of(combos),find_delta))
 conv_agg %>% pivot_longer(cols=2:5) %>% na.omit()
+
+RESULTS_ccm_wt_aggregate %>% group_by(xmap) %>% summarize(across(all_of(combos),find_delta)) %>% pivot_longer(cols=2:5) %>% na.omit()
 ```
 
 Okay, so we can see that the only direction that does not converge is rock:jonah, which decreases in predictive skill with increasing library size regardless of if the CCM is using the optimal E for rock or for Jonah crabs. Now let's revisit our CCM-by-area results
