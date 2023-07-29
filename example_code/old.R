@@ -579,3 +579,69 @@ params_ccm_combos_surr <- map_dfr(seq_len(100), ~params_ccm_combos)
 params_ccm_combos_surr <- params_ccm_combos_surr %>% mutate(surr_trial = rep(1:100, each=2))
 
 paste("jonah", 2, sep="_")
+
+
+
+# find_max <- function(df) {
+#   df_out <- df %>% summarise(
+#     max_J_S = max(`jonah:scallop`, na.rm = TRUE),
+#     max_S_J = max(`scallop:jonah`, na.rm = TRUE),
+#     max_J_R = max(`jonah:rock`, na.rm = TRUE),
+#     max_R_J = max(`rock:jonah`, na.rm = TRUE))
+#   return(df_out)
+# }
+# 1-ecdf(null_dist(df = RESULTS_ccm_by_reg_surr %>% filter(region==1), s="jonah:scallop"))(0.166819876)
+# 0.01*(sum(null_dist(df = RESULTS_ccm_by_reg_surr %>% filter(region==1), s="jonah:scallop") >= 0.166819876))
+
+# max_rho_by_area<- RESULTS_ccm_by_area %>% group_by(area) %>% find_max()
+# max_rho_wt_by_area<- RESULTS_ccm_wt_by_area %>% group_by(area) %>% find_max()
+# 
+# colSums(max_rho_by_area >0)
+# colSums(max_rho_wt_by_area>0)
+
+# We can see that for catchm max rho for J-\>S was \>0 for all area and
+# max rho for J-\>R was \>0 for 18/20 areas. For weight, max rho for J-\>S
+# was \>0 for 18/20 areas and max rho for J-\>R was \>0 for 19/20 areas.
+# S-\>J was 6 and 7 and R-\>J was 10 and 8 for catch and weight,
+# respectively.
+
+# max_rho_by_reg<- RESULTS_ccm_by_reg %>% group_by(region) %>% find_max()
+# max_rho_wt_by_reg<- RESULTS_ccm_wt_by_reg %>% group_by(region) %>% find_max()
+# 
+# max_rho_by_strat<- RESULTS_ccm_by_strat %>% group_by(stratum) %>% find_max()
+# max_rho_wt_by_strat<- RESULTS_ccm_wt_by_strat %>% group_by(stratum) %>% find_max()
+
+# Rho at max lib size - surr regions
+RESULTS_ccm_by_reg_surr %>% 
+  group_by(xmap, region) %>% 
+  pivot_longer(cols=all_of(combos)) %>% 
+  na.omit() %>% 
+  filter(substr(xmap, 1, 1)==substr(name, 1, 1))
+
+# If we look back at the max rho by region, we can see that we only really need to test jonah:scallop (all regions), jonah:rock (all regions), and rock:jonah for region 1 only.
+# #find_p(1,"jonah:scallop")
+
+#test %>% rowwise() %>% mutate(p = find_p(Var1, Var2))
+
+quantile(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==2), s="scallop:jonah"), .95)
+
+1-ecdf(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah"))(0.219) #p=0
+
+
+map(1:4, function(x) {
+  ndist = null_dist(df = RESULTS_ccm_by_strat_surr %>% filter(stratum==x), s="jonah:rock")
+  prob = 1-ecdf(ndist)(max_rho_by_strat[x,"max_J_R"])
+  return(prob)
+}) #strat 4 is sig, p=0.03
+
+map(1:4, function(x) {
+  ndist = null_dist(df = RESULTS_ccm_by_strat_surr %>% filter(stratum==x), s="scallop:jonah")
+  prob = 1-ecdf(ndist)(max_rho_by_strat[x,"max_S_J"])
+  return(prob)
+}) #strats 3 and 4 are sig, p=0 and p=0.01
+
+map(1:4, function(x) {
+  ndist = null_dist(df = RESULTS_ccm_by_strat_surr %>% filter(stratum==x), s="rock:jonah")
+  prob = 1-ecdf(ndist)(max_rho_by_strat[x,"max_R_J"])
+  return(prob)
+}) #strat 1 is sig, p=0.02
