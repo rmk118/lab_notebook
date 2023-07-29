@@ -775,6 +775,9 @@ envi_df <- df_tows %>%
   select(-c(Year, Season)) %>%
   mutate(date = lubridate::ymd(date)) %>%  filter(date < as.Date("2020-05-01"))
 
+ggplot(data=envi_df %>% select(-area))+geom_line(aes(x=date,y=temp))+facet_grid(Region~Stratum)
+ggplot(data=envi %>% select(-area))+geom_line(aes(x=date,y=temp))+facet_grid(Region~Stratum)
+
 envi_df <- envi_df %>% 
   mutate(temp2 = case_when(
     !is.na(temp) ~ temp,
@@ -785,6 +788,10 @@ envi <- envi_df %>% arrange(date) %>% group_by(area) %>%
   mutate(temp = lag2(temp)) %>% 
   arrange(area)
 
+envi_catch2 <- left_join(envi_df %>% mutate(Region = as.factor(Region),
+                                            Stratum = as.factor(Stratum)), catchTidy_complete) %>% 
+  na.omit()
+
 envi_catch <- left_join(envi, catchCCMdf) %>% na.omit()
 #envi_df %>% group_by(area) %>% summarise(num = n_distinct(date))
 
@@ -792,14 +799,14 @@ envi_ccm_combos<- expand.grid(species=c("scallop", "jonah", "rock"), areaInput=l
   mutate(areaInput = as.integer(areaInput))
 
 
-# By area, each individually - CATCH with depth
+# By area, each individually - CATCH with temp
 RESULTS_ccm_temp_by_area <- pmap_dfr(envi_ccm_combos,function(species, areaInput){
   
   df_temp <- envi_catch %>% filter(area == areaInput)
   lib_vec <- paste(1, nrow(df_temp))
   
   rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec, 
-                           columns = species,target = species, maxE = 7, showPlot = FALSE)
+                           columns = "temp",target = species, maxE = 7, showPlot = FALSE)
   E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
   out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = species, E = E_out_1, Tp=1,
                libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
@@ -807,6 +814,24 @@ RESULTS_ccm_temp_by_area <- pmap_dfr(envi_ccm_combos,function(species, areaInput
            area = areaInput, 
            E = E_out_1)
 })
+
+# By area, each individually - CATCH with temp - take 2
+RESULTS_ccm_temp_by_area <- pmap_dfr(envi_ccm_combos,function(species, areaInput){
+  
+  df_temp <- envi_catch2 %>% filter(area == areaInput, Species==species) %>% select(c("date","temp", "value"))
+  #print(df_temp)
+  lib_vec <- paste(1, nrow(df_temp))
+
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = "temp",target = "value", maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = "value", E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(species=species,
+           area = areaInput,
+           E = E_out_1)
+})
+
 
 max_rho_temp_by_area <- RESULTS_ccm_temp_by_area %>% group_by(area) %>% 
  summarise(
@@ -817,6 +842,70 @@ max_rho_temp_by_area <- RESULTS_ccm_temp_by_area %>% group_by(area) %>%
     max_J_T = max(`jonah:temp`, na.rm = TRUE),
     max_T_J = max(`temp:jonah`, na.rm = TRUE))
 
+max_rho_temp_by_area2 <- RESULTS_ccm_temp_by_area %>% group_by(area, species) %>% 
+  summarise(
+    max_T_V = max(`temp:value`, na.rm = TRUE),
+    max_V_T = max(`value:temp`, na.rm = TRUE))
+
+max_rho_temp_by_area2 %>% filter(species=="jonah")
+
+RESULTS_ccm_temp_by_reg %>% group_by(region, species) %>% 
+  summarise(
+    max_T_V = max(`temp:value`, na.rm = TRUE),
+    max_V_T = max(`value:temp`, na.rm = TRUE)) %>% filter(species=="jonah")
+
+RESULTS_ccm_temp_by_strat %>% group_by(stratum, species) %>% 
+  summarise(
+    max_T_V = max(`temp:value`, na.rm = TRUE),
+    max_V_T = max(`value:temp`, na.rm = TRUE)) %>% filter(species=="rock")
+
+# By region - CATCH with temp
+RESULTS_ccm_temp_by_reg <- pmap_dfr(expand.grid(species=c("scallop", "jonah", "rock"), region=c(1:5), stringsAsFactors = FALSE),function(species, region){
+  
+  df_temp <- envi_catch2 %>% group_by(date, Region, Species) %>% summarise(temp = mean(temp), value=mean(value)) %>% filter(Region == region, Species==species) %>% select(c("date","temp", "value"))
+  #print(df_temp)
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = "temp",target = "value", maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = "value", E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(species=species,
+           region=region,
+           E = E_out_1)
+})
+
+# By stratum - CATCH with temp
+RESULTS_ccm_temp_by_strat <- pmap_dfr(expand.grid(species=c("scallop", "jonah", "rock"), stratum=c(1:4), stringsAsFactors = FALSE),function(species, stratum){
+  
+  df_temp <- envi_catch2 %>% group_by(date, Stratum, Species) %>% summarise(temp = mean(temp), value=mean(value)) %>% filter(Stratum == stratum, Species==species) %>% select(c("date","temp", "value"))
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = "temp",target = "value", maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = "value", E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = FALSE) %>%
+    mutate(species=species,
+           stratum=stratum,
+           E = E_out_1)
+})
+
+# Aggregate - CATCH with temp
+RESULTS_ccm_temp_agg <- pmap_dfr(expand.grid(species=c("scallop", "jonah", "rock"), stringsAsFactors = FALSE),function(species){
+  
+  df_temp <- envi_catch2 %>% group_by(date, Species) %>% summarise(temp = mean(temp), value=mean(value)) %>% filter(Species==species) %>% select(c("date","temp", "value"))
+  lib_vec <- paste(1, nrow(df_temp))
+  
+  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
+                           columns = "temp",target = "value", maxE = 7, showPlot = FALSE)
+  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
+  out_1 <- CCM(dataFrame= df_temp, columns = "temp",target = "value", E = E_out_1, Tp=1,
+               libSizes = paste(E_out_1+2, nrow(df_temp) - E_out_1, "1",sep=" "), sample=100, verbose=FALSE, showPlot = TRUE) %>%
+    mutate(species=species,
+           E = E_out_1)
+})
 
 p1 <- ggplot(data=regionsGrid)+geom_sf(aes(fill=max_R_S))+lims(fill = c(-0.3, .8))+labs(fill=NULL)+ 
   ggtitle('R->S')
@@ -901,150 +990,3 @@ ggplot(data = jonahCatch %>% filter(Type=="catch", Season=="Fall") %>% filter(Ye
 
 #line graph of abundance over time by season, no spatial distinction
 ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
-
-########## CCM randomization #################
-
-#agg weight
-
-RESULTS_ccm_wt_aggregate %>% group_by(xmap) %>% summarize(across(all_of(combos),last)) %>% pivot_longer(cols=all_of(combos)) %>% na.omit() %>% filter(substr(xmap, 1, 1)==substr(name, 1, 1))
-
-set.seed(7)
-ccm_agg_wt_surr <- cbind(wtCCMdf_agg, surrogate(wtCCMdf_agg$jonah, ns=1000)) %>% select(-jonah)
-ccm_agg_wt_surr <- rename_with(ccm_agg_wt_surr,.cols=!any_of(c("date", "scallop", "rock")),~ paste0("jonah_", .x, recycle0 = TRUE))
-
-#Create the data frame that will store the combinations we want to test
-params_ccm_combos_surr_1000 <- map_dfr(seq_len(1000), ~params_ccm_combos %>% select(-"jonah"))
-params_ccm_combos_surr_1000 <- params_ccm_combos_surr_1000 %>% mutate(surr_trial = rep(1:1000, each=2))
-
-RESULTS_ccm_agg_wt_surr <- pmap_dfr(params_ccm_combos_surr_1000,function(prey, surr_trial){
-  
-  lib_vec <- paste(1, nrow(ccm_agg_wt_surr))
-  jonah_col = paste("jonah",surr_trial, sep="_" )
-  
-  #The only difference for finding E opt is that the column name for jonah is now jonah_n, 
-  #where n is the surrogate trial number
-  rho_E_1<- EmbedDimension(dataFrame = ccm_agg_wt_surr, lib = lib_vec, pred = lib_vec, 
-                           columns = jonah_col,target = prey, maxE = 7, showPlot = FALSE) 
-  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1] #store E
-  
-  #Run CCM - jonah to rock/scallop
-  #We are only running the CCM at max lib size
-  out_1 <- CCM(dataFrame= ccm_agg_wt_surr, columns=jonah_col, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(nrow(ccm_agg_wt_surr) - E_out_1, nrow(ccm_agg_wt_surr) - E_out_1, 
-                                "1",sep=" "), sample=1, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(prey=prey,
-           direction= paste("jonah","->","prey"),
-           E = E_out_1, trial_num = surr_trial) %>% 
-    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
-    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
-  
-  #find optimal E for predicting jonah from scallop or rock (i.e., scallop/rock -> jonah)
-  rho_E_2<- EmbedDimension(dataFrame = ccm_agg_wt_surr, lib = lib_vec, pred = lib_vec, 
-                           columns = prey,target = jonah_col, maxE = 7, showPlot = FALSE)
-  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1] #store E
-  
-  #Run CCM - rock/scallop to jonah
-  out_2 <- CCM(dataFrame= ccm_agg_wt_surr, columns=prey, target=jonah_col, E = E_out_2, Tp=1, 
-               libSizes = paste(nrow(ccm_agg_wt_surr)-E_out_2, nrow(ccm_agg_wt_surr)-E_out_2, "1",sep=" "), 
-               sample=1, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(prey=prey,
-           direction= paste("prey","->","jonah"),
-           E = E_out_2, trial_num = surr_trial)  %>% 
-    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
-    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
-  
-  bind_rows(out_1,out_2)
-  
-}) %>% mutate("jonah"=NA) %>% addDirection()
-
-
-hist(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"))
-ggplot(data=data.frame(x=null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock")), aes(x)) +
-  stat_ecdf(geom = "step")
-
-ggplot()+geom_histogram(aes(x=null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock")))+geom_vline(xintercept = 0.262)
-quantile(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"), 0.95)
-1-ecdf(null_dist(RESULTS_ccm_agg_wt_surr, s="jonah:rock"))(0.262) #p=0.276
-
-############### Regions weight ###############
-
-#Create surrogate data
-set.seed(7)
-ccm_reg_wt_surr <- wtCCMdf_reg %>% group_by(Region) %>% mutate(new=surrogate(jonah, ns=100)) %>% select(-jonah) %>% mutate(new=data.frame(new)) %>% unnest(cols=new)
-
-#Rename the surrogate columns to be of the form "jonah_1", "jonah_2", etc.
-ccm_reg_wt_surr <- rename_with(ccm_reg_wt_surr,.cols=!any_of(c("date", "scallop", "rock", "Region")),~ paste0("jonah_", .x, recycle0 = TRUE) %>% str_remove("X"))
-
-# Random CCM by region, each individually - weight
-
-RESULTS_ccm_wt_by_reg_surr <- pmap_dfr(params_regions_combos_surr,function(prey, region, surr_trial){
-  df_temp <- ccm_reg_wt_surr %>% filter(Region == region)
-  lib_vec <- paste(1, nrow(df_temp))
-  jonah_col = paste("jonah",surr_trial, sep="_" )
-  
-  rho_E_1<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
-                           columns = jonah_col,target = prey, maxE = 7, showPlot = FALSE)
-  E_out_1<-rho_E_1[which.max(rho_E_1$rho),"E"][1]
-  out_1 <- CCM(dataFrame= df_temp, columns=jonah_col, target=prey, E = E_out_1, Tp=1,
-               libSizes = paste(nrow(df_temp) - E_out_1, nrow(df_temp) - E_out_1, 
-                                "1",sep=" "), sample=1, verbose=FALSE, showPlot = FALSE) %>%
-    mutate(prey=prey,
-           direction= paste("jonah","->","prey"),
-           E = E_out_1,region=region, trial_num = surr_trial) %>% 
-    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
-    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
-  
-  rho_E_2<- EmbedDimension(dataFrame = df_temp, lib = lib_vec, pred = lib_vec,
-                           columns = prey,target = jonah_col, maxE = 7, showPlot = FALSE)
-  E_out_2<-rho_E_2[which.max(rho_E_1$rho),"E"][1]
-  out_2 <- CCM(dataFrame= df_temp, columns=prey, target=jonah_col, E = E_out_2, Tp=1,
-               libSizes = paste(nrow(df_temp)-E_out_2, nrow(df_temp)-E_out_2, "1",sep=" "), sample=1, verbose=FALSE, showPlot = FALSE)  %>%
-    mutate(prey=prey,
-           direction= paste("prey","->","jonah"),
-           E = E_out_2,region=region, trial_num = surr_trial) %>% 
-    rename_with( ~ paste0("jonah:", prey, recycle0 = TRUE), starts_with("jonah")) %>% 
-    rename_with( ~ paste0(prey, ":jonah",recycle0 = TRUE), starts_with(prey))
-  bind_rows(out_1,out_2)
-}) %>% mutate("jonah"=NA)  %>% addDirection()
-
-
-quantile(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==2), s="scallop:jonah"), .95)
-
-1-ecdf(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah"))(0.219) #p=0
-
-ggplot(data.frame(x=null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah")), aes(x)) +
-  stat_ecdf(geom = "step")+
-  geom_hline(yintercept = 0.95)+
-  geom_vline(xintercept = 0.219, color="red")
-
-ggplot(data.frame(x=null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==2), s="scallop:jonah")), aes(x)) +
-  stat_ecdf(geom = "step")+
-  geom_hline(yintercept = 0.95)+
-  geom_vline(xintercept = 0.1612493)+
-  geom_vline(xintercept = 0.312, color="red")+theme_bw()
-
-ggplot(data.frame(x=null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==2), s="scallop:jonah")), aes(x)) +
-  geom_histogram(bins = 25)+
-  geom_hline(yintercept = 0.95)+
-  geom_vline(xintercept = 0.1612493)+
-  geom_vline(xintercept = 0.312, color="red")+theme_bw()
-
-map(1:5, function(x) {
-  ndist = null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==x), s="jonah:scallop")
-  prob = 1-ecdf(ndist)(max_rho_wt_by_reg[x,"max_J_S"])
-  return(prob)
-})
-
-map(1:5, function(x) {
-  ndist = null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==x), s="jonah:rock")
-  prob = 1-ecdf(ndist)(max_rho_wt_by_reg[x,"max_J_R"])
-  return(prob)
-})
-
-map(1:5, function(x) {
-  ndist = null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==x), s="scallop:jonah")
-  prob = 1-ecdf(ndist)(max_rho_wt_by_reg[x,"max_S_J"])
-  return(prob)
-})
-
-                                                                                                                                                       

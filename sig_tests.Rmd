@@ -758,3 +758,6 @@ find_p_area_wt <- function(x,y) {
 print(area_df %>% rowwise() %>% mutate(p = find_p_area_wt(Var1, Var2)) %>% filter(p<0.1))
 ```
 
+# Temperature
+
+## By area

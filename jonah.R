@@ -139,3 +139,19 @@ ggplot(data=left_join(surveyGrid %>% group_by(Stratum) %>% summarise(num = n_dis
 ggplot(data=left_join(surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_by_area_max %>% rename(area=areaInput)))+geom_sf(aes(fill=value))+facet_wrap(~name) #+scale_fill_viridis_c(option="F")
 
 ggplot(data=left_join(surveyGrid %>% group_by(area) %>% summarise(num = n_distinct(GridID)), RESULTS_ccm_wt_by_area_max %>% rename(area=areaInput)))+geom_sf(aes(fill=value))+facet_wrap(~name)
+
+landings <- read.csv("data/MaineDMR_Landings.csv")
+ggplot(data=landings)+geom_line(aes(x=year, y=total_weight, color=species))
+
+library(scales)
+ggplot(data=landings %>% filter(species=="Crab Jonah"))+
+  geom_line(aes(x=year, y=total_value))+
+  theme_classic()+
+  labs(x="Year", y="Total value ($)")+
+  scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)))
+
+cor.test()
+catchCCMdf_agg
+landings$
