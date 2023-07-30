@@ -86,14 +86,24 @@ library(rstatix)
 library(ggpubr)
 #Build the linear model
 model  <- lm(Diff ~ Stratum, data = sex_diff)
+model
+par(mfrow = c(2, 2))
+plot(model)
+plot(model,5)
+summary(model)
+
+durbinWatsonTest(model)
+ncvTest(model)
 # Create a QQ plot of residuals
 ggqqplot(residuals(model))
 
 sex_diff %>% group_by(Stratum) %>% identify_outliers(Diff)
 
-sex_diff <- sex_diff %>% filter(!(Year==2019 & Stratum==3)) %>% mutate(Stratum = as.factor(Stratum)) %>% arrange(Stratum)#remove extreme outlier
+sex_diff <- sex_diff %>% filter(!(Year==2019 & Stratum==3)) %>% 
+  mutate(Stratum = as.factor(Stratum)) %>% arrange(Stratum)#remove extreme outlier
 
 shapiro.test(residuals(model))
+
 
 sex_diff %>%
   group_by(Stratum) %>%
@@ -101,10 +111,28 @@ sex_diff %>%
 
 library(car)
 ggqqplot(sex_diff, "Diff", facet.by = "Stratum")
-plot(model, 1)
+plot(model, 3)
 
 sex_diff %>% ungroup() %>% levene_test(Diff ~ Stratum)
 leveneTest(Diff ~ Stratum, data=sex_diff)
 
 welch_anova_test(data=sex_diff %>% ungroup(), Diff ~ Stratum)
 games_howell_test(data=sex_diff %>% ungroup(), Diff ~ Stratum)
+
+par(mfrow = c(2, 2))
+plot(lm(Diff ~ Year + Stratum, data=sex_diff))
+
+summary(lm(Diff ~ Year + Stratum, data=sex_diff))
+
+library(lme4)
+#library(nlme)
+
+lmer(Diff ~ (1|Year) + Stratum, data=sex_diff)
+summary(lmer(Diff ~ (1|Year) + Stratum, data=sex_diff))
+ggplot(data=sex_diff)
+  
+  
+ summary(anova(lmer(Diff ~ (1|Year) + Stratum, data=sex_diff))) 
+  
+  plot(lmer(Diff ~ (1|Year) + Stratum, data=sex_diff))
+  
