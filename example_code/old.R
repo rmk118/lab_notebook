@@ -645,3 +645,205 @@ map(1:4, function(x) {
   prob = 1-ecdf(ndist)(max_rho_by_strat[x,"max_R_J"])
   return(prob)
 }) #strat 1 is sig, p=0.02
+
+
+# Sex ratio testing -------------------------------------------------------
+# detach("package:lmerTest", unload = TRUE)
+# detach("package:lme4", unload = TRUE)
+# library(nlme)
+#  detach("package:nlme", unload = TRUE)
+
+data <- df_sex %>% group_by(Season, Year, Area, Tow_Number, Sex) %>% mutate(Num_Sex = cumsum(Frequency)) %>% slice_tail()
+
+sex_diff_old <- pivot_wider(data_complete, names_from="Season", values_from = "perc_m") %>% 
+  mutate(Diff = Fall-Spring) %>% na.omit() %>% 
+  group_by(Year, Stratum) %>% 
+  summarise(Diff = mean(Diff)) %>% 
+  filter(Year > 2004)
+
+sex_diff_reg <- pivot_wider(data_complete, names_from="Season", values_from = "perc_m") %>% 
+  mutate(Diff = Fall-Spring) %>% na.omit() %>% 
+  group_by(Year, Region, Stratum) %>% 
+  summarise(Diff = mean(Diff, na.rm=TRUE)) %>% 
+  filter(Year > 2004)
+
+
+sex_diff_reg <- sex_diff_reg %>% filter(!(Year==2010 & Stratum==4 & Region == 5))
+sex_diff_reg %>% group_by(Region, Stratum) %>% identify_outliers(Diff)
+
+mod2<- lm(Diff ~ Stratum + Region, data = sex_diff_reg)
+mod2
+summary(mod2)
+shapiro.test(residuals(mod2))
+durbinWatsonTest(mod2)
+ncvTest(mod2)
+
+sex_diff_reg %>%
+  group_by(Stratum, Region) %>%
+  shapiro_test(Diff) 
+
+
+mod3b<- lm(Diff ~ as.factor(Year) + Stratum, data = sex_diff)
+summary(mod3b)
+extractAIC(mod3b)
+
+plot(fitted(mod3), resid(mod3), xlab='Fitted Values', ylab='Residuals')
+
+sked.dat = sex_diff %>% ungroup() %>% 
+  mutate("abs.resids" = abs(residuals(mod3)))
+
+sked.resid.mod = lm(abs.resids~Stratum, data=sked.dat)
+
+ggplot(sked.dat) +
+  geom_point(aes(x=Stratum, y=abs.resids)) +
+  geom_abline(aes(intercept=coef(sked.resid.mod)[1],
+                  slope=coef(sked.resid.mod)[2]))
+
+mod4 <- lm(Diff ~ Year + Stratum + Region, data=sex_diff_reg)
+mod4
+summary(mod4)
+extractAIC(mod4)
+shapiro.test(residuals(mod4))
+par(mfrow = c(2, 2))
+plot(mod1)
+
+# sex_diff %>% ungroup() %>% levene_test(Diff ~ Stratum)
+# leveneTest(Diff ~ Stratum, data=sex_diff)
+# leveneTest(Diff ~ Stratum, data=sex_diff)
+
+# Basic ANOVA - only strat
+summary(aov(Diff ~ Stratum, data=sex_diff))
+summary(aov(Diff ~ Year, data=sex_diff))
+summary(aov(Diff ~ Year + Stratum, data=sex_diff))
+summary(aov(Diff ~ Year + Stratum + Region, data=sex_diff_reg))
+
+mod3gls <- gls(Diff~Stratum,weights=varPower(), data=sex_diff)
+summary(mod3gls)
+shapiro.test(residuals(mod3gls))
+
+# vf3 <- varPower(form =~ Stratum)
+# M.gls3 <- gls(Diff ~ Stratum,
+#               weights = vf3,data=sked.dat)
+# shapiro.test(residuals(M.gls3))
+# summary(M.gls3)
+# vf5 <- varExp(form =~ Stratum)
+# M.gls5 <- gls(Diff ~ Stratum,
+#               weights = vf5, data = sex_diff)
+# vf6<-varConstPower(form =~ Stratum)
+# M.gls6<-gls(Diff ~ Stratum,
+#             weights = vf6, data = sex_diff)
+anova(M.lm, mod3gls,M.gls3,M.gls5,M.gls6)
+# acf(residuals(mod3gls))
+# durbinWatsonTest(mod3gls)
+
+w <- sked.dat$Stratum
+wls<- lm(Diff ~ Stratum, weights=w, data=sked.dat)
+summary(wls)
+
+shapiro.test(wls$residuals)
+ncvTest(wls)
+## LMER models with package lme4 and lmerTest
+lmer1<- lmer(Diff ~ (1|Year) + Stratum, data=sex_diff)
+summary(lmer1)
+shapiro.test(residuals(lmer1)) #good
+ranova(lmer1)
+lmer_w <- lmer(Diff ~ (1|Year) + Stratum, data=sex_diff, weights=w)
+
+anova(lmer1, wls2, lmer_w)
+anova(lmer2, lmer2a, lmer2b, lmer3)
+ranova(lmer3)
+
+M.lm <-gls(Diff~Stratum, data=sked.dat)
+
+summary(gls(Diff~Stratum,weights=varPower(), data=sked.dat))
+
+#fit.ar1 <- gls(Diff ~ factor(Stratum), data=sex_diff, corr=corAR1())
+
+lmer2 <- lmer(Diff ~ (1|Year) + as.factor(Stratum) + as.factor(Region), data=sex_diff_reg)
+summary(lmer2)
+shapiro.test(residuals(lmer2))
+extractAIC(lmer2)
+ranova(lmer2)
+
+lmer2a <- lmer(Diff ~ (1|Year) + Stratum + Region, data=sex_diff_reg)
+lmer2b <- lmer(Diff ~ (1|Year) + as.factor(Stratum) + Region, data=sex_diff_reg)
+
+lmer3 <- lmer(Diff ~ (1|Year) + Stratum + (1|Region), data=sex_diff_reg)
+ranova(lmer3)
+summary(lmer3)
+shapiro.test(residuals(lmer3))
+extractAIC(lmer3)
+anova(lmer2, lmer2a, lmer3)
+
+ranova(lmer2)
+
+# lmer4 <- lmer(Diff ~ Stratum + (1|Region), data=sex_diff_reg)
+# summary(lmer4)
+# shapiro.test(residuals(lmer4))
+# extractAIC(lmer4)
+
+ggplot(data=data_complete_geom %>% filter(Season=="Fall"))+geom_sf(aes(fill=perc_m))+facet_wrap(~Year)
+ggplot(data=data_complete_geom %>% filter(Season=="Spring"))+geom_sf(aes(fill=perc_m))+facet_wrap(~Year)
+ggplot(data=sex_diff_geom)+geom_sf(aes(fill=Diff))+facet_wrap(~Year)
+extractAIC(wls)
+
+
+with (sex_diff, {interaction.plot(Year, factor(Stratum), Diff, ylab="mean of Diff", xlab="time", trace.label="Stratum") })
+
+# Unweighted linear models ------------------------------------------------
+
+mod1<- lm(Diff ~ Stratum, data = sex_diff)
+mod1
+summary(mod1)
+shapiro.test(residuals(mod1))
+durbinWatsonTest(mod1,max.lag=10) #OK
+ncvTest(mod1) #homogeneity of residual variance not met
+
+mod1b<- lm(Diff ~ Stratum, data = sex_diff %>% mutate(Stratum = as.factor(Stratum)))
+mod1b
+summary(mod1b)
+durbinWatsonTest(mod1b, max.lag=10) #OK
+ncvTest(mod2) #homogeneity of residual variance not met
+
+mod3<- lm(Diff ~ Year + Stratum, data = sex_diff)
+summary(mod3)
+shapiro.test(residuals(mod3))
+durbinWatsonTest(mod3, max.lag = 10) #OK
+ncvTest(mod3) #homogeneity of residual variance not met
+
+
+###### Welch & Kruskal-Wallis one-way ANOVAs
+#robust to violations of equal variance
+welch<- welch_anova_test(data=sex_diff, Diff ~ Stratum)
+games_howell_test(data=sex_diff, Diff ~ Stratum) #post-hoc for Welch
+
+data_complete <- data_complete %>%
+  group_by(Season, Year, Region, Stratum) %>% 
+  summarise(perc_m = mean(perc_m, na.rm=TRUE)) %>% 
+  mutate(Area = as.numeric(paste0(Region, Stratum)))
+
+#remove outlier
+sex_diff <- sex_diff %>%
+  filter(!(Year==2019 & Stratum==3))%>%
+  arrange(Stratum)
+
+wls2<- lm(Diff ~ Stratum, weights=w, data=sex_diff)
+summary(wls2)
+shapiro.test(wls2$residuals) #Good
+extractAIC(wls2)
+acf(wls2$residuals) #Good
+durbinWatsonTest(wls2, max.lag=10) #Good
+ncvTest(wls2) #Good
+
+w <- sex_diff$Stratum
+wls<- lm(Diff ~ Stratum + Year, weights=w, data=sex_diff)
+summary(wls)
+shapiro.test(wls$residuals) #Good
+extractAIC(wls)
+acf(wls$residuals) #Good
+durbinWatsonTest(wls, max.lag=10) #Good
+ncvTest(wls) #Good
+
+surveyGrid$area <- as.integer(paste0(surveyGrid$Region, surveyGrid$Stratum))
+
+df_j_len <- df_j_len %>% mutate(Common_Name = "Jonah crab") #note shell height is in cm
