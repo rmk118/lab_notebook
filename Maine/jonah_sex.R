@@ -9,9 +9,10 @@ library(car)
  library(lme4)
 library(lmerTest)
 library(sf)
-# detach("package:lme4", unload = TRUE)
-# library(nlme)
-# detach("package:nlme", unload = TRUE)
+detach("package:lmerTest", unload = TRUE)
+detach("package:lme4", unload = TRUE)
+library(nlme)
+ detach("package:nlme", unload = TRUE)
 
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -91,6 +92,8 @@ summary(mod0)
 #across all years
 ggplot(data=sex_diff_geom %>% group_by(Stratum) %>% summarize(Diff = mean(Diff)))+geom_sf(aes(fill=Diff))
 
+ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_boxplot()+theme_bw()
+
 ggplot(data=sex_diff %>% group_by(Stratum) %>% summarise(Diff=mean(Diff)), aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +
   stat_regline_equation(label.y = -0.05, aes(label = ..rr.label..))
@@ -128,6 +131,7 @@ extractAIC(mod2)
 mod3<- lm(Diff ~ Year + Stratum, data = sex_diff)
 mod3
 summary(mod3)
+shapiro.test(residuals(mod3))
 extractAIC(mod3)
 par(mfrow = c(2, 2))
 plot(mod3)
@@ -156,18 +160,28 @@ sex_diff_reg %>%
 
 durbinWatsonTest(mod1)
 durbinWatsonTest(mod2)
-durbinWatsonTest(mod4)
+durbinWatsonTest(mod3)
 
 #homogeneity of residual variance not met
 ncvTest(mod1) 
 ncvTest(mod2)
-ncvTest(mod4)
+ncvTest(mod3)
 sex_diff %>% ungroup() %>% levene_test(Diff ~ Stratum)
 leveneTest(Diff ~ Stratum, data=sex_diff)
 leveneTest(Diff ~ Stratum, data=sex_diff)
 
+plot(fitted(mod3), resid(mod3), xlab='Fitted Values', ylab='Residuals')
 
 
+sked.dat = sex_diff %>% ungroup() %>% 
+  mutate("abs.resids" = abs(residuals(mod3)))
+
+sked.resid.mod = lm(abs.resids~Stratum, data=sked.dat)
+
+ggplot(sked.dat) +
+  geom_point(aes(x=Stratum, y=abs.resids)) +
+  geom_abline(aes(intercept=coef(sked.resid.mod)[1],
+                  slope=coef(sked.resid.mod)[2]))
 
 ###### Welch & Kruskal-Wallis one-way ANOVAs
 #robust to violations of equal variance
@@ -217,3 +231,41 @@ anova(lmer2, lmer2a, lmer2b, lmer3)
 
 ranova(lmer3)
 
+M.lm <-gls(Diff~Stratum, data=sked.dat)
+
+summary(gls(Diff~Stratum,weights=varPower(), data=sked.dat))
+
+mod3gls <- gls(Diff~Stratum,weights=varPower(), data=sked.dat)
+summary(mod3gls)
+shapiro.test(residuals(mod3gls))
+
+
+
+vf3 <- varPower(form =~ Stratum)
+M.gls3 <- gls(Diff ~ Stratum,
+              weights = vf3,data=sked.dat)
+shapiro.test(residuals(M.gls3))
+summary(M.gls3)
+
+
+vf5 <- varExp(form =~ Stratum)
+M.gls5 <- gls(Diff ~ Stratum,
+              weights = vf5, data = sex_diff)
+
+
+vf6<-varConstPower(form =~ Stratum)
+M.gls6<-gls(Diff ~ Stratum,
+            weights = vf6, data = sex_diff)
+
+
+# anova(M.lm, mod3gls,M.gls3,M.gls5,M.gls6)
+# acf(residuals(mod3gls))
+# durbinWatsonTest(mod3gls)
+# 
+# 
+# w <- 1/(sked.dat$Stratum)
+# wls<- lm(Diff ~ Stratum, weights=w, data=sked.dat)
+# summary(wls)
+# plot(wls)
+# shapiro.test(wls$residuals)
+# ncvTest(wls)
