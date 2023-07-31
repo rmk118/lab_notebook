@@ -1,5 +1,6 @@
 
 
+
 Now, we're going to take a different approach. Instead of utilizing the
 different scales of spatial replication by running CCM on them
 individually to identify similarities and differences, we're going to do

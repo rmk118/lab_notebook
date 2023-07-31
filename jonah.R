@@ -2,7 +2,14 @@
 #Ruby Krasnow
 #July 24, 2023
 
-# jonah_catchE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch") %>% rowid_to_column(var="region")
+
+fig_for_slide <- complete_tidy_diff %>% filter(Species=="jonah", Region== 1, Stratum==1, Type=="catch")
+fig_for_slide$lag <- lead(fig_for_slide$value)
+ggplot(data=fig_for_slide, aes(x=value, y=lag))+geom_line()
+
+EmbedDimension(dataFrame = fig_for_slide %>% select(value), pred="1 37", lib="1 37", columns="value", target="value")
+PredictNonlinear(dataFrame = fig_for_slide %>% select(value), pred="1 37", lib="1 37", columns="value", target="value", E=2)
+
 # jonah_catchE_rho <- findSpeciesErho(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="catch")%>% round(digits=3) %>% rowid_to_column(var="region")
 # 
 # jonah_wtE <- findSpeciesE(complete_tidy_diff %>% filter(Species=="jonah") %>% na.omit(), type="wt") 

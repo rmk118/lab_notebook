@@ -296,7 +296,7 @@ quantile(js_c_null$value, .95)
 ggplot(js_c_null, aes(value)) +
 stat_ecdf(geom = "step")+
   geom_hline(yintercept = 0.95)+
-  geom_vline(xintercept = 0.432)+
+ # geom_vline(xintercept = quantile(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah"), .95))+
   geom_vline(xintercept = 0.237, color="red")
 ```
 
@@ -452,7 +452,7 @@ reg_df %>% rowwise() %>% mutate(p = find_p_reg(Var1, Var2))
 ```
 
 ### Weight
-```{r, eval=FALSE}
+```{r}
 #Create surrogate data
 set.seed(7)
 ccm_reg_wt_surr <- wtCCMdf_reg %>% group_by(Region) %>% mutate(new=surrogate(jonah, ns=200)) %>% select(-jonah) %>% mutate(new=data.frame(new)) %>% unnest(cols=new)
@@ -521,9 +521,9 @@ reg_df %>% rowwise() %>% mutate(p = find_p_reg_wt(Var1, Var2))
 # 
  ggplot(data.frame(x=null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah")), aes(x)) +
    geom_histogram(bins = 40)+
-   #geom_hline(yintercept = 0.95)+
-#   geom_vline(xintercept = 0.1612493)+
-   geom_vline(xintercept = 0.1955, color="red")+theme_bw()
+geom_vline(xintercept = quantile(null_dist(df = RESULTS_ccm_wt_by_reg_surr %>% filter(region==1), s="scallop:jonah"), .95))+
+   geom_vline(xintercept = 0.1955, color="red")+theme_bw()+labs(x="Cross-map skill", y="Count")+theme(axis.text=element_text(size=10),
+        axis.title.x=element_text(size=12, margin = margin(t=10)), axis.title.y = element_text(margin = margin(r=10)))
 ```
 
 scallop:jonah for weight is highly statistically significant in regions 1 and 2!
@@ -545,7 +545,7 @@ ccm_strat_surr <- rename_with(ccm_strat_surr,.cols=!any_of(c("date", "scallop", 
 
 ```
 
-```{r,eval=FALSE}
+```{r}
 RESULTS_ccm_by_strat_surr <- pmap_dfr(params_strat_combos_surr,function(prey, stratum, surr_trial){
   df_temp <- ccm_strat_surr %>% filter(Stratum==stratum)
   lib_vec <- paste(1, nrow(df_temp))
@@ -599,7 +599,7 @@ ccm_strat_wt_surr <- wtCCMdf_strat %>% group_by(Stratum) %>% mutate(new=surrogat
 ccm_strat_wt_surr <- rename_with(ccm_strat_wt_surr,.cols=!any_of(c("date", "scallop", "rock", "Stratum")),~ paste0("jonah_", .x, recycle0 = TRUE) %>% str_remove("X"))
 ```
 
-```{r, eval=FALSE}
+```{r}
 RESULTS_ccm_wt_by_strat_surr <- pmap_dfr(params_strat_combos_surr,function(prey, stratum, surr_trial){
   df_temp <- ccm_strat_wt_surr %>% filter(Stratum==stratum)
   lib_vec <- paste(1, nrow(df_temp))
