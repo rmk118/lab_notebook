@@ -1,6 +1,6 @@
 #Jonah crab seasonal sex ratio differences
 #Ruby Krasnow
-#Last modified: July 30, 2023
+#Last modified: July 31, 2023
 
 # Load packages
 library(tidyverse)
@@ -9,7 +9,11 @@ library(ggpubr)
 library(car)
 library(sf)
 library(sandwich)
+library(lme4)
+library(lmerTest)
 library(lmtest)
+library(tseries)
+library(forecast)
 
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
@@ -48,15 +52,14 @@ data_complete <- data_complete %>% filter(Sex != "Unknown") %>%
          perc_m = ifelse(Sex == "Male", Num_Sex/Total, (1-(Num_Sex/Total)))) #calculate percent male
 
 #find the mean proportion of female crabs for each stratum by season and year
-data_complete <- data_complete %>%
+data_strat <- data_complete %>%
   group_by(Season, Year, Stratum) %>% 
   summarise(perc_f = mean(perc_f, na.rm=TRUE)) 
 
-data_complete_geom <- left_join(regionsGrid_orig %>% 
-                                  mutate(Area = area, .keep="unused"), data_complete) #join to sf object for visualization
+data_complete_geom <- left_join(regionsGrid_orig, data_strat) #join to sf object for visualization
 
 
-sex_diff <- pivot_wider(data_complete, names_from="Season", values_from = "perc_f") %>% 
+sex_diff <- pivot_wider(data_strat, names_from="Season", values_from = "perc_f") %>% 
   group_by(Year, Stratum) %>% 
   summarise(Fall = mean(Fall, na.rm=TRUE),
             Spring = mean(Spring, na.rm=TRUE)) %>% 
@@ -107,6 +110,8 @@ ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme
 ggplot(data=sex_diff %>% group_by(Stratum) %>% summarise(Diff=mean(Diff)), aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +
   stat_regline_equation(label.y = -0.05, aes(label = ..rr.label..))
+
+
 
 
 

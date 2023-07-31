@@ -990,3 +990,4 @@ ggplot(data = jonahCatch %>% filter(Type=="catch", Season=="Fall") %>% filter(Ye
 
 #line graph of abundance over time by season, no spatial distinction
 ggplot(data = catchTidy_seasons %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+

@@ -154,4 +154,4 @@ ggplot(data=landings %>% filter(species=="Crab Jonah"))+
 
 cor.test()
 catchCCMdf_agg
-landings$
+landings
