@@ -7,9 +7,9 @@ library(tidyverse)
 library(rstatix)
 library(ggpubr)
 library(car)
-library(lme4)
-library(lmerTest)
 library(sf)
+library(sandwich)
+library(lmtest)
 
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
@@ -77,29 +77,21 @@ sex_diff %>%
 
 tibble(sex_diff) #preview data
 
+# Ordinary least squares linear regression
+lm <- lm(Diff ~ Stratum, data=sex_diff)
+summary(lm)
+par(mfrow = c(2, 2))
+plot(lm)
+shapiro.test(lm$residuals) #good
+durbinWatsonTest(lm, max.lag=15) #good
 
-# Weighted least-squares linear regression --------------------------------
+bptest(lm) #p<0.05, will use robust standard errors
+lm_results <- coeftest(lm, vcov = vcovHC(lm, type = 'HC0'))
+lm_results
 
-# Construct weighting vector equivalent to stratum number
-w <- sex_diff$Stratum 
-
-# Test with Year as explanatory variable - non-significant
-wls_year<- lm(Diff ~ Stratum + Year, weights=w, data=sex_diff)
-summary(wls_year)
-
-# Weighted least squares linear regression
-wls<- lm(Diff ~ Stratum, weights=w, data=sex_diff)
-summary(wls)
-
-# Visualize and test normality of residuals
-shapiro.test(wls$residuals)
-
-# Visualize and test autocorrelation of residuals
-acf(wls$residuals)
-durbinWatsonTest(wls, max.lag=15) #none have p<0.05
-
-# Test for homogeneity of residuals
-ncvTest(wls)
+# Year is not significant when added as an explanatory variable
+lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
+coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
 
 
 # Figures -----------------------------------------------------------------
@@ -110,7 +102,7 @@ ggplot(data=sex_diff)+geom_line(aes(x=Year, y=Diff, group=Stratum, color=Stratum
 allYears <- sex_diff_geom %>% group_by(Stratum) %>% summarize(Diff = mean(Diff))
 ggplot(data=allYears)+geom_sf(aes(fill=Diff))
 
-ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_boxplot()+theme_bw()
+ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
 
 ggplot(data=sex_diff %>% group_by(Stratum) %>% summarise(Diff=mean(Diff)), aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +

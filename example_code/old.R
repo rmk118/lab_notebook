@@ -648,6 +648,8 @@ map(1:4, function(x) {
 
 
 # Sex ratio testing -------------------------------------------------------
+# library(lme4)
+# library(lmerTest)
 # detach("package:lmerTest", unload = TRUE)
 # detach("package:lme4", unload = TRUE)
 # library(nlme)
@@ -706,7 +708,7 @@ extractAIC(mod4)
 shapiro.test(residuals(mod4))
 par(mfrow = c(2, 2))
 plot(mod1)
-
+bartlett.test(Diff ~ Stratum, data=sex_diff)
 # sex_diff %>% ungroup() %>% levene_test(Diff ~ Stratum)
 # leveneTest(Diff ~ Stratum, data=sex_diff)
 # leveneTest(Diff ~ Stratum, data=sex_diff)
@@ -816,6 +818,8 @@ ncvTest(mod3) #homogeneity of residual variance not met
 #robust to violations of equal variance
 welch<- welch_anova_test(data=sex_diff, Diff ~ Stratum)
 games_howell_test(data=sex_diff, Diff ~ Stratum) #post-hoc for Welch
+kruskal.test(data=sex_diff, Diff ~ Stratum)
+TukeyHSD()
 
 data_complete <- data_complete %>%
   group_by(Season, Year, Region, Stratum) %>% 
@@ -847,3 +851,34 @@ ncvTest(wls) #Good
 surveyGrid$area <- as.integer(paste0(surveyGrid$Region, surveyGrid$Stratum))
 
 df_j_len <- df_j_len %>% mutate(Common_Name = "Jonah crab") #note shell height is in cm
+
+
+lm_power <- lm((Diff)^ ~ Stratum, data=sex_diff)
+
+# Weighted least-squares linear regression --------------------------------
+
+# Construct weighting vector equivalent to stratum number
+w <- sex_diff$Stratum 
+
+# Weighted least squares linear regression
+wls<- lm(Diff ~ Stratum, weights=w, data=sex_diff)
+summary(wls)
+
+# Visualize and test normality of residuals
+plot(wls, 2)
+shapiro.test(wls$residuals)
+
+# Visualize and test autocorrelation of residuals
+acf(wls$residuals)
+durbinWatsonTest(wls, max.lag=15) #none have p<0.05
+
+# Visualize and test homogeneity of residual variance
+plot(wls, 1)
+ncvTest(wls)
+ncvTest(wls)
+bptest(wls, varformula = ~ fitted.values(wls), studentize=F)
+coeftest(wls, vcov = vcovHC(wls, type = 'HC0'))
+
+# Test with Year as explanatory variable - non-significant
+wls_year<- lm(Diff ~ Stratum + Year, weights=w, data=sex_diff)
+summary(wls_year)
