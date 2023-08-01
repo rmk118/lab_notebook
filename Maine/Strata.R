@@ -270,13 +270,13 @@ autoplot(ts3[,3:4])
 ts3[,4] %>% diff() %>% ggtsdisplay(main="")
 ts3[,4] %>% ggtsdisplay(main="")
 
-# ARIMA vs S-Map ----------------------------------------------------------
+# ARIMA vs S-Map (na.approx) ----------------------------------------------------------
 ts_val <- ts3[,c("Season", "Year", "value", "date")]
 
-fit <- auto.arima(ts_val[,"value"])
-summary(fit)
-checkresiduals(fit)
-arimaPlot <- autoplot(forecast(fit))
+# fit <- auto.arima(ts_val[,"value"])
+# summary(fit)
+# checkresiduals(fit)
+# arimaPlot <- autoplot(forecast(fit))
 
 tsdf <- data.frame(ts_val)
 ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
@@ -291,7 +291,10 @@ PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", 
 
 s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=0.23)
 compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
+#	rho	            mae	                rmse	          perc	            p_val
+#0.765294344181914	1.51542737184567	2.2260418910586	0.928571428571429	0.000409866759442813
 plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
+
 
 train <- 1:30
 test <- 31:44
@@ -299,9 +302,6 @@ test <- 31:44
 fit_train <- auto.arima(ts_val[train,"value"])
 summary(fit_train)
 checkresiduals(fit_train)
-
-
-
 
 EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44") %>% filter(rho == max(rho))
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4)
@@ -334,19 +334,126 @@ yrs
 ind <- index(ts_val)
 ind
 
+edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
+                            Hi.95 = preds + 1.96*sqrt(pred_var),
+                            Lo.80 = preds - 1.28*sqrt(pred_var),
+                            Hi.80 = preds + 1.28*sqrt(pred_var),
+                            yrs = yrs)
+
+
+
+
+edmPlot_manual <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
+  geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
+  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_ribbon(data = edm_df, aes(x = yrs, y = preds, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
+  labs(x="Year", y="Jonah crab average catch (num/tow)")+
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
+edmPlot_manual
 
 arimaPlot_manual <- ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
   geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
-  ylab("Catch")+scale_color_manual(values=c("blue"))
+  labs(x="Year", y="")+
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
 arimaPlot_manual
 
-edm_plot <-ggplot()+
+
+library(patchwork)
+edmPlot_manual+arimaPlot_manual +
+  plot_layout(guides = 'collect')
+
+
+edm_ARIMAplot <-ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
   geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"))+
   geom_path(aes(x=yrs, y=arima_preds, color="ARIMA"))+
   ylab("Jonah crab average catch (num/tow)")
 edm_plot +theme_classic()
 
+
+# EDM vs. ARIMA (na.spline) -----------------------------------------------
+
+ts4<- na.spline(ts(catchTidy_agg_complete %>% filter(Species=="jonah", Type=="catch") %>% mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1)))
+
+ts_val4 <- ts4[,c("Season", "Year", "value", "date")]
+tsdf4 <- data.frame(ts_val4)
+ggplot(data=tsdf4)+geom_line(aes(x=date, y=value))
+
+fit_train4 <- auto.arima(ts_val4[train,"value"])
+summary(fit_train4)
+checkresiduals(fit_train4)
+
+EmbedDimension(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44") #%>% filter(rho == max(rho))
+PredictNonlinear(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=3)
+PredictNonlinear(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta="0.85 0.9 0.95 1 1.05 1.1") %>% filter(rho == max(rho))
+
+s_out4 <- SMap(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=1.05)
+
+compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
+plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
+
+(tsdf4[31:44, "value"] == s_out4$predictions$Observations[1:14]) #sanity check
+
+compute_stats(s_out4$predictions$Observations[1:14], arima_preds$Point.Forecast)
+compute_stats(s_out4$predictions$Observations, s_out$predictions$Predictions)
+
+
+forecast(fit_train, h=14)
+arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
+
+arimaPlot_train <- autoplot(forecast(fit_train, h=14)) + 
+  geom_path(data = data.frame(ts_val), aes(x = c(1:44), y = value)) + 
+  ylab("Catch")
+arimaPlot_train
+
+
+edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], preds = s_out$predictions$Predictions[2:15], pred_var = s_out$predictions$Pred_Variance[2:15])
+
+yrs <- seq(2016, 2022.5, 0.5)
+yrs
+ind <- index(ts_val)
+ind
+
+edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
+                            Hi.95 = preds + 1.96*sqrt(pred_var),
+                            Lo.80 = preds - 1.28*sqrt(pred_var),
+                            Hi.80 = preds + 1.28*sqrt(pred_var),
+                            yrs = yrs)
+
+
+
+
+edmPlot_manual <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
+  geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
+  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_ribbon(data = edm_df, aes(x = yrs, y = preds, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
+  labs(x="Year", y="Jonah crab average catch (num/tow)")+
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
+edmPlot_manual
+
+arimaPlot_manual <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
+  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
+  labs(x="Year", y="")+
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
+arimaPlot_manual
+
+
+library(patchwork)
+edmPlot_manual+arimaPlot_manual +
+  plot_layout(guides = 'collect')
+
+
+edm_ARIMAplot <-ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
+  geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"))+
+  geom_path(aes(x=yrs, y=arima_preds, color="ARIMA"))+
+  ylab("Jonah crab average catch (num/tow)")
+edm_plot +theme_classic()
