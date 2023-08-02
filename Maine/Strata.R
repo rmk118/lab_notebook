@@ -547,8 +547,6 @@ summary(fit_train)
 checkresiduals(fit_train)
 
 
-
-
 EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44") %>% filter(rho == max(rho))
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4)
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4, theta="0.3 0.4 0.5 0.55 0.6 0.65 0.7") %>% filter(rho == max(rho))

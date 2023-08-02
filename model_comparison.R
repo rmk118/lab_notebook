@@ -1,7 +1,7 @@
 # Comparing EDM models to linear models
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Aug 1, 2023
+# Last modified: Aug 2, 2023
 
 #Load packages
 library(tidyverse)
@@ -79,7 +79,7 @@ catch_agg <- catch_agg %>%
 
 ts1 <- ts(catchTidy_agg %>% filter(Species=="jonah", Type=="catch") %>% mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1))
 
-ts1<- na.spline(ts1)
+ts1<- na.spline(ts1) #using na.spline produces better EDM results than linear interpolation via na.approx
 
 
 # ARIMA vs S-Map ----------------------------------------------------------
