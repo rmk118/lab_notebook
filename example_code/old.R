@@ -777,7 +777,53 @@ extractAIC(wls)
 
 with (sex_diff, {interaction.plot(Year, factor(Stratum), Diff, ylab="mean of Diff", xlab="time", trace.label="Stratum") })
 
-# Unweighted linear models ------------------------------------------------
+# Unweighted linear models / Stratum analysis ------------------------------------------------
+
+# regionsGrid_seasons <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch"))
+# 
+# ggplot(data=regionsGrid_seasons %>% group_by(Stratum, Species, Season) %>% summarize(avg = mean(value, na.rm=TRUE)))+geom_sf(aes(fill=avg))+facet_grid(Season~Species)+scale_fill_viridis_c(option = "F", name="avg catch")
+# 
+# lag2 <- function(x) {
+#   x_lagged <- (x - lag(x, 2))
+#   return(x_lagged)
+# } 
+# catch_complete_diff <- catch_strat_complete %>% arrange(date) %>% group_by(Stratum) %>%
+#   mutate(across(where(is.double) & !date, lag2)) %>% 
+#   filter(date != "2003-11-01" & date != "2004-05-01") %>%  filter(as.Date(date) < as.Date("2020-05-01"))
+# 
+# complete_tidy_diff <- pivot_longer(catch_complete_diff,cols =starts_with("avg")) %>% 
+#   mutate(Type = case_when(
+#     startsWith(name, "avgCatch_") ~"catch",
+#     startsWith(name,"avgWt_") ~"wt")) %>% 
+#   mutate(Species = case_when(
+#     endsWith(name, "s") ~"scallop",
+#     endsWith(name, "r") ~"rock",
+#     endsWith(name, "j") ~"jonah")) %>%
+#   mutate(Species = as.factor(Species),
+#          Type = as.factor(Type),
+#          Stratum = as.factor(Stratum)) %>% 
+#   select(-name)  
+# 
+# params_ccm_combos <- data.frame(jonah=c("jonah", "jonah"), prey=c("scallop", "rock"))
+# 
+# catch_ccm <- catch_complete_diff %>% select(-c(Season, avgWt_s, avgWt_j, avgWt_r)) %>% rename("jonah" = "avgCatch_j", "rock"="avgCatch_r", "scallop"="avgCatch_s")
+# 
+# v_keep_col <- c("E","Tp","num_pred", "rho", "mae","rmse","perc","p_val","rho_linear", "mae_linear",
+#                 "rmse_linear","perc_linear","p_val_linear")
+# 
+# # Strata as replicates
+# RESULTS_ccm_rep_strata <- pmap_dfr(params_ccm_combos,function(jonah,prey){
+#   
+#   out_1 <- do_xmap_ID(catch_ccm,predictor=jonah,target=prey,ID_col="Stratum",E=3, tp=1)  %>%
+#     mutate(direction= paste("jonah","->",prey))
+#   
+#   out_2 <- do_xmap_ID(catch_ccm,predictor=prey,target=jonah,ID_col="Stratum",E=3, tp=1) %>% 
+#     mutate(direction= paste(prey,"->","jonah"))
+#   
+#   bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col))  %>% mutate(type="catch", replicate = "stratum")
+
+
+
 
 # ets1 <- ets(window(ts1[,"value"], 2001.0, 2015.5))
 # #    lamba="auto")
@@ -970,3 +1016,91 @@ acf(residuals(m1))
 # # summary(m3)
 # # shapiro.test(residuals(m3))
 #  Box.test(residuals(m3))
+
+
+# All figures -------------------------------------------------------------
+
+
+
+ggplot(data = catchTidy_strat %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value, na.rm=TRUE)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+
+ggplot(data = catchTidy_strat_complete %>%
+         filter(Type == "catch", Species != "scallop") %>%
+         group_by(date, Species) %>%
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=as.Date(date), y=avg))+
+  geom_line()+
+  facet_wrap(~Species)+
+  labs(y="catch")+
+  theme_classic()
+
+
+ggplot(data = catchTidy_strat_complete %>%
+         filter(Type == "catch", Species != "scallop") %>%
+         group_by(Year, Season, Species) %>%
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=Year, y=avg))+
+  geom_line()+
+  facet_grid(Season~Species)+
+  labs(y="catch")+
+  theme_classic()
+
+#All areas on one graph, split by species
+ggplot(data = complete_tidy_diff %>%
+         filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, group=Stratum,color=Stratum))+geom_line()+
+  facet_wrap(~Species) +
+  labs(y="2nd-differenced catch", x="Year")
+
+#Colored by species, split by area
+ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop"),
+       aes(x=date, y=value, group=Species,color=Species))+
+  geom_line()+
+  facet_wrap(~Stratum)+
+  labs(x="Depth stratum")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
+
+# # Testing imputed data ----------------------------------------------------
+# fixCOVID <- function(df) {
+#   df_out <- df %>% mutate(across(starts_with("avg"), na.approx))
+# }
+# 
+# catch_complete_imp <- catch_complete %>% arrange(across(c("area", "Season", "Year"))) %>% 
+#   fixCOVID()
+# 
+# catch_complete_diff_imp <- catch_complete_imp %>% arrange(date) %>% group_by(area) %>% 
+#   mutate(across(where(is.double) & !date, lag2)) %>% 
+#   arrange(area) %>% 
+#   filter(date != "2000-11-01" & date != "2001-05-01")
+# 
+# #Tidy it up
+# complete_tidy_diff_imp <- pivot_longer(catch_complete_diff_imp,cols = starts_with("avg")) %>% 
+#   mutate(Type = case_when(
+#     startsWith(name, "avgCatch_") ~"catch",
+#     startsWith(name,"avgWt_") ~"wt",
+#     startsWith(name,"avgLogWt") ~"logWt",
+#     startsWith(name,"avgLogCatch") ~"logCatch")) %>% 
+#   mutate(Species = case_when(
+#     endsWith(name, "s") ~"scallop",
+#     endsWith(name, "r") ~"rock",
+#     endsWith(name, "j") ~"jonah")) %>%
+#   mutate(area = as.factor(area), Species = as.factor(Species),
+#          Region = as.factor(Region), Type = as.factor(Type),
+#          Stratum = as.factor(Stratum)) %>% 
+#   select(-name)
+# 
+# #All areas on one graph, split by species
+# ggplot(data = complete_tidy_diff_imp %>% 
+#          filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=area))+geom_line()+facet_wrap(~Species) +labs(y="2nd-differenced catch", x="Year")
+# 
+# #Averaged across areas, split by species
+# ggplot(data = complete_tidy_diff_imp %>% filter(Type == "catch", Species != "scallop") %>% group_by(date, Species) %>% 
+#          summarise(avg = mean(value, na.rm = TRUE)), aes(x=date, y=avg))+geom_line()+facet_wrap(~Species)+theme_classic()+labs(y="2nd-differenced catch", x="Year")
+# 
+# #Colored by species, split by area
+# ggplot(data = complete_tidy_diff_imp %>% filter(Type == "catch", Species != "scallop"), aes(x=date, y=value, color=Species))+geom_line()+facet_grid(Region~Stratum)+labs(x="Depth stratum", y="Region")+theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
+# 
+# EmbedDimension(dataFrame=complete_tidy_diff_imp %>% filter(Species=="jonah", Type=="wt") %>% group_by(date) %>% 
+#                  summarise(avg = mean(value, na.rm = TRUE)) %>% 
+#                  ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 43", pred="1 43")
+
+# rm(complete_tidy_diff_imp)
+# rm(catch_complete_diff_imp)
+# rm(catch_complete_imp)

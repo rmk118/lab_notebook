@@ -1,7 +1,7 @@
 # Comparing EDM models to linear models
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Aug 2, 2023
+# Last modified: Aug 3, 2023
 
 #Load packages
 library(tidyverse)
@@ -140,7 +140,8 @@ edmPlot_manual <- ggplot()+
   geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
   geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
   labs(x="", y="Avg. catch/tow")+
-  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
+  theme(legend.position = "none")
 edmPlot_manual
 
 arimaPlot_manual <- ggplot()+
@@ -148,18 +149,27 @@ arimaPlot_manual <- ggplot()+
   geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
   labs(x="Year", y="Avg. catch/tow")+
-  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
+  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
+  theme(legend.position = "none")
 arimaPlot_manual
 
-edmPlot_manual/arimaPlot_manual +
-   plot_layout(guides = 'collect')+
+(edmPlot_manual/arimaPlot_manual) +
+  plot_layout(guides = 'collect')+
    plot_annotation(tag_levels = 'A')
 
 
 both_noCI <-ggplot()+
+  theme_classic()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
-  geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"))+
-  geom_path(data=arima_preds, aes(x=yrs, y=Point.Forecast, color="ARIMA"))+
-  labs(y="Avg. catch", x="Year")
+  geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"), size=1)+
+  geom_path(data=arima_preds, aes(x=yrs, y=Point.Forecast, color="ARIMA"), size=1)+
+  labs(y="Avg. catch/tow", x="Year")+scale_color_manual(name="Model", values=c("#FF1f5B", "#009ade"))+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 12))
+  
+both_noCI
 
-both_noCI +theme_classic()
+
+(((edmPlot_manual/arimaPlot_manual) +  plot_layout(guides = 'collect')) |  both_noCI  )+
+  plot_annotation(tag_levels = 'A') +   plot_layout(widths = c(1, 2.5))
