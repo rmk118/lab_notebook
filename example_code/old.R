@@ -779,6 +779,16 @@ with (sex_diff, {interaction.plot(Year, factor(Stratum), Diff, ylab="mean of Dif
 
 # Unweighted linear models ------------------------------------------------
 
+# ets1 <- ets(window(ts1[,"value"], 2001.0, 2015.5))
+# #    lamba="auto")
+# summary(ets1)
+# plot(ets1)
+# accuracy(ets1)
+# 
+# ets1 %>% forecast(h=14) %>% autoplot()
+# obs <- tsdf %>% slice(31:44) %>% pull(value)
+# compute_stats(ets1$mean, obs)
+
 mod1b<- lm(Diff ~ Stratum, data = sex_diff %>% mutate(Stratum = as.factor(Stratum)))
 mod1b
 summary(mod1b)

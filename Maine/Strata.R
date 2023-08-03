@@ -4,22 +4,16 @@ library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(viridis)
 library(rEDM) #EDM
-library(sf) #for spatial data
+library(mgcv) #GAMs
+# Time series packages
 library(tseries)
+library(zoo)
+library(forecast)
 
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #scallop catch
 df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #rock crab catch
 df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #jonah crab catch
-
-# surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
-# 
-# surveyGrid <- surveyGrid %>% 
-#   mutate(Region = region_id,
-#          Stratum = depth_stra,
-#          GridID = grid_id, .keep="unused", .before=last_surve)
-# 
-# surveyGrid$area <- as.numeric(paste0(surveyGrid$Region, surveyGrid$Stratum))
 
 cleanCatch <- function(x) {
   full_join(x, df_tows) %>%
@@ -51,6 +45,9 @@ colOrder<-c("Survey", "Tow_Number", "Region", "Stratum", "Expanded_Catch",
 j_cat_clean_seasons <- j_cat_clean_seasons %>% select(all_of(colOrder))
 r_cat_clean_seasons <- r_cat_clean_seasons %>% select(all_of(colOrder))
 s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
+
+
+# Strata analysis ---------------------------------------------------------
 
 # summaryStrat <- function(df) {
 #   df %>% group_by(Season, Year, Stratum) %>%
@@ -102,7 +99,6 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   labs(y="catch")+
 #   theme_classic()
 
-
 # ggplot(data = catchTidy_strat_complete %>% 
 #          filter(Type == "catch", Species != "scallop") %>% 
 #          group_by(Year, Season, Species) %>% 
@@ -111,7 +107,6 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   facet_grid(Season~Species)+
 #   labs(y="catch")+
 #   theme_classic()
-
 
 # regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
 # regionsGrid <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch",) %>% group_by(Stratum, date, Species))
@@ -127,7 +122,6 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   x_lagged <- (x - lag(x, 2))
 #   return(x_lagged)
 # } 
-
 # catch_complete_diff <- catch_strat_complete %>% arrange(date) %>% group_by(Stratum) %>%
 #   mutate(across(where(is.double) & !date, lag2)) %>% 
 #   filter(date != "2003-11-01" & date != "2004-05-01") %>%  filter(as.Date(date) < as.Date("2020-05-01"))
@@ -158,12 +152,6 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   facet_wrap(~Stratum)+
 #   labs(x="Depth stratum")+
 #   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
-# 
-# 
-# EmbedDimension(dataFrame=complete_tidy_diff %>% filter(Species=="jonah", Type=="catch") %>% group_by(date) %>% 
-#                  summarise(avg = mean(value, na.rm = TRUE)) %>% 
-#                  ungroup() %>% select(date, avg),  columns ="avg", target="avg", lib = "1 31", pred="1 31")
-# 
 # 
 # params_ccm_combos <- data.frame(jonah=c("jonah", "jonah"), prey=c("scallop", "rock"))
 # 
@@ -206,182 +194,63 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   bind_rows(out_1,out_2) %>% select(direction, all_of(v_keep_col)) %>% mutate(type="wt", replicate = "stratum") })
 
 
-# Linear models -----------------------------------------------------------
-# library(mgcv)
-# jgam1 <- gam(avgCatch_j ~ s(temp) + Season, data=catch_strat_complete)
-# summary(jgam1)
-# par(mfrow = c(2, 2))
-# plot(jgam1)
-# 
-# jgam2 <- gam(jonah ~ s(Year), data=catch_ccm)
-# summary(jgam1)
-# par(mfrow = c(2, 2))
-# plot(jgam1)
+# Linear + GAM/GAMM models -----------------------------------------------------------
 
-# ts1 <- ts(catch_ccm %>% filter(Stratum==1))
-# tslm1<- tslm(jonah ~ rock + temp + trend, data=ts1)
-# summary(tslm1)
-# 
-# ts2 <- ts(catch_strat_complete %>% group_by(Stratum) %>% mutate(date=as.Date(date)) %>% arrange(date), frequency=2)
-# tslm2<- tslm(avgCatch_j ~ trend + Stratum, data=ts2)
-# summary(tslm2)
-# autoplot(ts2 , facets = TRUE)
+tsdf <- tsdf %>% mutate(yrs = index(ts1))
+jgam1 <- gam(value ~ s(yrs), data=tsdf[train,])
+summary(jgam1)
+# gam(value ~ s(date), data=tsdf[train,]) #produces a model essentially equal to s(yrs)
+
+jgam2 <- gam(value ~ s(Year, bs = "gp") + Season, data=tsdf[train,]) #better than default
+summary(jgam2)
+acf(jgam2$residuals)
+
+jgam3 <- gam(value ~ s(Year) + Season, data=tsdf[train,])
+summary(jgam3)
 
 
-# Aggregate ---------------------------------------------------------------
+gam_ar1 <- gamm(value ~ s(Year, bs = "gp") + Season, data=tsdf[train,], correlation = corARMA(form = ~ 1|Year, p = 1))
+summary(gam_ar1$gam)
+acf(gam_ar1$gam$residuals)
 
-# summaryAgg <- function(df) {
-#   df %>% group_by(Season, Year) %>%
-#     summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
-#               avgWt = mean(Expanded_Weight_kg, na.rm=TRUE))
-#              # temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE)) 
-# }
-# 
-# #computes averages for each stratum
-# j_cat_agg <- summaryAgg(j_cat_clean_seasons)
-# r_cat_agg <- summaryAgg(r_cat_clean_seasons)
-# s_cat_agg <- summaryAgg(s_cat_clean_seasons)
+gam_ar1b <- gamm(value ~ s(Year) + Season, data=tsdf[train,], correlation = corARMA(form = ~ 1|Year, p = 1))
+summary(gam_ar1b$gam)
+acf(gam_ar1b$lme$residuals)
 
-#catch_agg <- s_cat_agg %>% left_join(j_cat_agg, by=c("Season", "Year", "temp"), suffix = c("_s", "_j"))
-#catch_agg <- s_cat_agg %>% left_join(j_cat_agg, by=c("Season", "Year"), suffix = c("_s", "_j"))
-# 
-# catch_agg2 <- catch_agg %>% left_join(r_cat_agg, by=c("Season", "Year", "temp")) %>% 
-#   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused") %>% ungroup() %>% complete(Season, Year)
-# catch_agg2 <- catch_agg %>% left_join(r_cat_agg, by=c("Season", "Year")) %>% 
-#   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused") %>% ungroup() %>% complete(Season, Year)
-# 
-# catchTidy_agg2 <- pivot_longer(catch_agg2, 
-#                                 cols = starts_with("avg")) %>% 
-#   mutate(Type = case_when(
-#     startsWith(name, "avgCatch_") ~"catch",
-#     startsWith(name,"avgWt_") ~"wt")) %>% 
-#   mutate(Species = case_when(
-#     endsWith(name, "s") ~"scallop",
-#     endsWith(name, "r") ~"rock",
-#     endsWith(name, "j") ~"jonah")) %>% ungroup() %>% complete(Season, Year)
-# 
-# 
-# catchTidy_agg2 <- catchTidy_agg2 %>% 
-#   mutate(Species = as.factor(Species),Season = as.factor(Season)) %>% 
-#   select(-name)
-# 
-# catch_agg_complete2 <- complete(data=catch_agg2 %>% ungroup(), Season, Year) %>% 
-#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""))%>% 
-#   filter(Year > 2000)
-# 
-# catchTidy_agg_complete2<- complete(data = catchTidy_agg2 %>% ungroup(),Season, Year) %>% 
-#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% 
-#   filter(Year > 2000)
+gam_ar2 <- gamm(value ~ s(Year, bs = "gp") + Season, data=tsdf[train,], correlation = corARMA(form = ~ 1|Year, p = 2))
+summary(gam_ar2$gam)
+acf(gam_ar2$gam$residuals)
 
-# ts3 <- ts(catchTidy_agg_complete %>% filter(Species=="jonah", Type=="catch") %>% mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1))
-# class(ts3)
-# ts3
-# index(ts3)
-# ts3<- na.approx(ts3)
-# autoplot(ts3[,3:4])
-# 
-# # fit <- auto.arima(ts3[,"value"],xreg=ts3[,"temp"])
-# 
-# ts3[,4] %>% diff() %>% ggtsdisplay(main="")
-# ts3[,4] %>% ggtsdisplay(main="")
+anova(gam_ar1$lme, gam_ar1b$lme)
+
+plot(jgam1)
+predict.gam(jgam1,newdata=tsdf[test,] )
+
+# in-sample
+gamPlot_manual <- ggplot()+
+    geom_path(data = tsdf[train,], aes(x = yrs, y = value)) + 
+   geom_path(aes(x=tsdf[train,]$yrs, y=jgam2$fitted.values,color="s(Year, bs=gp) + Season"))+ 
+  geom_path(aes(x=tsdf[train,]$yrs, y=jgam1$fitted.values,color="s(yrs)"))+ 
+  geom_path(aes(x=tsdf[train,]$yrs, y=jgam3$fitted.values,color="s(Year) + Season"))+
+  geom_path(aes(x=tsdf[train,]$yrs, y=gam_ar1$gam$fitted.values,color="s(Year), bs=gp + Season + AR1"))
+gamPlot_manual
 
 
-# ARIMA vs S-Map (na.approx) ----------------------------------------------------------
-# ts_val <- ts3[,c("Season", "Year", "value", "date")]
-# 
-# # fit <- auto.arima(ts_val[,"value"])
-# # summary(fit)
-# # checkresiduals(fit)
-# # arimaPlot <- autoplot(forecast(fit))
-# 
-# tsdf <- data.frame(ts_val)
-# ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
-# 
-# theta_seq <- seq(0.01, 0.75, by=0.05)
-# theta_seq <- paste(theta_seq, collapse=" ")
-# 
-# EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
-# PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3)
-# PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=theta_seq)
-# PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta="0.16 0.17 0.18 0.19 0.2 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28") %>% filter(rho == max(rho))
-# 
-# s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=0.23)
-# compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
-# 
-# plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
+gamPlot_manual_out <- ggplot()+
+  geom_path(data = tsdf[train,], aes(x = yrs, y = value)) + 
+  geom_path(aes(x=tsdf[test,]$yrs, y=predict.gam(jgam1,newdata=tsdf[test,] ),color="s(yrs)"))+ 
+  geom_path(aes(x=tsdf[test,]$yrs, y=predict.gam(jgam3,newdata=tsdf[test,] ),color="s(Year) + Season"))+
+  geom_path(aes(x=tsdf[test,]$yrs, y=predict.gam(jgam2,newdata=tsdf[test,] ),
+                color="s(Year, bs=gp) + Season"))+ 
+  geom_path(aes(x=tsdf[test,]$yrs, y=predict.gam(gam_ar1$gam,newdata=tsdf[test,] ),
+                color="s(Year, bs=gp) + Season + AR1"))
+gamPlot_manual_out
 
-#train <- 1:30
-# test <- 31:44
-# 
-# fit_train <- auto.arima(ts_val[train,"value"])
-# summary(fit_train)
-# checkresiduals(fit_train)
-# 
-# EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44") %>% filter(rho == max(rho))
-# PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4)
-# PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4, theta="0.3 0.4 0.5 0.55 0.6 0.65 0.7") %>% filter(rho == max(rho))
-# 
-# s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=0.6)
-# 
-# plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
-# 
-# (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
-# 
-# #compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
-# compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
-
-# forecast(fit_train, h=14)
-# arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
-# 
-# arimaPlot_train <- autoplot(forecast(fit_train, h=14)) + 
-#   geom_path(data = data.frame(ts_val), aes(x = c(1:44), y = value)) + 
-#   ylab("Catch")
-# arimaPlot_train
-# 
-# 
-# edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], preds = s_out$predictions$Predictions[2:15], pred_var = s_out$predictions$Pred_Variance[2:15])
-
-#yrs <- seq(2016, 2022.5, 0.5)
-#yrs
-# ind <- index(ts_val)
-# ind
-
-#edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
-                            # Hi.95 = preds + 1.96*sqrt(pred_var),
-                            # Lo.80 = preds - 1.28*sqrt(pred_var),
-                            # Hi.80 = preds + 1.28*sqrt(pred_var),
-                            # yrs = yrs)
-
-# edmPlot_manual <- ggplot()+
-#   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
-#   geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
-#   geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
-#   geom_ribbon(data = edm_df, aes(x = yrs, y = preds, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
-#   labs(x="Year", y="Jonah crab average catch (num/tow)")+
-#   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
-# edmPlot_manual
-# 
-# arimaPlot_manual <- ggplot()+
-#   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
-#   geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
-#   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
-#   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
-#   labs(x="Year", y="")+
-#   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))
-# arimaPlot_manual
-# 
-# 
-# 
-# edmPlot_manual+arimaPlot_manual +
-#   plot_layout(guides = 'collect')
+tslm1<- tslm(value ~ Year + season + trend, data=window(ts1, 2001.0, 2015.5))
+summary(tslm1)
+plot(tslm1$fitted.values)
 
 
-# edm_ARIMAplot <-ggplot()+
-#   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
-#   geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"))+
-#   geom_path(aes(x=yrs, y=arima_preds, color="ARIMA"))+
-#   ylab("Jonah crab average catch (num/tow)")
-# edm_ARIMAplot +theme_classic()
 
 
 # EDM vs. ARIMA (na.spline) -----------------------------------------------
@@ -394,7 +263,6 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 # ggplot(data=tsdf4)+geom_line(aes(x=date, y=value))
 # 
 # fit_train4 <- auto.arima(ts_val4[train,"value"])
-# summary(fit_train4)
 # checkresiduals(fit_train4)
 # 
 # forecast(fit_train4, h=14)
@@ -454,14 +322,11 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 #   plot_layout(guides = 'collect')+
 #   plot_annotation(tag_levels = 'A')
 # 
-# 
 # edm_ARIMAplot4 <-ggplot()+
 #   geom_path(data = data.frame(ts_val4), aes(x = ind, y = value)) + 
 #   geom_path(data = edm_df4, aes(x=yrs, y=preds, color="EDM"))+
 #   geom_path(data=arima_preds4, aes(x=yrs, y=Point.Forecast, color="ARIMA"))+
-#   labs(y="Avg. catch", x="Year")
-# 
-# edm_ARIMAplot4 +theme_classic()
+#   labs(y="Avg. catch", x="Year") +theme_classic()
 
 # Aggregate ---------------------------------------------------------------
 
@@ -553,14 +418,13 @@ PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", 
 
 s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=0.6)
 
-
 plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
 
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
 
 yrs <- seq(2016, 2022.5, 0.5)
-yrs
+ind <- index(ts_val)
 
 forecast(fit_train, h=14)
 arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
@@ -573,13 +437,7 @@ arimaPlot_train <- autoplot(forecast(fit_train, h=14)) +
   ylab("Catch")
 arimaPlot_train
 
-
 edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], preds = s_out$predictions$Predictions[2:15], pred_var = s_out$predictions$Pred_Variance[2:15])
-
-
-ind <- index(ts_val)
-ind
-
 
 arimaPlot_manual <- ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
@@ -588,10 +446,3 @@ arimaPlot_manual <- ggplot()+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
   ylab("Catch")+scale_color_manual(values=c("blue"))
 arimaPlot_manual
-
-edm_plot <-ggplot()+
-  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
-  geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"))+
-  geom_path(aes(x=yrs, y=arima_preds, color="ARIMA"))+
-  ylab("Jonah crab average catch (num/tow)")
-edm_plot +theme_classic()
