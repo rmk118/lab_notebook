@@ -11,6 +11,7 @@ library(rEDM) #EDM
 library(tseries)
 library(forecast)
 library(zoo)
+library(sf)
 
 #Import data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -124,7 +125,24 @@ ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
 
-# Now let's plot
+
+# Poster figures ----------------------------------------------------------
+
+#Prep: poster fig. 5 - Embedding dimension for aggregate catch
+fig <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
+
+# Figure 5
+ggplot(data=fig, aes(x=E, y=rho))+
+  geom_line()+
+  scale_x_continuous(breaks=seq(0,10,2))+
+  theme_classic()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 12))
+
+
+# Prep: poster fig. 6 - EDM vs ARIMA
 edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], 
                      preds = s_out$predictions$Predictions[2:15], 
                      pred_var = s_out$predictions$Pred_Variance[2:15])
@@ -153,11 +171,12 @@ arimaPlot_manual <- ggplot()+
   theme(legend.position = "none")
 arimaPlot_manual
 
+# Figure 6 (poster)
 (edmPlot_manual/arimaPlot_manual) +
   plot_layout(guides = 'collect')+
    plot_annotation(tag_levels = 'A')
 
-
+# Prep: slides fig. 6 - poster figure plus no-confidence interval combined plot
 both_noCI <-ggplot()+
   theme_classic()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
@@ -170,6 +189,34 @@ both_noCI <-ggplot()+
   
 both_noCI
 
-
+# Figure 6 (slides)
 (((edmPlot_manual/arimaPlot_manual) +  plot_layout(guides = 'collect')) |  both_noCI  )+
   plot_annotation(tag_levels = 'A') +   plot_layout(widths = c(1, 2.5))
+
+
+#Prep: fig. 7 - Map of rock and Jonah crab abundance by stratum
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
+
+surveyGrid <- surveyGrid %>% 
+  mutate(Region = region_id,
+         Stratum = depth_stra,
+         GridID = grid_id, .keep="unused", .before=last_surve)
+
+new <- c("Jonah crab", "Rock crab")
+names(new) <- c("jonah", "rock")
+
+figDat <- regionsGrid %>% 
+  filter(Species != "scallop") %>% 
+  group_by(Species, Stratum) %>% 
+  summarise(avg = mean(value, na.rm=TRUE))
+
+# Figure 7
+fig7 <- ggplot()+
+  geom_sf(aes(fill=avg), data=figDat)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_wrap(.~Species, labeller = labeller(Species = new))+
+  #theme(strip.text = element_text(size = 14))
+  labs(fill="Avg catch/tow")+
+  theme(axis.text.x = element_text(size = 10))
+fig7

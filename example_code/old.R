@@ -1104,3 +1104,153 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
 # rm(complete_tidy_diff_imp)
 # rm(catch_complete_diff_imp)
 # rm(catch_complete_imp)
+
+
+# EDM vs. ARIMA (na.spline) -----------------------------------------------
+
+#ts4<- na.spline(ts(catchTidy_agg_complete2 %>% filter(Species=="jonah", Type=="catch") %>% 
+#   mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1)))
+
+#ts_val4 <- ts4[,c("Year", "value", "date")]
+#tsdf4 <- data.frame(ts_val4)
+# ggplot(data=tsdf4)+geom_line(aes(x=date, y=value))
+# 
+# fit_train4 <- auto.arima(ts_val4[train,"value"])
+# checkresiduals(fit_train4)
+# 
+# forecast(fit_train4, h=14)
+# arima_preds4 <- data.frame(forecast(fit_train4, h=14)) %>% mutate(yrs = yrs)
+# 
+#EmbedDimension(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44") #%>% filter(rho == max(rho))
+#PredictNonlinear(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=8)
+# PredictNonlinear(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=3, 
+#                  theta="0.85 0.9 0.95 1 1.05 1.1") %>% filter(rho == max(rho))
+# 
+# s_out4 <- SMap(dataFrame=tsdf4, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=1.05)
+# 
+# compute_stats(s_out4$predictions$Observations, s_out4$predictions$Predictions)
+# plot(x=s_out4$predictions$Observations, y=s_out4$predictions$Predictions)
+# 
+# (tsdf4[31:44, "value"] == s_out4$predictions$Observations[1:14]) #sanity check
+# 
+# compute_stats(s_out4$predictions$Observations[1:14], arima_preds4$Point.Forecast)
+# compute_stats(s_out4$predictions$Observations, s_out4$predictions$Predictions)
+# 
+# arimaPlot_train4 <- autoplot(forecast(fit_train4, h=14)) + 
+#   geom_path(data = data.frame(ts_val), aes(x = c(1:44), y = value)) + 
+#   ylab("Catch")
+# arimaPlot_train4
+# 
+# edm_df4 <- data.frame(obs = s_out4$predictions$Observations[1:14], 
+#                       preds = s_out4$predictions$Predictions[2:15], 
+#                       pred_var = s_out4$predictions$Pred_Variance[2:15])
+# 
+# yrs <- seq(2016, 2022.5, 0.5)
+# ind <- index(ts_val)
+# 
+# edm_df4 <- edm_df4 %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
+#                             Hi.95 = preds + 1.96*sqrt(pred_var),
+#                             Lo.80 = preds - 1.28*sqrt(pred_var),
+#                             Hi.80 = preds + 1.28*sqrt(pred_var),
+#                             yrs = yrs)
+# 
+# edmPlot_manual4 <- ggplot()+
+#   geom_path(data = data.frame(ts_val4), aes(x = ind, y = value)) + 
+#   geom_path(data = edm_df4, aes(x=yrs, y=preds,color="line"))+
+#   geom_ribbon(data = edm_df4, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+#   labs(x="Year", y="Avg. catch")+
+#   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
+# edmPlot_manual4
+# 
+# arimaPlot_manual4 <- ggplot()+
+#   geom_path(data = data.frame(ts_val4), aes(x = ind, y = value)) + 
+#   geom_path(data = arima_preds4, aes(x=yrs, y=Point.Forecast,color="line"))+
+#   geom_ribbon(data = arima_preds4, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+#   labs(x="Year", y="")+
+#   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
+# arimaPlot_manual4
+# 
+# edmPlot_manual4+arimaPlot_manual4 +
+#   edmPlot_manual4+arimaPlot_manual4 +
+#   plot_layout(guides = 'collect')+
+#   plot_annotation(tag_levels = 'A')
+# 
+# edm_ARIMAplot4 <-ggplot()+
+#   geom_path(data = data.frame(ts_val4), aes(x = ind, y = value)) + 
+#   geom_path(data = edm_df4, aes(x=yrs, y=preds, color="EDM"))+
+#   geom_path(data=arima_preds4, aes(x=yrs, y=Point.Forecast, color="ARIMA"))+
+#   labs(y="Avg. catch", x="Year") +theme_classic()
+
+ts3 <- ts(catchTidy_agg_complete %>% filter(Species=="jonah", Type=="catch") %>% mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1))
+class(ts3)
+ts3
+index(ts3)
+ts3<- na.spline(ts3)
+autoplot(ts3[,3:4])
+
+# fit <- auto.arima(ts3[,"value"],xreg=ts3[,"temp"])
+
+ts3[,4] %>% diff() %>% ggtsdisplay(main="")
+ts3[,4] %>% ggtsdisplay(main="")
+
+ts_val <- ts3[,c("Season", "Year", "value", "date")]
+
+fit <- auto.arima(ts_val[,"value"])
+summary(fit)
+checkresiduals(fit)
+arimaPlot <- autoplot(forecast(fit))
+
+tsdf <- data.frame(ts_val)
+ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
+
+theta_seq <- seq(0.01, 0.75, by=0.05)
+theta_seq <- paste(theta_seq, collapse=" ")
+
+PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3)
+PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=theta_seq)
+PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta="0.16 0.17 0.18 0.19 0.2 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28") %>% filter(rho == max(rho))
+
+s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=0.23)
+compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
+plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
+
+train <- 1:30
+test <- 31:44
+
+fit_train <- auto.arima(ts_val[train,"value"])
+summary(fit_train)
+checkresiduals(fit_train)
+
+EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44") %>% filter(rho == max(rho))
+PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4)
+PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=4, theta="0.3 0.4 0.5 0.55 0.6 0.65 0.7") %>% filter(rho == max(rho))
+
+s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=0.6)
+
+plot(x=s_out$predictions$Observations, y=s_out$predictions$Predictions)
+
+(tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
+
+yrs <- seq(2016, 2022.5, 0.5)
+ind <- index(ts_val)
+
+forecast(fit_train, h=14)
+arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
+
+compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
+compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
+
+arimaPlot_train <- autoplot(forecast(fit_train, h=14)) + 
+  geom_path(data = data.frame(ts_val), aes(x = c(1:44), y = value)) + 
+  ylab("Catch")
+arimaPlot_train
+
+edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], preds = s_out$predictions$Predictions[2:15], pred_var = s_out$predictions$Pred_Variance[2:15])
+
+arimaPlot_manual <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = ind, y = value)) + 
+  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
+  ylab("Catch")+scale_color_manual(values=c("blue"))
+arimaPlot_manual

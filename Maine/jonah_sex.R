@@ -96,20 +96,36 @@ lm_results
 lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
 coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
 
+ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
 
 # Figures -----------------------------------------------------------------
 
 ggplot(data=sex_diff)+geom_line(aes(x=Year, y=Diff, group=Stratum, color=Stratum))
 
 #across all years
-allYears <- sex_diff_geom %>% group_by(Stratum) %>% summarize(Diff = mean(Diff))
-ggplot(data=allYears)+geom_sf(aes(fill=Diff))
+#find the mean proportion of female crabs for each stratum by season
+data_agg <- data_complete %>%
+  group_by(Season, Stratum) %>% 
+  summarise(perc_f = mean(perc_f, na.rm=TRUE)) 
 
-ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
+sex_diff_agg <- pivot_wider(data_agg, names_from="Season", values_from = "perc_f") %>% 
+  group_by(Stratum) %>% 
+  summarise(Fall = mean(Fall, na.rm=TRUE),
+            Spring = mean(Spring, na.rm=TRUE)) %>% 
+  mutate(Diff = Fall-Spring, .keep="unused") %>% #calculate the seasonal difference in perc. female from Fall to Spring
+  na.omit() %>% 
+  ungroup() %>% 
+  mutate(Stratum = as.numeric(Stratum))
 
-ggplot(data=sex_diff %>% group_by(Stratum) %>% summarise(Diff=mean(Diff)), aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
+ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +
-  stat_regline_equation(label.y = -0.05, aes(label = ..rr.label..))
+  stat_regline_equation(label.y = 0.05, aes(label = ..rr.label..))
+
+sex_diff_geom_agg <- left_join(regionsGrid_orig, sex_diff_agg) #join to sf for visualization
+
+ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))
+
+
 
 
 
