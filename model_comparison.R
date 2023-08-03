@@ -9,6 +9,7 @@ library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(rEDM) #EDM
 library(tseries)
+library(forecast)
 library(zoo)
 
 #Import data
@@ -117,6 +118,8 @@ compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
 # ASK ETHAN WHY THESE ARE DIFFERENT
 compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
 compute_stats(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
+ComputeError(s_out$predictions$Observations, s_out$predictions$Predictions)
+ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
 
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
@@ -136,7 +139,7 @@ edmPlot_manual <- ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
   geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
   geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
-  labs(x="Year", y="Avg. catch")+
+  labs(x="", y="Avg. catch/tow")+
   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
 edmPlot_manual
 
@@ -144,11 +147,11 @@ arimaPlot_manual <- ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
   geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
-  labs(x="Year", y="")+
+  labs(x="Year", y="Avg. catch/tow")+
   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()
 arimaPlot_manual
 
-edmPlot_manual+arimaPlot_manual +
+edmPlot_manual/arimaPlot_manual +
    plot_layout(guides = 'collect')+
    plot_annotation(tag_levels = 'A')
 

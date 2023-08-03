@@ -48,72 +48,121 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 
 
 # Strata analysis ---------------------------------------------------------
+library(sf)
+surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
 
-# summaryStrat <- function(df) {
-#   df %>% group_by(Season, Year, Stratum) %>%
-#     summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
-#               avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
-#               temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE)) 
-# }
+surveyGrid <- surveyGrid %>% 
+  mutate(Region = region_id,
+         Stratum = depth_stra,
+         GridID = grid_id, .keep="unused", .before=last_surve)
 
-# #computes averages for each stratum
-# j_cat_strat <- summaryStrat(j_cat_clean_seasons)
-# r_cat_strat <- summaryStrat(r_cat_clean_seasons)
-# s_cat_strat <- summaryStrat(s_cat_clean_seasons)
-# 
-# catch_strat <- s_cat_strat %>% left_join(j_cat_strat, by=c("Season", "Stratum", "Year", "temp"), suffix = c("_s", "_j"))
-# 
-# catch_strat <- catch_strat %>% left_join(r_cat_strat, by=c("Season", "Stratum", "Year", "temp")) %>% 
-#   mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
-# 
-# catchTidy_strat <- pivot_longer(catch_strat, 
-#                                   cols = starts_with("avg")) %>% 
-#   mutate(Type = case_when(
-#     startsWith(name, "avgCatch_") ~"catch",
-#     startsWith(name,"avgWt_") ~"wt")) %>% 
-#   mutate(Species = case_when(
-#     endsWith(name, "s") ~"scallop",
-#     endsWith(name, "r") ~"rock",
-#     endsWith(name, "j") ~"jonah"))
+summaryStrat <- function(df) {
+  df %>% group_by(Season, Year, Stratum) %>%
+    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
+              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
+}
 
-# catchTidy_strat <- catchTidy_strat %>% 
-#   mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum)) %>% 
-#   select(-name)
-# 
-# catch_strat_complete <- complete(data=catch_strat %>% ungroup(), Stratum, Season, Year) %>% 
-#  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
-#    filter(as.Date(date) > as.Date("2003-05-01"))
-# 
-# catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum, Season, Year) %>% 
-#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
-#   filter(as.Date(date) > as.Date("2003-05-01"))
+#computes averages for each stratum
+j_cat_strat <- summaryStrat(j_cat_clean_seasons)
+r_cat_strat <- summaryStrat(r_cat_clean_seasons)
+s_cat_strat <- summaryStrat(s_cat_clean_seasons)
 
-# ggplot(data = catchTidy_strat %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value, na.rm=TRUE)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+catch_strat <- s_cat_strat %>% left_join(j_cat_strat, by=c("Season", "Stratum", "Year", "temp"), suffix = c("_s", "_j"))
 
-# ggplot(data = catchTidy_strat_complete %>% 
-#          filter(Type == "catch", Species != "scallop") %>% 
-#          group_by(date, Species) %>% 
-#          summarise(avg = mean(value, na.rm = TRUE)), aes(x=as.Date(date), y=avg))+
-#   geom_line()+
-#   facet_wrap(~Species)+
-#   labs(y="catch")+
-#   theme_classic()
+catch_strat <- catch_strat %>% left_join(r_cat_strat, by=c("Season", "Stratum", "Year", "temp")) %>%
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
 
-# ggplot(data = catchTidy_strat_complete %>% 
-#          filter(Type == "catch", Species != "scallop") %>% 
-#          group_by(Year, Season, Species) %>% 
-#          summarise(avg = mean(value, na.rm = TRUE)), aes(x=Year, y=avg))+
-#   geom_line()+
-#   facet_grid(Season~Species)+
-#   labs(y="catch")+
-#   theme_classic()
+catchTidy_strat <- pivot_longer(catch_strat,
+                                  cols = starts_with("avg")) %>%
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>%
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
 
-# regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
-# regionsGrid <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch",) %>% group_by(Stratum, date, Species))
-# 
-# ggplot(data=regionsGrid %>% filter(Species != "scallop") %>% group_by(Species, Stratum) %>% summarise(avg = mean(value, na.rm=TRUE)))+
-#   geom_sf(aes(fill=avg))+facet_wrap(~Species)#+scale_fill_viridis_c()
-# 
+catchTidy_strat <- catchTidy_strat %>%
+  mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
+  select(-name)
+
+ catch_strat_complete <- complete(data=catch_strat %>% ungroup(), Stratum, Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
+    filter(as.Date(date) > as.Date("2003-05-01"))
+
+ catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum, Season, Year) %>% 
+   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
+  filter(as.Date(date) > as.Date("2003-05-01"))
+
+ggplot(data = catchTidy_strat %>% filter(Type=="catch", Species=="jonah") %>% group_by(Year, Season) %>% summarise(value = mean(value, na.rm=TRUE)))+geom_line(aes(x=Year, y=value))+facet_wrap(~Season)+theme_classic()+labs(y="Abundance (catch/tow)")
+
+ggplot(data = catchTidy_strat_complete %>%
+         filter(Type == "catch", Species != "scallop") %>%
+         group_by(date, Species) %>%
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=as.Date(date), y=avg))+
+  geom_line()+
+  facet_wrap(~Species)+
+  labs(y="catch")+
+  theme_classic()
+
+ggplot(data = catchTidy_strat_complete %>%
+         filter(Type == "catch", Species != "scallop") %>%
+         group_by(Year, Season, Species) %>%
+         summarise(avg = mean(value, na.rm = TRUE)), aes(x=Year, y=avg))+
+  geom_line()+
+  facet_grid(Season~Species)+
+  labs(y="catch")+
+  theme_classic()
+
+regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
+regionsGrid <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch",) %>% group_by(Stratum, date, Species))
+
+# FIGURE FOR POSTER
+
+new <- c("Jonah crab", "Rock crab")
+names(new) <- c("jonah", "rock")
+
+figDat <- regionsGrid %>% 
+  filter(Species != "scallop") %>% 
+  group_by(Species, Stratum) %>% 
+  summarise(avg = mean(value, na.rm=TRUE))
+
+fig7 <- ggplot()+
+  geom_sf(aes(fill=avg), data=figDat)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+ facet_wrap(.~Species, labeller = labeller(Species = new))+
+ labs(fill="Avg catch/tow")+
+ theme(axis.text.x = element_text(size = 10))
+
+   °
+ # scale_x_continuous(breaks=c(70, 68, 66),
+  #                   labels = function(x) paste0(x, "*degree*East")) #labels= c("70", "69", "68"))
+  #coord_sf(expand = TRUE, label_axes = list( bottom = c("70", "69", "68", "66")))
+  #scale_x_continuous(breaks = seq(from = 70, to = 67, by = -1))
+fig7
+
+
+ggplot()+
+  geom_sf(aes(fill=AREA), data=nc)+
+  coord_sf()+
+  scale_x_continuous(labels = letters[1:5]) +
+  scale_y_continuous(
+    breaks = c(34, 34.5, 35.7),
+    labels = c("A", "B", "C"))
+
+ggplot()+
+  geom_sf(aes(fill=avg), data=figDat)+
+  coord_sf()+
+ # scale_x_continuous(labels = letters[1:5]) +
+  scale_y_continuous(
+    breaks = c(44.5, 43.5, 42.5),
+    labels = c("A", "B", "C"))
+
+
+  #theme(strip.text = element_text(size = 14))
+
 # regionsGrid_seasons <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch"))
 # 
 # ggplot(data=regionsGrid_seasons %>% group_by(Stratum, Species, Season) %>% summarize(avg = mean(value, na.rm=TRUE)))+geom_sf(aes(fill=avg))+facet_grid(Season~Species)+scale_fill_viridis_c(option = "F", name="avg catch")
@@ -249,8 +298,6 @@ gamPlot_manual_out
 tslm1<- tslm(value ~ Year + season + trend, data=window(ts1, 2001.0, 2015.5))
 summary(tslm1)
 plot(tslm1$fitted.values)
-
-
 
 
 # EDM vs. ARIMA (na.spline) -----------------------------------------------
@@ -395,7 +442,7 @@ ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
 theta_seq <- seq(0.01, 0.75, by=0.05)
 theta_seq <- paste(theta_seq, collapse=" ")
 
-EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
+
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3)
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta=theta_seq)
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44", E=3, theta="0.16 0.17 0.18 0.19 0.2 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28") %>% filter(rho == max(rho))
@@ -446,3 +493,16 @@ arimaPlot_manual <- ggplot()+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
   ylab("Catch")+scale_color_manual(values=c("blue"))
 arimaPlot_manual
+
+#Poster figure
+fig <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
+
+ggplot(data=fig, aes(x=E, y=rho))+
+  geom_line()+
+  scale_x_continuous(breaks=seq(0,10,2))+
+ # scale_x_discrete(breaks=as.character(1:10),labels=as.character(1:10))+
+  theme_classic()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 12))
