@@ -718,15 +718,13 @@ map(1:4, function(x) {
 }) #strat 1 is sig, p=0.02
 
 
-# Sex ratio testing -------------------------------------------------------
+# Sex ratio testing old-------------------------------------------------------
 # library(lme4)
 # library(lmerTest)
- detach("package:lmerTest", unload = TRUE)
-detach("package:lme4", unload = TRUE)
- library(nlme)
+ #detach("package:lmerTest", unload = TRUE)
+#detach("package:lme4", unload = TRUE)
 #  detach("package:nlme", unload = TRUE)
-
-data <- df_sex %>% group_by(Season, Year, Area, Tow_Number, Sex) %>% mutate(Num_Sex = cumsum(Frequency)) %>% slice_tail()
+# library(nlme)
 
 sex_diff_old <- pivot_wider(data_complete, names_from="Season", values_from = "perc_m") %>% 
   mutate(Diff = Fall-Spring) %>% na.omit() %>% 
@@ -734,15 +732,10 @@ sex_diff_old <- pivot_wider(data_complete, names_from="Season", values_from = "p
   summarise(Diff = mean(Diff)) %>% 
   filter(Year > 2004)
 
-sex_diff_reg <- sex_diff_reg %>% filter(!(Year==2010 & Stratum==4 & Region == 5))
-sex_diff_reg %>% group_by(Region, Stratum) %>% identify_outliers(Diff)
-
 mod2<- lm(Diff ~ Stratum + Region, data = sex_diff_reg)
 mod2
 summary(mod2)
 shapiro.test(residuals(mod2))
-durbinWatsonTest(mod2)
-ncvTest(mod2)
 
 sex_diff_reg %>%
   group_by(Stratum, Region) %>%
@@ -805,7 +798,7 @@ lmer1<- lmer(Diff ~ (1|Year) + Stratum, data=sex_diff)
 summary(lmer1)
 shapiro.test(residuals(lmer1)) #good
 ranova(lmer1)
-lmer_w <- lmer(Diff ~ (1|Year) + Stratum, data=sex_diff, weights=w)
+#lmer_w <- lmer(Diff ~ (1|Year) + Stratum, data=sex_diff, weights=w)
 
 anova(lmer1, wls2, lmer_w)
 anova(lmer2, lmer2a, lmer2b, lmer3)
@@ -815,7 +808,7 @@ M.lm <-gls(Diff~Stratum, data=sked.dat)
 
 summary(gls(Diff~Stratum,weights=varPower(), data=sked.dat))
 
-#fit.ar1 <- gls(Diff ~ factor(Stratum), data=sex_diff, corr=corAR1())
+fit.ar1 <- gls(Diff ~ factor(Stratum), data=sex_diff, corr=corAR1())
 
 lmer2 <- lmer(Diff ~ (1|Year) + as.factor(Stratum) + as.factor(Region), data=sex_diff_reg)
 summary(lmer2)
@@ -843,8 +836,6 @@ ranova(lmer2)
 ggplot(data=data_complete_geom %>% filter(Season=="Fall"))+geom_sf(aes(fill=perc_m))+facet_wrap(~Year)
 ggplot(data=data_complete_geom %>% filter(Season=="Spring"))+geom_sf(aes(fill=perc_m))+facet_wrap(~Year)
 ggplot(data=sex_diff_geom)+geom_sf(aes(fill=Diff))+facet_wrap(~Year)
-extractAIC(wls)
-
 
 with (sex_diff, {interaction.plot(Year, factor(Stratum), Diff, ylab="mean of Diff", xlab="time", trace.label="Stratum") })
 
@@ -980,14 +971,6 @@ summary(wls_year)
 
 # Regions -----------------------------------------------------------------
 
-sex_diff_reg <- pivot_wider(data_complete, names_from="Season", values_from = "perc_f") %>% 
-  group_by(Year, Region, Stratum) %>% 
-  summarise(Fall = mean(Fall, na.rm=TRUE),
-            Spring = mean(Spring, na.rm=TRUE)) %>% 
-  mutate(Diff = Fall-Spring, .keep="unused") %>% #calculate the seasonal difference in perc. female from Fall to Spring
-  na.omit() %>% 
-  filter(Year > 2004) %>% ungroup() %>% 
-  mutate(Stratum = as.numeric(Stratum))
 
 ggplot(data=sex_diff_reg, aes(x=Year, y=Diff))+geom_line()+facet_grid(Region~Stratum)+geom_smooth(method = "lm", se=FALSE)
 
@@ -1020,13 +1003,8 @@ acf(residuals(mod5))
 durbinWatsonTest(mod5)
 Box.test(residuals(mod5), type="L")
 
-# 
-
 summary(p1)
 coef(p1,round=TRUE)
-
-library(nlme)
-
 
 # reg_ts <- sex_diff_reg %>% complete(Region, Stratum, Year) #%>% pivot_wider(names_from=c(Region, Stratum), values_from = Diff)
 # 

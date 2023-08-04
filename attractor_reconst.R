@@ -1,4 +1,4 @@
-#Jonah crab analysis
+#Attractor reconstruction slide figures
 #Ruby Krasnow
 #Last modified: Aug 4, 2023
 
@@ -78,7 +78,7 @@ plot_ly(tsdf_combined2, x = ~value.x, y = ~lag_val.x, z = ~lag_val2.x, type = 's
 tsdf_combined2 <- tsdf_combined %>% mutate(across((starts_with("val") | starts_with("lag")), 
                      ~ (.x - mean(.x, na.rm=TRUE))/ sd(.x, na.rm=TRUE)))
 
-
+# FIGURE IMAGE
 plot_ly(tsdf_combined2 %>% slice(1:44), 
         x = ~value.x, 
         y = ~lag_val.x, 
@@ -106,53 +106,3 @@ ggplot(data = tsdf_wt, aes(x=yrs, y=value))+
         axis.text.y = element_text(margin = margin(t = 0, r = 5, b = 0, l = 0)),
         axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
 
-# Regions -----------------------------------------------------------------
-summaryReg <- function(df) {
-  df %>% group_by(Season, Year, Region) %>%
-    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
-              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
-              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
-}
-
-#computes averages for each stratum
-j_cat_reg <- summaryReg(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Region)
-r_cat_reg <- summaryReg(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Region)
-s_cat_reg <- summaryReg(s_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Region)
-
-catch_reg <- s_cat_reg %>% left_join(j_cat_reg, by=c("Season", "Region", "Year", "temp"), suffix = c("_s", "_j"))
-
-catch_reg <- catch_reg %>% left_join(r_cat_reg, by=c("Season", "Region", "Year", "temp")) %>%
-  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
-
-catchTidy_reg <- pivot_longer(catch_reg,
-                              cols = starts_with("avg")) %>%
-  mutate(Type = case_when(
-    startsWith(name, "avgCatch_") ~"catch",
-    startsWith(name,"avgWt_") ~"wt")) %>%
-  mutate(Species = case_when(
-    endsWith(name, "s") ~"scallop",
-    endsWith(name, "r") ~"rock",
-    endsWith(name, "j") ~"jonah"))
-
-catchTidy_reg <- catchTidy_reg %>%
-  mutate(Species = as.factor(Species),Season = as.factor(Season), Region = as.factor(Region)) %>%
-  select(-name)
-
-catch_reg_complete <- complete(data=catch_reg %>% ungroup(), Region, Season, Year) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>%
-  filter(as.Date(date) > as.Date("2003-05-01"))
-
-catchTidy_reg_complete<- complete(data = catchTidy_reg %>% ungroup(),Region, Season, Year) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Region) %>%
-  filter(as.Date(date) > as.Date("2003-05-01")) %>% ungroup()
-
-
-catchTidy_reg_complete_j1 <- catchTidy_reg_complete %>% 
-  filter(Species =="jonah") %>% 
-  arrange(Region, date) %>% 
-  group_by(Season, Type) %>% 
-  mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
-  ungroup() 
-
-par(mfrow=c(2,3))
-findSpeciesGroups_both(catchTidy_reg_complete_j1, type="catch", g="Region", species="jonah")
