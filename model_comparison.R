@@ -1,17 +1,21 @@
-# Comparing EDM models to linear models
+# Comparing EDM models to linear models + Poster/presentation figures
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Aug 3, 2023
+# Last modified: Aug 4, 2023
 
 #Load packages
 library(tidyverse)
 library(lubridate) #date formatting
 library(patchwork) #combining plots
+library(scales) #plot scales
+library(sf) #spatial analysis
+
+## Time series packages
 library(rEDM) #EDM
 library(tseries)
 library(forecast)
 library(zoo)
-library(sf)
+
 
 #Import data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -90,7 +94,7 @@ ts_val <- ts1[,c("Season", "Year", "value", "date")]
 tsdf <- data.frame(ts_val)
 ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
 
-# First fit the EDM model
+## EDM model ----
 
 EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44")
 
@@ -100,7 +104,7 @@ PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", 
  
 s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=1.05)
 
-# Now ARIMA
+## ARIMA ----
 train <- 1:30
 
 fit_train <- auto.arima(ts_val[train,"value"])
@@ -128,10 +132,28 @@ ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions
 
 # Poster figures ----------------------------------------------------------
 
-#Prep: poster fig. 5 - Embedding dimension for aggregate catch
+## Fig. 2 - Landings -----------------------------------------
+# Prep: poster and slides fig. 2 - Jonah crab landings in Maine
+landings <- read.csv("data/MaineDMR_Landings.csv")
+ggplot(data=landings)+geom_line(aes(x=year, y=total_weight, color=species))
+
+
+ggplot(data=landings %>% filter(species=="Crab Jonah"))+
+  geom_line(aes(x=year, y=total_value))+
+  theme_classic()+
+  labs(x="Year", y="Total value ($)")+
+  scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)))
+
+# Fig. 3 on poster is map of survey area
+# Fig. 3 on slides is Deyle et al., 2018 time delay diagram
+# Fig. 4 on poster and slides is attractor reconstruction diagram
+
+## Fig. 5A - E (agg.)-----------------------------------------
+#Prep: Poster fig. 5 and slides 5a - Embedding dimension for aggregate catch
 fig <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
 
-# Figure 5
 ggplot(data=fig, aes(x=E, y=rho))+
   geom_line()+
   scale_x_continuous(breaks=seq(0,10,2))+
@@ -139,10 +161,10 @@ ggplot(data=fig, aes(x=E, y=rho))+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
-  theme(text = element_text(size = 12))
+  theme(text = element_text(size = 14))
 
 
-# Prep: poster fig. 6 - EDM vs ARIMA
+## Fig. 6 - EDM vs ARIMA -------------------------------------
 edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], 
                      preds = s_out$predictions$Predictions[2:15], 
                      pred_var = s_out$predictions$Pred_Variance[2:15])
@@ -160,7 +182,7 @@ edmPlot_manual <- ggplot()+
   labs(x="", y="Avg. catch/tow")+
   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
   theme(legend.position = "none")
-edmPlot_manual
+edmPlot_manual #6A
 
 arimaPlot_manual <- ggplot()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
@@ -169,9 +191,9 @@ arimaPlot_manual <- ggplot()+
   labs(x="Year", y="Avg. catch/tow")+
   scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
   theme(legend.position = "none")
-arimaPlot_manual
+arimaPlot_manual #6B
 
-# Figure 6 (poster)
+# Figure 6 (poster) combined A and B
 (edmPlot_manual/arimaPlot_manual) +
   plot_layout(guides = 'collect')+
    plot_annotation(tag_levels = 'A')
@@ -186,21 +208,66 @@ both_noCI <-ggplot()+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
   theme(text = element_text(size = 12))
-  
-both_noCI
+both_noCI #6C
 
-# Figure 6 (slides)
+# Figure 6 (slides) combined A, B, and C
 (((edmPlot_manual/arimaPlot_manual) +  plot_layout(guides = 'collect')) |  both_noCI  )+
   plot_annotation(tag_levels = 'A') +   plot_layout(widths = c(1, 2.5))
 
 
-#Prep: fig. 7 - Map of rock and Jonah crab abundance by stratum
+# Strata analysis ---------------------------------------------------------
+
 surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
 
 surveyGrid <- surveyGrid %>% 
   mutate(Region = region_id,
          Stratum = depth_stra,
          GridID = grid_id, .keep="unused", .before=last_surve)
+
+summaryStrat <- function(df) {
+  df %>% group_by(Season, Year, Stratum) %>%
+    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
+              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
+}
+
+#computes averages for each stratum
+j_cat_strat <- summaryStrat(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
+r_cat_strat <- summaryStrat(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
+s_cat_strat <- summaryStrat(s_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
+
+catch_strat <- s_cat_strat %>% left_join(j_cat_strat, by=c("Season", "Stratum", "Year", "temp"), suffix = c("_s", "_j"))
+
+catch_strat <- catch_strat %>% left_join(r_cat_strat, by=c("Season", "Stratum", "Year", "temp")) %>%
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
+
+catchTidy_strat <- pivot_longer(catch_strat,
+                                cols = starts_with("avg")) %>%
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>%
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy_strat <- catchTidy_strat %>%
+  mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
+  select(-name)
+
+catch_strat_complete <- complete(data=catch_strat %>% ungroup(), Stratum, Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
+  filter(as.Date(date) > as.Date("2003-05-01"))
+
+catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum, Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
+  filter(as.Date(date) > as.Date("2003-05-01"))
+
+## Fig. 7 - Jonah/rock by stratum --------------------------------------------------
+
+#Prep: Fig. 7 - Map of rock and Jonah crab abundance by strat
+regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
+regionsGrid <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch",) %>% group_by(Stratum, date, Species))
 
 new <- c("Jonah crab", "Rock crab")
 names(new) <- c("jonah", "rock")
@@ -220,3 +287,36 @@ fig7 <- ggplot()+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))
 fig7
+
+## Fig. 5A - E (strat) --------------------------------------------------
+
+findSpeciesGroups_both<- function(df, species, type, g) {
+  df_out <- df %>% na.omit() %>% 
+    filter(Type == type, Species == species) %>% 
+    group_by(!!sym(g), date) %>% 
+    summarise(avg = mean(value)) %>% 
+    group_by(!!sym(g))  %>%
+    summarise(E_opt = findE_v(avg),
+              rho_E = findErho_v(avg),
+              Theta = findTheta_v(avg, E_opt),
+              rho_theta = findThetaRho_v(avg, E_opt))
+  return(df_out)
+}
+
+catchTidy_strat_complete_j <- catchTidy_strat_complete %>% 
+  filter(Species =="jonah", Type == "catch") %>% 
+  arrange(Stratum, date)
+
+catchTidy_strat_complete_j1 <- catchTidy_strat_complete_j %>% 
+  group_by(Season) %>% 
+  mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
+  ungroup()
+
+catchTidy_strat_complete_j2 <- catchTidy_strat_complete_j %>%
+  mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
+  ungroup()
+
+all.equal(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
+setdiff(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
+
+findSpeciesGroups_both(catchTidy_strat_complete_j, type="catch", g="Stratum", species="jonah")

@@ -1,3 +1,5 @@
+# Strata analysis and GAMs/linear models
+
 #Load packages
 library(tidyverse)
 library(lubridate) #date formatting
@@ -65,8 +67,8 @@ summaryStrat <- function(df) {
 
 #computes averages for each stratum
 j_cat_strat <- summaryStrat(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
-r_cat_strat <- summaryStrat(r_cat_clean_seasons)
-s_cat_strat <- summaryStrat(s_cat_clean_seasons)
+r_cat_strat <- summaryStrat(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
+s_cat_strat <- summaryStrat(s_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum)
 
 catch_strat <- s_cat_strat %>% left_join(j_cat_strat, by=c("Season", "Stratum", "Year", "temp"), suffix = c("_s", "_j"))
 
@@ -165,44 +167,3 @@ gamPlot_manual_out
 tslm1<- tslm(value ~ Year + season + trend, data=window(ts1, 2001.0, 2015.5))
 summary(tslm1)
 plot(tslm1$fitted.values)
-
-# Aggregate ---------------------------------------------------------------
-
-summaryAgg <- function(df) {
-  df %>% group_by(Season, Year) %>%
-    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
-              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
-              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE)) 
-}
-
-#computes averages for each stratum
-j_cat_agg <- summaryAgg(j_cat_clean_seasons)
-r_cat_agg <- summaryAgg(r_cat_clean_seasons)
-s_cat_agg <- summaryAgg(s_cat_clean_seasons)
-
-catch_agg <- s_cat_agg %>% left_join(j_cat_agg, by=c("Season", "Year", "temp"), suffix = c("_s", "_j"))
-
-catch_agg <- catch_agg %>% left_join(r_cat_agg, by=c("Season", "Year", "temp")) %>% 
-  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused") %>% ungroup() %>% complete(Season, Year)
-
-catchTidy_agg <- pivot_longer(catch_agg, 
-                              cols = starts_with("avg")) %>% 
-  mutate(Type = case_when(
-    startsWith(name, "avgCatch_") ~"catch",
-    startsWith(name,"avgWt_") ~"wt")) %>% 
-  mutate(Species = case_when(
-    endsWith(name, "s") ~"scallop",
-    endsWith(name, "r") ~"rock",
-    endsWith(name, "j") ~"jonah")) %>% ungroup() %>% complete(Season, Year)
-
-catchTidy_agg <- catchTidy_agg %>% 
-  mutate(Species = as.factor(Species),Season = as.factor(Season)) %>% 
-  select(-name)
-
-catch_agg_complete <- complete(data=catch_agg %>% ungroup(), Season, Year) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""))%>% 
-  filter(Year > 2000)
-
-catchTidy_agg_complete<- complete(data = catchTidy_agg %>% ungroup(),Season, Year) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% 
-  filter(Year > 2000)
