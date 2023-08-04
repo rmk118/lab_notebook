@@ -144,7 +144,8 @@ ggplot(data=landings %>% filter(species=="Crab Jonah"))+
   labs(x="Year", y="Total value ($)")+
   scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
   theme(axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)))
+        axis.title.y = element_text(margin = margin(r = 10)),
+        text = element_text(size = 14))
 
 # Fig. 3 on poster is map of survey area
 # Fig. 3 on slides is Deyle et al., 2018 time delay diagram
@@ -255,13 +256,9 @@ catchTidy_strat <- catchTidy_strat %>%
   mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
   select(-name)
 
-catch_strat_complete <- complete(data=catch_strat %>% ungroup(), Stratum, Season, Year) %>% 
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
-  filter(as.Date(date) > as.Date("2003-05-01"))
-
 catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum, Season, Year) %>% 
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
-  filter(as.Date(date) > as.Date("2003-05-01"))
+  filter(as.Date(date) > as.Date("2003-05-01")) %>% ungroup()
 
 ## Fig. 7 - Jonah/rock by stratum --------------------------------------------------
 
@@ -288,35 +285,119 @@ fig7 <- ggplot()+
   theme(axis.text.x = element_text(size = 10))
 fig7
 
-## Fig. 5A - E (strat) --------------------------------------------------
+## Fig. 5B - E (strat) --------------------------------------------------
+catchTidy_strat_complete_j <- catchTidy_strat_complete %>% 
+  filter(Species =="jonah") %>% 
+  arrange(Stratum, date) %>% 
+  group_by(Stratum, Season, Type) %>% 
+  mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
+  ungroup() 
 
-findSpeciesGroups_both<- function(df, species, type, g) {
-  df_out <- df %>% na.omit() %>% 
-    filter(Type == type, Species == species) %>% 
-    group_by(!!sym(g), date) %>% 
-    summarise(avg = mean(value)) %>% 
-    group_by(!!sym(g))  %>%
-    summarise(E_opt = findE_v(avg),
-              rho_E = findErho_v(avg),
-              Theta = findTheta_v(avg, E_opt),
-              rho_theta = findThetaRho_v(avg, E_opt))
-  return(df_out)
+ggplot(data=catchTidy_strat_complete_j %>% filter(Type=="catch"), aes(x=date, y=value))+
+  geom_line(data=catchTidy_strat_complete_j %>% filter(Type=="catch"), aes(x=date, y=value, group=Stratum, color=Stratum))
+
+stratE <- map_dfr(c(1:4), function(x) {
+  v <- catchTidy_strat_complete_j %>% filter(Type=="catch", Stratum==x) %>% pull(value)
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  rho_E %>% mutate(Stratum = paste("Stratum ",x))
+})
+
+#Figure 5B
+fig5b <- ggplot()+
+  geom_line(data=stratE, aes(x=E, y=rho))+
+  facet_wrap(~Stratum)+
+  theme_bw()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 14))
+fig5b
+
+
+# Area analysis --------------------------------------------------
+## Fig. 5C - E (areas) --------------------------------------------------
+
+summaryArea <- function(df) {
+  df %>% group_by(Season, Year, Stratum, Region) %>%
+    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
+              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
 }
 
-catchTidy_strat_complete_j <- catchTidy_strat_complete %>% 
-  filter(Species =="jonah", Type == "catch") %>% 
-  arrange(Stratum, date)
+#computes averages for each Area
+j_cat_area <- summaryArea(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum, Region)
+r_cat_area <- summaryArea(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum, Region)
+s_cat_area <- summaryArea(s_cat_clean_seasons) %>% ungroup() %>% complete(Season, Year, Stratum, Region)
 
-catchTidy_strat_complete_j1 <- catchTidy_strat_complete_j %>% 
-  group_by(Season) %>% 
+catch_area <- s_cat_area %>% left_join(j_cat_area, by=c("Season", "Stratum", "Region", "Year", "temp"), suffix = c("_s", "_j"))
+
+catch_area <- catch_area %>% left_join(r_cat_area, by=c("Season", "Stratum", "Region", "Year", "temp")) %>%
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused")
+
+catchTidy_area <- pivot_longer(catch_area,
+                                cols = starts_with("avg")) %>%
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>%
+  mutate(Species = case_when(
+    endsWith(name, "s") ~"scallop",
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy_area <- catchTidy_area %>%
+  mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum), Region = as.factor(Region), Area = paste0(Region, Stratum)) %>%
+  select(-name)
+
+catchTidy_area_complete<- complete(data = catchTidy_area %>% ungroup(),Region, Stratum, Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Season) %>%
+  filter(as.Date(date) > as.Date("2003-05-01")) %>% ungroup()
+
+catchTidy_area_complete_j <- catchTidy_area_complete %>% 
+  filter(Species =="jonah") %>% 
+  arrange(Area, date) %>% 
+  group_by(Region, Stratum, Area, Season, Type) %>% 
   mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
-  ungroup()
+  ungroup() 
 
-catchTidy_strat_complete_j2 <- catchTidy_strat_complete_j %>%
-  mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
-  ungroup()
+areaList <- c(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54)
+areaE <- map_dfr(areaList, function(x) {
+  reg <- substr(x, 1, 1)
+  strat <- substr(x, 2, 2)
+  v <- catchTidy_area_complete_j %>% filter(Type=="catch", Area==x) %>% pull(value)
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  rho_E %>% mutate(Region = reg, Stratum = strat)
+})
 
-all.equal(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
-setdiff(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
+#Figure 5C
+fig5c <- ggplot()+
+  geom_line(data=areaE, aes(x=E, y=rho))+
+  facet_grid(Region~Stratum)+
+theme_light()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 14),
+        panel.grid.major = element_line(colour = "grey70", linewidth = 0.2),
+        panel.grid.minor = element_blank())
+fig5c
 
-findSpeciesGroups_both(catchTidy_strat_complete_j, type="catch", g="Stratum", species="jonah")
+ggplot()+
+  geom_line(data=areaE, aes(x=E, y=rho))+
+  facet_grid(Region~Stratum)+
+  theme_light()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        text = element_text(size = 14),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white", color="black"),
+        strip.text = element_text(colour = "black"))

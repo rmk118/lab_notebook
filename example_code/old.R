@@ -1141,6 +1141,22 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
   labs(x="Depth stratum")+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
 
+# catchTidy_strat_complete_j2 <- catchTidy_strat_complete_j %>% 
+#   mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
+#   ungroup()#%>% 
+# mutate(temp = round(temp, digits=7),value = round(value, digits=7))
+# 
+# all.equal(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
+# all.equal(catchTidy_strat_complete_j, catchTidy_strat_complete_j1)
+# dplyr::setdiff(catchTidy_strat_complete_j1[,1:8], catchTidy_strat_complete_j2[,1:8])
+# dplyr::setdiff(catchTidy_strat_complete_j2, catchTidy_strat_complete_j1)
+# anti_join(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2)
+# anti_join(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2, by="temp")
+# 
+# catchTidy_strat_complete_j1$included_a1 <- TRUE
+# catchTidy_strat_complete_j2$included_a2 <- TRUE
+# res <- merge(catchTidy_strat_complete_j1, catchTidy_strat_complete_j2, all=TRUE)
+
 # # Testing imputed data ----------------------------------------------------
 # fixCOVID <- function(df) {
 #   df_out <- df %>% mutate(across(starts_with("avg"), na.approx))
