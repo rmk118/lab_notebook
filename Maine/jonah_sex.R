@@ -278,6 +278,19 @@ med_date <- df_tows  %>%
   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
   ungroup() 
 
+int <- df_tows  %>% 
+  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+  mutate(stdYear = date(stdYear)) %>% 
+  group_by(Year, Region, Depth_Stratum) %>% 
+  summarise(med = median(stdYear)) %>% 
+  mutate(Stratum = Depth_Stratum, .keep="unused") %>%
+  ungroup() 
+
+int <- left_join(int, sex_diff_reg) %>% 
+  na.omit()
+
+
 tot_date <- df_tows %>% 
   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% 
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
@@ -292,17 +305,16 @@ tot_date <- df_tows %>%
 
 int2 <- left_join(tot_date, sex_diff_reg) %>% na.omit()
 
-int <- med_date %>% filter(Year > 2004 & Year != 2020) %>% 
-  group_by(Year, Region, Stratum) %>% 
-  mutate(dur = max(med) - min(med)) %>% 
-  mutate(dur = as.integer(dur)) %>% 
-  filter(Season == "Fall")
+# int <- med_date %>% filter(Year > 2004 & Year != 2020) %>% 
+#   group_by(Year, Region, Stratum) %>% 
+#   mutate(dur = max(med) - min(med)) %>% 
+#   mutate(dur = as.integer(dur)) %>% 
+#   filter(Season == "Fall")
 
 ggplot(data=int)+geom_line(aes(x=Year,y=dur))
 
-int <- left_join(int, sex_diff_reg) %>% 
- na.omit()
 
+View(df_tows %>% filter(Year==2022, (Region %in% c(1:3)) & (as.numeric(Depth_Stratum) %in% c(2,4))))
 
 summary(d1)
 summary(d2)
@@ -310,24 +322,9 @@ summary(d3)
 
 anova(d1, d2, d3)
 
-AIC(lm(Diff ~ Stratum + Year + Region + dur, 
-    data = int)) #210.54
-AIC(d3)
-
-summary(lm(Diff ~ Stratum + Region +dur, 
-           data = int)) 
-
-AIC((lm(Diff ~ Stratum + Region +dur, 
-        data = int)))#222.4
-
-# 
-# d1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|dur, 
-#           data = int) #autocorrelation
 d1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, 
           data = int2) #autocorrelation
 
- # d2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|dur, 
- #           data = int, correlation = corAR1()) #more autocorrelation than 1
 d2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, 
                     data = int2, correlation = corAR1(form =  ~Year|Stratum/Region))
 summary(d2) #winner winner
@@ -336,25 +333,14 @@ d3 <- (lme(Diff ~ Stratum + Year + Region, random = ~ 1|len,
     data = int2, correlation = corAR1(form =  ~1|len)))
 anova(d2, d3)
 
-# d3 <- lm(Diff ~ Stratum + Year + Region + dur, 
-#          data = int) high AIC
-# d3 <- lm(Diff ~ Stratum + Year + Region + med, 
-#                  data = int) 
-# d4 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|med, 
-#            data = int) #worse than d5
+
+
 d4 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len, 
           data = int2) #worse than d5
 
-# d5 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|dur, 
-#           data = int) singular
 
-# d5 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
-#           data = int)
-# 
  # d5 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len, 
  #          data = int2, correlation = corAR1()) singular
-# d6 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
-#           data = int, correlation = corAR1())
 
 anova(d1, d2)
 anova(d4, d2)
@@ -385,3 +371,19 @@ anova(d2)
 
 tidy(d2)
 ggplot(int2, aes(x=Year, y=len))+geom_point()+geom_smooth(method="lm", se=FALSE)
+
+
+i1 <- lm(Diff ~ Stratum + Year + Region + med, 
+           data = int)  #autocorr
+i2 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|med, 
+            data = int) #worse than d5
+i3 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
+           data = int)
+i4 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
+           data = int, correlation = corAR1())
+# i5 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
+#             data = int, correlation = corAR1(form =  ~1|med))
+i5 <- 
+anova( i2, i3, i4)
+
+plot(i1)
