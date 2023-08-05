@@ -154,18 +154,13 @@ sex_diff_reg %>%
 
 reg1 <- lm(Diff ~ Stratum + Region, data = sex_diff_reg)
 summary(reg1)
-par(mfrow = c(2, 2))
-plot(reg1)
-shapiro.test(reg1$residuals) #good
 durbinWatsonTest(reg1) #significant autocorrelation
 ncvTest(reg1) #also non-constant variance
 
 reg2 <- lm(Diff ~ Stratum + Region + Year, data = sex_diff_reg)
 summary(reg2)
 par(mfrow = c(2, 2))
-plot(reg2)
 shapiro.test(reg2$residuals) #good
-
 durbinWatsonTest(reg2) #significant autocorrelation, but less than 1
 ncvTest(reg2) #also non-constant variance
 
@@ -174,11 +169,12 @@ summary(reg3)
 shapiro.test(residuals(reg3)) #good
 acf(residuals(reg3))
 ncvTest(reg3) #also non-constant variance
-Box.test(residuals(reg3))
+Box.test(residuals(reg3)) #
 par(mfrow = c(2, 2))
 plot(reg3)
 arm::display(reg3)
 tidy(reg3)
+
 
 library(nlme)
 reg4 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg)
@@ -188,6 +184,8 @@ plot(reg4, resid(., type = "normalized") ~ fitted(.) | Region, abline = 0)
 plot(ACF(reg4, resType = "normalized"))
 Box.test(residuals(reg4))
 acf(residuals(reg4, type="normalized"))
+Box.test(residuals(reg4, type="normalized"))
+shapiro.test(residuals(reg4, type="normalized"))
 aug <- broom.mixed::augment(reg4)
 aug
 ggplot(aug, aes(Year, Diff)) +
@@ -198,26 +196,49 @@ plot(reg4, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
 plot(reg4, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 
 
-reg5 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, correlation = corAR1(form =  ~Year|Region/Stratum))
+reg5 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
+            correlation = corAR1(form =  ~Year|Region/Stratum))
 summary(reg5)
+summary(reg5)$tTable
+fixef(reg5)
+ranef(reg5)
 plot(reg5)
-Box.test(residuals(reg5, type="normalized"))
+vcov(reg5)
+intervals(reg5, which="fixed")
+coef(reg5)
 plot(reg5, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
 plot(reg5, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-plot(ACF(reg5, resType = "normalized"))
+AIC(reg5)
 acf(residuals(reg5, type="normalized"))
 shapiro.test(resid(reg5))
-
+anova(reg5)
 anova(reg4, reg5)
 ranef(reg5)
+getCall(reg5)$correlation
+intervals(reg5, which="var-cov")$corStruct
+anova(reg5)
 
-gls1 <- gls(Diff ~ Stratum + Year, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
-summary(gls1)
-plot(gls1)
-acf(residuals(gls1, type="normalized"))
+# gls1 <- gls(Diff ~ Stratum + Year, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
+# summary(gls1)
+# plot(gls1)
+# acf(residuals(gls1, type="normalized"))
 
 gls2 <- gls(Diff ~ Stratum + Year + Region, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
+gls2b <- gls(Diff ~ Stratum + Year + Region, data=sex_diff_reg, corr=corAR1(form =  ~Year|Region/Stratum))
 summary(gls2)
-plot(gls1)
-acf(residuals(gls2,type="normalized"))
-shapiro.test(resid(gls2,type="normalized"))
+summary(gls2b)
+plot(gls2)
+acf(residuals(gls2, type="normalized"))
+shapiro.test(residuals(gls2, type="normalized"))
+plot(gls2, resid(.) ~ Year, abline = 0, cex = 0.3)
+plot(gls2, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+plot(gls2, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+
+anova(gls2b,gls2)
+
+reg6 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
+            correlation = corARMA(form= ~ Year | Region/Stratum, p=1, q=1))
+summary(reg6)
+AIC(reg6)
+
+Box.test(residuals(gls2, type="normalized"), type="L")
