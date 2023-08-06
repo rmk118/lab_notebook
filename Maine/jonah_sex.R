@@ -1,6 +1,6 @@
 #Jonah crab seasonal sex ratio differences
 #Ruby Krasnow
-#Last modified: July 31, 2023
+#Last modified: Aug 5, 2023
 
 # Load packages
 library(tidyverse)
@@ -15,7 +15,8 @@ library(lmtest)
 library(tseries)
 library(forecast)
 library(lubridate)
-
+library(broom)
+library(broom.mixed)
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -31,8 +32,9 @@ regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_disti
 df_j_len <- df_j_len %>%
   arrange(Season, Year, Stratum, Region, Tow_Number)
 
-df_sex <- df_j_len %>% filter(Year > 2003) %>% 
-  select(Season, Year, Tow_Number, Region, Stratum, Frequency, Sex) %>% 
+df_sex <- df_j_len %>% 
+  filter(Year > 2003) %>% 
+  select(c("Season", "Year", "Tow_Number", "Region", "Stratum", "Frequency", "Sex")) %>% 
   arrange(Season, Year, Stratum, Region, Tow_Number)
 
 data_complete <- df_sex %>% 
@@ -153,107 +155,11 @@ sex_diff_reg %>%
   group_by(Region, Stratum) %>%
   shapiro_test(Diff)
 
-reg1 <- lm(Diff ~ Stratum + Region, data = sex_diff_reg)
-summary(reg1)
-durbinWatsonTest(reg1) #significant autocorrelation
-ncvTest(reg1) #also non-constant variance
-
-reg2 <- lm(Diff ~ Stratum + Region + Year, data = sex_diff_reg)
-summary(reg2)
-par(mfrow = c(2, 2))
-shapiro.test(reg2$residuals) #good
-durbinWatsonTest(reg2) #significant autocorrelation, but less than 1
-ncvTest(reg2) #also non-constant variance
-
-reg3 <- lmer(Diff ~ Stratum + (1|Region) + Year, data = sex_diff_reg)
-summary(reg3)
-shapiro.test(residuals(reg3)) #good
-acf(residuals(reg3))
-ncvTest(reg3) #also non-constant variance
-Box.test(residuals(reg3)) #
-par(mfrow = c(2, 2))
-plot(reg3)
-arm::display(reg3)
-tidy(reg3)
-
-
-library(nlme)
-reg4 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg)
-summary(reg4)
-plot(reg4)
-plot(reg4, resid(., type = "normalized") ~ fitted(.) | Region, abline = 0)
-plot(ACF(reg4, resType = "normalized"))
-Box.test(residuals(reg4))
-acf(residuals(reg4, type="normalized"))
-Box.test(residuals(reg4, type="normalized"))
-shapiro.test(residuals(reg4, type="normalized"))
-aug <- broom.mixed::augment(reg4)
-aug
-ggplot(aug, aes(Year, Diff)) +
-  geom_point(alpha = 0.3) +
-  facet_wrap(~Region)
-
-plot(reg4, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
-plot(reg4, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-
-
-reg5 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
-            correlation = corAR1(form =  ~Year|Region/Stratum))
-summary(reg5)
-summary(reg5)$tTable
-fixef(reg5)
-ranef(reg5)
-plot(reg5)
-vcov(reg5)
-intervals(reg5, which="fixed")
-coef(reg5)
-plot(reg5, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
-plot(reg5, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-AIC(reg5)
-acf(residuals(reg5, type="normalized"))
-shapiro.test(resid(reg5))
-anova(reg5)
-anova(reg4, reg5)
-ranef(reg5)
-getCall(reg5)$correlation
-intervals(reg5, which="var-cov")$corStruct
-anova(reg5)
-tidy(gls2)
-# gls1 <- gls(Diff ~ Stratum + Year, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
-# summary(gls1)
-# plot(gls1)
-# acf(residuals(gls1, type="normalized"))
-
-
-
-gls2 <- gls(Diff ~ Stratum + Year + Region, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
-# gls2b <- gls(Diff ~ Stratum + Year + Region, data=sex_diff_reg, corr=corAR1(form =  ~Year|Region/Stratum))
-summary(gls2)
-# summary(gls2b)
-plot(gls2)
-acf(residuals(gls2, type="normalized"))
-shapiro.test(residuals(gls2, type="normalized"))
-plot(gls2, resid(.) ~ Year, abline = 0, cex = 0.3)
-plot(gls2, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
-plot(gls2, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
-AIC(gls2)
-anova(d2,gls2)
-
-# reg6 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
-#             correlation = corARMA(form= ~ Year | Region/Stratum, p=1, q=1))
-# summary(reg6)
-#AIC(reg6) higher AIC than reg5
-
-
-
-Box.test(residuals(gls2, type="normalized"), type="L")
-
 min_date <- df_tows %>% group_by(Year, Season) %>% slice_min(Start_Date) %>% 
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear))
 
-View(min_date %>% filter(Season=="Fall"))
 ggplot(data=min_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
 ggplot(data=min_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
 
@@ -262,7 +168,6 @@ max_date <- df_tows %>% group_by(Year, Season) %>% slice_max(Start_Date) %>%
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear))
 
-View(max_date %>% filter(Season=="Fall"))
 ggplot(data=max_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
 ggplot(data=max_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
 
@@ -278,6 +183,10 @@ med_date <- df_tows  %>%
   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
   ungroup() 
 
+med_date %>% 
+  group_by(Season, Year) %>% 
+  summarise(med = max(med) - min(med))
+
 int <- df_tows  %>% 
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
@@ -285,14 +194,12 @@ int <- df_tows  %>%
   group_by(Year, Region, Depth_Stratum) %>% 
   summarise(med = median(stdYear)) %>% 
   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
-  ungroup() 
+  ungroup() #not grouped by season
 
-int <- left_join(int, sex_diff_reg) %>% 
-  na.omit()
-
+int <- left_join(int, sex_diff_reg) %>% na.omit()
 
 tot_date <- df_tows %>% 
-  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% 
+  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% #errant February
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear)) %>% 
@@ -301,89 +208,183 @@ tot_date <- df_tows %>%
   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
   ungroup() %>% filter(Year > 2004 & Year != 2020) %>% 
   mutate(len = ifelse(len < 10, 151, len))
-#%>% complete(Season, Year, Region, Stratum)
 
 int2 <- left_join(tot_date, sex_diff_reg) %>% na.omit()
 
+library(nlme)
+
+gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
+gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
+len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
+
+summary(gls1)
+plot(gls1)
+
+shapiro.test(residuals(gls1, type="normalized"))
+shapiro.test(residuals(gls2, type="normalized"))
+shapiro.test(residuals(len1, type="normalized"))
+
+plot(gls1, resid(.) ~ Year, abline = 0, cex = 0.3)
+plot(gls1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+plot(gls1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+plot(gls1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+
+Box.test(residuals(gls2), type="L")
+
+tidy(gls1)
+tidy(gls2)
+tidy(len1)
+
+par(mfrow=c(3,1), mar=c(1,1,1,1))
+acf(residuals(gls1, type="normalized"))
+acf(residuals(gls2, type="normalized"))
+acf(residuals(len1, type="normalized"))
+acf(residuals(len1_ml, type="normalized"))
+acf(residuals(len1_ml2, type="normalized"))
+
+anova(gls1, gls2)
+anova(gls1, gls2, len1)
+
+plot(len1, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
+plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+plot(len1, resid(.) ~ Year, abline = 0, cex = 0.3)
+plot(len1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+
+summary(len1)
+plot(len1)
+
+acf(residuals(len1))
+
+
+ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
+  geom_smooth(method="lm", se=FALSE)+
+  facet_grid(Stratum~Region)
+
+ggplot(int2, aes(x=Year, y=len))+geom_point()+geom_smooth(method="gam")+
+  geom_smooth(method="rlm", se=FALSE, color="red")+theme_classic()
+rlm(data = int2, len ~ Year)
+
+
+gls1_ml <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region), method = "ML")
+gls2_ml <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2, method="ML")
+len1_ml <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1(), method = "ML")
+
+
+anova(gls1_ml, gls2_ml, len1_ml)
+anova(gls1_ml)
+
+library(RLRsim)
+exactRLRT(len1)
+
+tidy(gls1_ml)
+tidy(gls1)
+tidy(len1_ml)
+
+# Rejected models ---------------------------------------------------------
+
+### With median survey date
+# i1 <- lm(Diff ~ Stratum + Year + Region + med, data = int)  #autocorr, med not sig, fails ncvTest
+# i2 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|med, data = int) #unneeded complexity, high AIC
+# i5 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, data = int, correlation = corAR1(form =  ~1|med)) #exactly the same as corAR1()
+
+### With length
+# i1 <- lm(Diff ~ Stratum + Year + Region + len, data = int2)  #autocorr, len not sig
+#d5 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len, data = int2, correlation = corAR1()) # singular
+# d1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2) #autocorrelation
+
+# incompatible formulas for groups in 'random' and 'correlation'
+#lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, 
+#          correlation = corAR1(form =  ~Year|Stratum/Region))
+
+##### same corr form another
+# Same as form =  ~Year|Stratum/Region
+# gls2b <- gls(Diff ~ Stratum + Year + Region, data=sex_diff_reg, corr=corAR1(form =  ~Year|Region/Stratum))
+# Same as corAR1()
+#d2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, 
+         # correlation = corAR1(form =  ~1|len))
+
+#len1_ml2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1(form = ~1|len), method = "ML")
+
+#### Autocorrelation
+#reg1<-lm(Diff ~ Stratum + Region, data = sex_diff_reg)
+#durbinWatsonTest(reg1) #significant autocorrelation
+#ncvTest(reg1) #also non-constant variance
+
+#reg2<-lm(Diff ~ Stratum + Region + Year, data = sex_diff_reg)
+#shapiro.test(reg2$residuals) #good
+#durbinWatsonTest(reg2) #significant autocorrelation, but less than 1
+#ncvTest(reg2) #also non-constant variance
+
+#d2 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len,  data = int2) #autocorrelation
+#identical(d1$fitted, d2$fitted)
+#identical(d1$residuals, d2$residuals)
+
+#i1 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, data = int)
+
+##### Region should be a fixed effect
+# reg6 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
+#             correlation = corARMA(form= ~ Year | Region/Stratum, p=1, q=1))
+# gls1 <- gls(Diff ~ Stratum + Year, data=sex_diff_reg, corr=corAR1(form =  ~Year|Stratum/Region))
+
+# reg4 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg)
+# summary(reg4)
+# plot(reg4)
+# plot(reg4, resid(., type = "normalized") ~ fitted(.) | Region, abline = 0)
+# plot(ACF(reg4, resType = "normalized"))
+# Box.test(residuals(reg4))
+# acf(residuals(reg4, type="normalized"))
+# Box.test(residuals(reg4, type="normalized"))
+# shapiro.test(residuals(reg4, type="normalized"))
+# aug <- broom.mixed::augment(reg4)
+# aug
+# ggplot(aug, aes(Year, Diff)) +
+#   geom_point(alpha = 0.3) +
+#   facet_wrap(~Region)
+# 
+# plot(reg4, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+# plot(reg4, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+# 
+# anova(reg4, reg5)
+
+
+# reg5 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
+#             correlation = corAR1(form =  ~Year|Region/Stratum))
+# summary(reg5)
+# summary(reg5)$tTable
+# fixef(reg5)
+# ranef(reg5)
+# plot(reg5)
+# vcov(reg5)
+# intervals(reg5, which="fixed")
+# coef(reg5)
+# plot(reg5, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
+# plot(reg5, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+# AIC(reg5)
+# acf(residuals(reg5, type="normalized"))
+# shapiro.test(resid(reg5))
+# anova(reg5)
+# getCall(reg5)$correlation
+# intervals(reg5, which="var-cov")$corStruct
+
+# reg3 <- lmer(Diff ~ Stratum + (1|Region) + Year, data = sex_diff_reg)
+# summary(reg3)
+# shapiro.test(residuals(reg3)) #good
+# acf(residuals(reg3))
+# ncvTest(reg3) #also non-constant variance
+# Box.test(residuals(reg3)) #
+# par(mfrow = c(2, 2))
+# plot(reg3)
+# arm::display(reg3)
+
+#### Duration - worse version of len
 # int <- med_date %>% filter(Year > 2004 & Year != 2020) %>% 
 #   group_by(Year, Region, Stratum) %>% 
 #   mutate(dur = max(med) - min(med)) %>% 
 #   mutate(dur = as.integer(dur)) %>% 
 #   filter(Season == "Fall")
+#ggplot(data=int)+geom_line(aes(x=Year,y=dur))
 
-ggplot(data=int)+geom_line(aes(x=Year,y=dur))
-
-
-View(df_tows %>% filter(Year==2022, (Region %in% c(1:3)) & (as.numeric(Depth_Stratum) %in% c(2,4))))
-
-summary(d1)
-summary(d2)
-summary(d3)
-
-anova(d1, d2, d3)
-
-d1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, 
-          data = int2) #autocorrelation
-
-d2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, 
-                    data = int2, correlation = corAR1(form =  ~Year|Stratum/Region))
-summary(d2) #winner winner
-
-d3 <- (lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, 
-    data = int2, correlation = corAR1(form =  ~1|len)))
-anova(d2, d3)
-
-
-
-d4 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len, 
-          data = int2) #worse than d5
-
-
- # d5 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|len, 
- #          data = int2, correlation = corAR1()) singular
-
-anova(d1, d2)
-anova(d4, d2)
-anova(d2,reg2)
-anova(d1, d2, d4)
-
-acf(residuals(reg2))
-acf(residuals(d1, type="normalized"))
-acf(residuals(reg2, type="partial"))
-acf(residuals(d2, type="normalized"))
-plot(d2)
-acf(residuals(d4, type="normalized"))
-
-  #  correlation = corAR1(form= ~ Year | Region/Stratum)))
-orig <- lm(Diff ~ Stratum + Region + Year, random = ~Year|len, 
-           data = int2)
-
-shapiro.test(resid(d2))
-
-fixef(d2)
-intervals(d2, which="fixed")
-plot(d2, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
-plot(d2, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-AIC(reg5)
-acf(residuals(reg5, type="normalized"))
-shapiro.test(resid(reg5))
-anova(d2)
-
-tidy(d2)
-ggplot(int2, aes(x=Year, y=len))+geom_point()+geom_smooth(method="lm", se=FALSE)
-
-
-i1 <- lm(Diff ~ Stratum + Year + Region + med, 
-           data = int)  #autocorr
-i2 <- lme(Diff ~ Stratum + Region + Year, random = ~Year|med, 
-            data = int) #worse than d5
-i3 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
-           data = int)
-i4 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
-           data = int, correlation = corAR1())
-# i5 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, 
-#             data = int, correlation = corAR1(form =  ~1|med))
-i5 <- 
-anova( i2, i3, i4)
-
-plot(i1)
+#Median date - length between first and last sampling days per year is better
+#med1 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, data = int, correlation = corAR1())
