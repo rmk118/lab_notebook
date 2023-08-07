@@ -1,22 +1,34 @@
 #Jonah crab seasonal sex ratio differences
 #Ruby Krasnow
-#Last modified: Aug 5, 2023
+#Last modified: Aug 7, 2023
 
 # Load packages
 library(tidyverse)
-library(rstatix)
-library(ggpubr)
-library(car)
-library(sf)
-library(sandwich)
-library(lme4)
-library(lmerTest)
-library(lmtest)
+#library(lubridate) #working with dates, imported by tidyverse??
+library(sf) #for spatial data analysis/visualization
+
+# Time series analysis
 library(tseries)
 library(forecast)
-library(lubridate)
-library(broom)
+
+#Data visualization
+library(patchwork)
+library(ggpubr)
+
+#Stats/modeling
+library(car)
+library(rstatix)
+library(nlme)
 library(broom.mixed)
+library(RLRsim)
+library(MASS)
+
+#library(sandwich)
+# library(lme4)
+# library(lmerTest)
+# library(lmtest)
+#library(broom)
+
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
@@ -120,7 +132,10 @@ sex_diff_agg <- pivot_wider(data_agg, names_from="Season", values_from = "perc_f
   ungroup() %>% 
   mutate(Stratum = as.numeric(Stratum))
 
-ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+geom_point()+theme_bw()+ stat_smooth(method="lm", se=FALSE)+
+ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
+  geom_point()+
+  theme_bw()+
+  stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +
   stat_regline_equation(label.y = 0.05, aes(label = ..rr.label..))
 
@@ -155,26 +170,34 @@ sex_diff_reg %>%
   group_by(Region, Stratum) %>%
   shapiro_test(Diff)
 
-min_date <- df_tows %>% group_by(Year, Season) %>% slice_min(Start_Date) %>% 
+min_date <- df_tows %>% 
+  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
+  group_by(Year, Season) %>% slice_min(Start_Date) %>% 
+  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+  mutate(stdYear = date(stdYear))
+
+
+
+max_date <- df_tows %>% 
+  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
+group_by(Year, Season) %>% slice_max(Start_Date) %>% 
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear))
 
 ggplot(data=min_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
 ggplot(data=min_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
-
-max_date <- df_tows %>% group_by(Year, Season) %>% slice_max(Start_Date) %>% 
-  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
-  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
-  mutate(stdYear = date(stdYear))
-
+ggplot(data=min_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
 ggplot(data=max_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
 ggplot(data=max_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
+ggplot(data=max_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
 
 min(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
 median(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
 
 med_date <- df_tows  %>% 
+  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% 
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear)) %>% 
@@ -211,7 +234,7 @@ tot_date <- df_tows %>%
 
 int2 <- left_join(tot_date, sex_diff_reg) %>% na.omit()
 
-library(nlme)
+
 
 gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
 gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
@@ -262,8 +285,43 @@ ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
   geom_smooth(method="lm", se=FALSE)+
   facet_grid(Stratum~Region)
 
-ggplot(int2, aes(x=Year, y=len))+geom_point()+geom_smooth(method="gam")+
-  geom_smooth(method="rlm", se=FALSE, color="red")+theme_classic()
+fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
+ #geom_jitter(size=1)+
+ geom_point(size=1)+
+ geom_smooth(method="gam", aes(color="GAM"))+
+#geom_smooth()+
+ geom_smooth(method="rlm", se=FALSE, aes(color="RLM"))+
+ # geom_smooth(method="lm", se=FALSE, color="red")+
+ # stat_regline_equation(label.y=120, aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")))+
+  stat_regline_equation(label.y=120, label.x = 5)+
+  theme_classic()+
+ ylim(110,170)+
+  labs(x="Years since 2005", y="Time elapsed (days)")+
+  scale_colour_manual(name="legend", values=c("blue", "red"))
+fig1a
+
+fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
+  geom_point(size=1)+
+  geom_smooth(method="gam",  aes(color="GAM"))+
+  geom_smooth(method="rlm", se=FALSE,  aes(color="RLM"))+
+  # geom_smooth(method="lm", se=FALSE, color="red")+
+  stat_regline_equation(label.y=120, label.x = 5)+
+  theme_classic()+
+  ylim(110,170)+
+  labs(x="Years since 2005",y="")+
+  scale_colour_manual(name="legend", values=c("blue", "red"))
+fig1b
+
+(fig1a + fig1b) + 
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 12)) &
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
+
 rlm(data = int2, len ~ Year)
 
 
@@ -275,7 +333,7 @@ len1_ml <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, co
 anova(gls1_ml, gls2_ml, len1_ml)
 anova(gls1_ml)
 
-library(RLRsim)
+
 exactRLRT(len1)
 
 tidy(gls1_ml)
