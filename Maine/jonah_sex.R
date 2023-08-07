@@ -4,7 +4,7 @@
 
 # Load packages
 library(tidyverse)
-#library(lubridate) #working with dates, imported by tidyverse??
+library(lubridate) #working with dates
 library(sf) #for spatial data analysis/visualization
 
 # Time series analysis
@@ -16,6 +16,7 @@ library(patchwork)
 library(ggpubr)
 
 #Stats/modeling
+
 library(car)
 library(rstatix)
 library(nlme)
@@ -23,10 +24,8 @@ library(broom.mixed)
 library(RLRsim)
 library(MASS)
 
-#library(sandwich)
 # library(lme4)
 # library(lmerTest)
-# library(lmtest)
 #library(broom)
 
 # Import data
@@ -46,7 +45,7 @@ df_j_len <- df_j_len %>%
 
 df_sex <- df_j_len %>% 
   filter(Year > 2003) %>% 
-  select(c("Season", "Year", "Tow_Number", "Region", "Stratum", "Frequency", "Sex")) %>% 
+  dplyr::select(c("Season", "Year", "Tow_Number", "Region", "Stratum", "Frequency", "Sex")) %>% 
   arrange(Season, Year, Stratum, Region, Tow_Number)
 
 data_complete <- df_sex %>% 
@@ -103,13 +102,15 @@ plot(lm)
 shapiro.test(lm$residuals) #good
 durbinWatsonTest(lm, max.lag=15) #good
 
-bptest(lm) #p<0.05, will use robust standard errors
-lm_results <- coeftest(lm, vcov = vcovHC(lm, type = 'HC0'))
-lm_results
-
-# Year is not significant when added as an explanatory variable
-lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
-coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
+# library(lmtest)
+# library(sandwich)
+# bptest(lm) #p<0.05, will use robust standard errors
+# lm_results <- coeftest(lm, vcov = vcovHC(lm, type = 'HC0'))
+# lm_results
+# 
+# # Year is not significant when added as an explanatory variable
+# lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
+# coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
 
 ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
 
@@ -136,8 +137,8 @@ ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
   geom_point()+
   theme_bw()+
   stat_smooth(method="lm", se=FALSE)+
-  stat_regline_equation(label.y = 0, aes(label = ..eq.label..)) +
-  stat_regline_equation(label.y = 0.05, aes(label = ..rr.label..))
+  stat_regline_equation(label.y = 0, aes(label = after_stat(eq.label))) +
+  stat_regline_equation(label.y = 0.05, aes(label = after_stat(rr.label)))
 
 sex_diff_geom_agg <- left_join(regionsGrid_orig, sex_diff_agg) #join to sf for visualization
 
@@ -176,8 +177,6 @@ min_date <- df_tows %>%
   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
   mutate(stdYear = date(stdYear))
-
-
 
 max_date <- df_tows %>% 
   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
@@ -234,8 +233,6 @@ tot_date <- df_tows %>%
 
 int2 <- left_join(tot_date, sex_diff_reg) %>% na.omit()
 
-
-
 gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
 gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
 len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
@@ -262,8 +259,7 @@ par(mfrow=c(3,1), mar=c(1,1,1,1))
 acf(residuals(gls1, type="normalized"))
 acf(residuals(gls2, type="normalized"))
 acf(residuals(len1, type="normalized"))
-acf(residuals(len1_ml, type="normalized"))
-acf(residuals(len1_ml2, type="normalized"))
+acf(residuals(len1))
 
 anova(gls1, gls2)
 anova(gls1, gls2, len1)
@@ -278,34 +274,32 @@ plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 summary(len1)
 plot(len1)
 
-acf(residuals(len1))
-
-
 ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
   geom_smooth(method="lm", se=FALSE)+
   facet_grid(Stratum~Region)
 
 fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
- #geom_jitter(size=1)+
  geom_point(size=1)+
  geom_smooth(method="gam", aes(color="GAM"))+
-#geom_smooth()+
- geom_smooth(method="rlm", se=FALSE, aes(color="RLM"))+
- # geom_smooth(method="lm", se=FALSE, color="red")+
- # stat_regline_equation(label.y=120, aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")))+
-  stat_regline_equation(label.y=120, label.x = 5)+
+ #geom_smooth(method="rlm", se=FALSE, aes(color="RLM"))+
+  stat_poly_line(method="rlm",  aes(color="RLM"))+
+ # stat_regline_equation(label.y=120, label.x = 5)+
+  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
   theme_classic()+
  ylim(110,170)+
   labs(x="Years since 2005", y="Time elapsed (days)")+
   scale_colour_manual(name="legend", values=c("blue", "red"))
 fig1a
 
+
+library(ggpmisc)
 fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
   geom_point(size=1)+
-  geom_smooth(method="gam",  aes(color="GAM"))+
-  geom_smooth(method="rlm", se=FALSE,  aes(color="RLM"))+
-  # geom_smooth(method="lm", se=FALSE, color="red")+
-  stat_regline_equation(label.y=120, label.x = 5)+
+ geom_smooth(method="gam",  aes(color="GAM"))+
+ # geom_smooth(method="rlm", se=FALSE,  aes(color="RLM"))+
+  #stat_regline_equation(label.y=120, label.x = 5)+
+  stat_poly_line(method="rlm",  aes(color="RLM"))+
+  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
   theme_classic()+
   ylim(110,170)+
   labs(x="Years since 2005",y="")+
@@ -323,7 +317,7 @@ fig1b
         axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
 
 rlm(data = int2, len ~ Year)
-
+rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
 
 gls1_ml <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region), method = "ML")
 gls2_ml <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2, method="ML")
@@ -332,6 +326,7 @@ len1_ml <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, co
 
 anova(gls1_ml, gls2_ml, len1_ml)
 anova(gls1_ml)
+acf(residuals(len1_ml, type="normalized"))
 
 
 exactRLRT(len1)

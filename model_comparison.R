@@ -27,7 +27,7 @@ df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #Atlantic rock c
 cleanCatch <- function(x) {
   full_join(x, df_tows) %>%
     arrange(Survey, Tow_Number) %>% 
-    select(-c("Stratum", "Subsample_Weight_kg", "Subsample_Weight_kg_2", "Male_Wt_kg", "Female_Wt_kg","Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "End_Latitude","End_Longitude", "Air_Temp", "Tow_Time")) %>%
+    dplyr::select(-c("Stratum", "Subsample_Weight_kg", "Subsample_Weight_kg_2", "Male_Wt_kg", "Female_Wt_kg","Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "End_Latitude","End_Longitude", "Air_Temp", "Tow_Time")) %>%
     mutate(Number_Caught = replace_na(Number_Caught,0), #make implicit zeros explicit
            Weight_kg = replace_na(Weight_kg,0),
            Expanded_Catch = replace_na(Expanded_Catch,0),
@@ -75,7 +75,7 @@ catchTidy_agg <- pivot_longer(catch_agg,
 
 catchTidy_agg <- catchTidy_agg %>% 
   mutate(Species = as.factor(Species),Season = as.factor(Season)) %>% 
-  select(-name) %>%
+  dplyr::select(-name) %>%
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% 
   filter(Year > 2000)
 
@@ -176,22 +176,28 @@ edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
                             Hi.80 = preds + 1.28*sqrt(pred_var),
                             yrs = yrs)
 
+### For poster
 edmPlot_manual <- ggplot()+
-  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
-  geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
-  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value), linewidth=0.6) +
+  geom_path(data = edm_df, aes(x=yrs, y=preds,color="EDM"), linewidth=0.7)+
+  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "#4f9ff0", alpha = 0.2) +
   labs(x="", y="Avg. catch/tow")+
-  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
-  theme(legend.position = "none")
+  scale_color_manual(values=c("#4f9ff0"), name="")+ylim(c(-8, 25))+theme_classic()+
+  theme(text = element_text(size=12),
+        legend.position = "right",
+        axis.title.y = element_text(margin = margin(0,10,0,0)))
 edmPlot_manual #6A
 
 arimaPlot_manual <- ggplot()+
-  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
-  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
-  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "blue", alpha = 0.2) +
+  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value), linewidth=0.6) +
+  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="ARIMA"), linewidth=0.7)+
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "#c93237", alpha = 0.2) +
   labs(x="Year", y="Avg. catch/tow")+
-  scale_color_manual(values=c("blue"))+ylim(c(-8, 25))+theme_classic()+
-  theme(legend.position = "none")
+  scale_color_manual(values=c("#c93237"), name="")+ylim(c(-8, 25))+theme_classic()+
+ #theme(legend.position = "none",
+     theme(text = element_text(size=12),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(0,10,0,0)))
 arimaPlot_manual #6B
 
 # Figure 6 (poster) combined A and B
@@ -199,20 +205,44 @@ arimaPlot_manual #6B
   plot_layout(guides = 'collect')+
    plot_annotation(tag_levels = 'A')
 
-# Prep: slides fig. 6 - poster figure plus no-confidence interval combined plot
+### For slides
+# Prep: slides fig. 6 - individual graphs figure plus no-confidence interval combined plot
+edmPlot_manual2 <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
+  geom_path(data = edm_df, aes(x=yrs, y=preds,color="line"))+
+  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.95, ymax = Hi.95), fill = "#009ade", alpha = 0.2) +
+  labs(x="Year", y="Avg. catch/tow")+
+  scale_color_manual(values=c("#009ade"))+
+  ylim(c(-8, 25))+
+  theme_classic()+
+  theme(legend.position = "none")
+edmPlot_manual2 #6A
+
+arimaPlot_manual2 <- ggplot()+
+  geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
+  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="line"))+
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "#ff1f5b", alpha = 0.2) +
+  labs(x="Year", y="Avg. catch/tow")+
+  scale_color_manual(values=c("#ff1f5b"))+
+  ylim(c(-8, 25))+
+  theme_classic()+
+  theme(legend.position = "none")
+arimaPlot_manual2 #6B
+
 both_noCI <-ggplot()+
   theme_classic()+
   geom_path(data = data.frame(ts_val), aes(x = index(ts_val), y = value)) +
   geom_path(data = edm_df, aes(x=yrs, y=preds, color="EDM"), size=1)+
   geom_path(data=arima_preds, aes(x=yrs, y=Point.Forecast, color="ARIMA"), size=1)+
-  labs(y="Avg. catch/tow", x="Year")+scale_color_manual(name="Model", values=c("#FF1f5B", "#009ade"))+
+  labs(y="Avg. catch/tow", x="Year")+
+  scale_color_manual(name="Model", values=c("#FF1f5B", "#009ade"))+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
   theme(text = element_text(size = 12))
 both_noCI #6C
 
 # Figure 6 (slides) combined A, B, and C
-(((edmPlot_manual/arimaPlot_manual) +  plot_layout(guides = 'collect')) |  both_noCI  )+
+(((arimaPlot_manual2/edmPlot_manual2) +  plot_layout(guides = 'collect')) |  both_noCI  ) +
   plot_annotation(tag_levels = 'A') +   plot_layout(widths = c(1, 2.5))
 
 
@@ -254,7 +284,7 @@ catchTidy_strat <- pivot_longer(catch_strat,
 
 catchTidy_strat <- catchTidy_strat %>%
   mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
-  select(-name)
+  dplyr::select(-name)
 
 catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum, Season, Year) %>% 
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
@@ -350,7 +380,7 @@ catchTidy_area <- pivot_longer(catch_area,
 
 catchTidy_area <- catchTidy_area %>%
   mutate(Species = as.factor(Species),Season = as.factor(Season), Stratum = as.factor(Stratum), Region = as.factor(Region), Area = paste0(Region, Stratum)) %>%
-  select(-name)
+  dplyr::select(-name)
 
 catchTidy_area_complete<- complete(data = catchTidy_area %>% ungroup(),Region, Stratum, Season, Year) %>% 
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Season) %>%
@@ -390,7 +420,7 @@ theme_light()+
 fig5c
 
 ggplot()+
-  geom_line(data=areaE, aes(x=E, y=rho))+
+  geom_line(data=areaE, aes(x=E, y=rho, color=method))+
   facet_grid(Region~Stratum)+
   theme_light()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
@@ -401,3 +431,114 @@ ggplot()+
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))
+
+
+
+# Concatenation -----------------------------------------------------------
+
+delay <- function(x,n){
+  if(n>=0) 
+    lead(x,n) 
+  else 
+    lag(x,abs(n))
+}
+
+areaList_E <- expand_grid(E = c(1:7), reg = c(1:5), strat = c(1:4)) %>% arrange(reg, strat)
+
+make_block_ID <- function(df,predictor,target,ID_col,E,cause_lag=1){
+  
+  v_delays <- 0:-(E-1)
+  
+  df_ccm <- df %>%
+    dplyr::select({{ID_col}},{{target}}) %>%
+    group_by({{ID_col}}) %>%
+    transmute(target=delay({{target}},cause_lag))
+  
+  df_lags <- map_dfc(v_delays,function(d_i){
+    df %>%
+      group_by({{ID_col}}) %>%
+      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
+      ungroup({{ID_col}}) %>% dplyr::select(-{{ID_col}})
+  })
+  
+  df_out <- bind_cols(df_ccm,df_lags) %>% 
+    ungroup() %>%
+    mutate(index=row_number()) %>%
+    dplyr::select(index,everything())
+  
+  return(df_out)
+  
+}
+areaE <- areaE %>% mutate(method = "orig")
+catchTidy_area_complete_j <- catchTidy_area_complete_j %>% mutate(Region = as.integer(Region), Stratum = as.integer(Stratum))
+
+# Adding the other four regions to the library of points used to make predictions about the target region
+# i.e., concatenation of regions within a stratum
+
+areaReg <- pmap_dfr(areaList_E, function(E, reg, strat) {
+  v <- catchTidy_area_complete_j %>% 
+    filter(Type=="catch", Stratum == strat) %>% 
+    dplyr::select(Region,value)
+  
+  block <- make_block_ID(df=v, predictor = value, target = value, ID_col = Region, E=E) %>% na.omit() %>% mutate(index = row_number())
+  
+  columns_i <- names(block)[4:(E+3)]
+  
+  lib_whole <- paste(1, nrow(block))
+  first <- block %>% filter(Region == reg) %>% slice_head() %>% pull(index)
+  last <- block %>% filter(Region == reg) %>% slice_tail() %>% pull(index)
+  lib_pred <- paste(first, last)
+  
+  out_i <- Simplex(dataFrame=block,
+                   lib=lib_whole,
+                   pred=lib_pred,
+                   Tp=0, # The target has already been manually lagged
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   E=E)
+  out <- data.frame(compute_stats(out_i$Observations, out_i$Predictions)$rho) %>% 
+    mutate(E = E, Region = reg, Stratum = strat) 
+  out
+  
+})
+areaReg <- areaReg %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_reg")
+
+areaE <- rbind(areaE, areaReg)
+
+
+# Adding the other three strata to the library of points used to make predictions about the target stratum
+# i.e., concatenation of strata within a region
+
+areaStrat <- pmap_dfr(areaList_E, function(E, reg, strat) {
+  v <- catchTidy_area_complete_j %>% 
+    filter(Type=="catch", Region == reg) %>% 
+    dplyr::select(Stratum,value)
+  
+  block <- make_block_ID(df=v, predictor = value, target = value, ID_col = Stratum, E=E) %>% na.omit() %>% mutate(index = row_number())
+  
+  columns_i <- names(block)[4:(E+3)]
+  
+  lib_whole <- paste(1, nrow(block))
+  first <- block %>% filter(Stratum == strat) %>% slice_head() %>% pull(index)
+  last <- block %>% filter(Stratum == strat) %>% slice_tail() %>% pull(index)
+  lib_pred <- paste(first, last)
+  
+  out_i <- Simplex(dataFrame=block,
+                   lib=lib_whole,
+                   pred=lib_pred,
+                   Tp=0, # The target has already been manually lagged
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   E=E)
+  out <- data.frame(compute_stats(out_i$Observations, out_i$Predictions)$rho) %>% 
+    mutate(E = E, Region = reg, Stratum = strat) 
+  out
+  
+})
+
+areaStrat <- areaStrat %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_strat")
+
+areaE <- rbind(areaE, areaStrat)
+
