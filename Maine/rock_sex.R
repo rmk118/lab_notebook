@@ -136,4 +136,43 @@ sex_diff_r_reg <- pivot_wider(data_r_area, names_from="Season", values_from = "p
   mutate(Stratum = as.numeric(Stratum))
 
 sex_diff_r_geom_reg <- left_join(regionsGrid_reg, sex_diff_r_reg) #join to sf for visualization
+
 ggplot(data=sex_diff_r_geom_reg)+geom_sf(aes(fill=Diff))
+
+#find the mean proportion of female crabs for each stratum and region by season and year
+data_r_area <- data_r_complete %>%
+  group_by(Season, Year, Stratum, Region) %>% 
+  summarise(perc_f = mean(perc_f, na.rm=TRUE)) 
+
+sex_diff_r_reg <- pivot_wider(data_r_area, names_from="Season", values_from = "perc_f") %>% 
+  group_by(Year, Region, Stratum) %>% 
+  summarise(Fall = mean(Fall, na.rm=TRUE),
+            Spring = mean(Spring, na.rm=TRUE)) %>% 
+  mutate(Diff = Fall-Spring, .keep="unused") %>% #calculate the seasonal diff in perc. female, Fall-Spring
+  na.omit() %>% 
+  filter(Year > 2004) %>% ungroup() %>% 
+  mutate(Stratum = as.numeric(Stratum))
+
+sex_diff_r_geom_reg <- left_join(regionsGrid_reg, sex_diff_r_reg) #join to sf for visualization
+
+ggplot(data=sex_diff_r_geom_reg)+geom_sf(aes(fill=Diff))
+
+
+#find the mean proportion of female crabs for each stratum and region - all years
+data_r_area_all <- data_r_complete %>%
+  group_by(Season, Stratum, Region) %>% 
+  summarise(perc_f = mean(perc_f, na.rm=TRUE)) 
+
+sex_diff_r_reg_all <- pivot_wider(data_r_area_all, names_from="Season", values_from = "perc_f") %>% 
+  group_by(Region, Stratum) %>% 
+  summarise(Fall = mean(Fall, na.rm=TRUE),
+            Spring = mean(Spring, na.rm=TRUE)) %>% 
+  mutate(Diff = Fall-Spring, .keep="unused") %>% #calculate the seasonal diff in perc. female, Fall-Spring
+  na.omit() %>% 
+  ungroup() %>% 
+  mutate(Stratum = as.numeric(Stratum))
+
+sex_diff_r_geom_reg_all <- left_join(regionsGrid_reg, sex_diff_r_reg_all) #join to sf for visualization
+
+ggplot(data=sex_diff_r_geom_reg_all)+geom_sf(aes(fill=Diff))
+ggplot(data=sex_diff_r_geom_reg_all %>% filter(Stratum==1))+geom_sf(aes(fill=Diff))

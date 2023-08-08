@@ -528,7 +528,7 @@ fig5c <- ggplot()+
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))+
   scale_color_discrete(name="Method", 
-          labels=c('Incl. data from other regions', 'Incl. data from other strata', 'Single time series'),
+          labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
           guide = guide_legend(reverse = TRUE))
 fig5c
 
@@ -590,7 +590,9 @@ catchTidy_strat_no <- catchTidy_strat_no %>%
 regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
 
 regionsGrid_no_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
-                                 catchTidy_strat_no %>% filter(Type=="catch",) %>% group_by(Stratum, Species)) %>% filter(Species != "scallop")
+                                 catchTidy_strat_no %>% filter(Type=="catch",) %>% 
+  group_by(Stratum, Species)) %>% 
+  filter(Species != "scallop")
 
 new <- c("Jonah crab", "Rock crab")
 names(new) <- c("jonah", "rock")
@@ -605,6 +607,12 @@ fig7 <- ggplot()+
   theme(axis.text.x = element_text(size = 10))
 fig7
 
+ggplot()+
+  geom_sf(aes(fill=value), data=regionsGrid_no_seas %>% filter(Species=="jonah"))+
+  labs(fill="Avg catch/tow")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "GnBu", direction="reverse")+theme_light()
+
 ## Jonah/rock by stratum by season --------------------------------------------------
 
 summaryStrat_seas <- function(df) {
@@ -618,7 +626,8 @@ summaryStrat_seas <- function(df) {
 j_cat_strat_seas <- summaryStrat_seas(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Stratum)
 r_cat_strat_seas <- summaryStrat_seas(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Stratum)
 
-catch_strat_seas <- j_cat_strat_seas %>% left_join(r_cat_strat_seas, by=c("Stratum","Season", "temp"), suffix = c("_j", "_r"))
+catch_strat_seas <- j_cat_strat_seas %>% 
+  left_join(r_cat_strat_seas, by=c("Stratum","Season", "temp"), suffix = c("_j", "_r"))
 
 catchTidy_strat_seas <- pivot_longer(catch_strat_seas,
                                    cols = starts_with("avg")) %>%
@@ -631,7 +640,8 @@ catchTidy_strat_seas <- pivot_longer(catch_strat_seas,
 
 catchTidy_strat_seas <- catchTidy_strat_seas %>%
   mutate(Species = as.factor(Species), Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
-  dplyr::select(-name) %>% filter(Type=="catch")
+  dplyr::select(-name) %>% 
+  filter(Type=="catch")
 
 catchTidy_strat_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
                                   catchTidy_strat_seas)
@@ -640,40 +650,52 @@ catchTidy_strat_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.facto
 ggplot()+
   geom_sf(aes(fill=value), data=catchTidy_strat_seas)+
   coord_sf()+
-  scale_x_continuous(n.breaks = 2)+
   facet_grid(Season~Species, labeller = labeller(Species = new))+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))
 
 
-diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_seas %>% st_drop_geometry() %>% pivot_wider(names_from = "Season", id_cols = c("Stratum", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs")
+diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+              catchTidy_strat_seas %>% st_drop_geometry() %>% pivot_wider(names_from = "Season", id_cols = c("Stratum", "Species"), values_from = "value") %>% 
+               mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs") %>% 
+  mutate(pdiff = diff/Fall)
 
 ggplot()+
   geom_sf(aes(fill=diff), data=diff_geom)+
-  coord_sf()+
-  scale_x_continuous(n.breaks = 2)+
   facet_wrap(.~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
+ggplot()+
+  geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
 
-seas_diff_geom <- catchTidy_strat_complete %>%filter(Type == "catch", Species != "scallop") %>% 
-  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring) %>% na.omit()
+# Jonah only
+ggplot()+
+  geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
+  coord_sf()+
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
 
-seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff))) %>% mutate(avg = "avg of yearly diffs")
+
+
+seas_diff_geom <- catchTidy_strat_complete %>% filter(Type == "catch", Species != "scallop") %>% 
+  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% na.omit() %>% mutate(pdiff = diff/Fall)
+
+seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+                            seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff), pdiff=mean(pdiff))) %>% mutate(avg = "avg of yearly diffs")
 
 ggplot()+
   geom_sf(aes(fill=diff), data=seas_diff_geom)+
-  coord_sf()+
-  scale_x_continuous(n.breaks = 2)+
   facet_wrap(.~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
 ggplot()+
   geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom))+
-  coord_sf()+
-  scale_x_continuous(n.breaks = 2)+
   facet_grid(avg~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
