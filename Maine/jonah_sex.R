@@ -120,12 +120,14 @@ sex_diff_agg <- pivot_wider(data_agg, names_from="Season", values_from = "perc_f
   ungroup() %>% 
   mutate(Stratum = as.numeric(Stratum))
 
-ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
+#Straight line with r^2 = 0.97
+r_squared_j <- ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
   geom_point()+
   theme_bw()+
   stat_smooth(method="lm", se=FALSE)+
   stat_regline_equation(label.y = 0, aes(label = after_stat(eq.label))) +
-  stat_regline_equation(label.y = 0.05, aes(label = after_stat(rr.label)))
+  stat_regline_equation(label.y = 0.05, aes(label = after_stat(rr.label)))+
+  ylim(-0.1, 0.3)
 
 sex_diff_geom_agg <- left_join(regionsGrid_orig, sex_diff_agg) #join to sf for visualization
 
@@ -133,6 +135,7 @@ p1 <- ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))
 
 p2 <- ggplot(data=sex_diff_geom %>% group_by(Stratum) %>% summarise(diff = mean(Diff)))+geom_sf(aes(fill=diff))
 p1+p2
+
 # Regions -----------------------------------------------------------------
 
 #find the mean proportion of female crabs for each stratum and region by season and year
@@ -148,6 +151,10 @@ sex_diff_reg <- pivot_wider(data_area, names_from="Season", values_from = "perc_
   na.omit() %>% 
   filter(Year > 2004) %>% ungroup() %>% 
   mutate(Stratum = as.numeric(Stratum))
+
+regionsGrid_reg <- surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
+sex_diff_geom_reg <- left_join(regionsGrid_reg, sex_diff_reg) #join to sf for visualization
+ggplot(data=sex_diff_geom_reg)+geom_sf(aes(fill=Diff))
 
 # Many outliers, one extreme
 sex_diff_reg %>% 
