@@ -8,6 +8,7 @@ library(patchwork) #combining plots
 library(viridis)
 library(rEDM) #EDM
 library(mgcv) #GAMs
+
 # Time series packages
 library(tseries)
 library(zoo)

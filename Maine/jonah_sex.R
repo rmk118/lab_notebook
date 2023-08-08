@@ -1,6 +1,6 @@
 #Jonah crab seasonal sex ratio differences
 #Ruby Krasnow
-#Last modified: Aug 7, 2023
+#Last modified: Aug 8, 2023
 
 # Load packages
 library(tidyverse)
@@ -14,6 +14,7 @@ library(forecast)
 #Data visualization
 library(patchwork)
 library(ggpubr)
+library(ggpmisc)
 
 #Stats/modeling
 
@@ -23,10 +24,6 @@ library(nlme)
 library(broom.mixed)
 library(RLRsim)
 library(MASS)
-
-# library(lme4)
-# library(lmerTest)
-#library(broom)
 
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
@@ -102,16 +99,6 @@ plot(lm)
 shapiro.test(lm$residuals) #good
 durbinWatsonTest(lm, max.lag=15) #good
 
-# library(lmtest)
-# library(sandwich)
-# bptest(lm) #p<0.05, will use robust standard errors
-# lm_results <- coeftest(lm, vcov = vcovHC(lm, type = 'HC0'))
-# lm_results
-# 
-# # Year is not significant when added as an explanatory variable
-# lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
-# coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
-
 ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
 
 # Figures -----------------------------------------------------------------
@@ -142,9 +129,10 @@ ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
 
 sex_diff_geom_agg <- left_join(regionsGrid_orig, sex_diff_agg) #join to sf for visualization
 
-ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))
+p1 <- ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))
 
-
+p2 <- ggplot(data=sex_diff_geom %>% group_by(Stratum) %>% summarise(diff = mean(Diff)))+geom_sf(aes(fill=diff))
+p1+p2
 # Regions -----------------------------------------------------------------
 
 #find the mean proportion of female crabs for each stratum and region by season and year
@@ -281,9 +269,7 @@ ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
 fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
  geom_point(size=1)+
  geom_smooth(method="gam", aes(color="GAM"))+
- #geom_smooth(method="rlm", se=FALSE, aes(color="RLM"))+
   stat_poly_line(method="rlm",  aes(color="RLM"))+
- # stat_regline_equation(label.y=120, label.x = 5)+
   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
   theme_classic()+
  ylim(110,170)+
@@ -291,13 +277,9 @@ fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
   scale_colour_manual(name="legend", values=c("blue", "red"))
 fig1a
 
-
-library(ggpmisc)
 fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
   geom_point(size=1)+
  geom_smooth(method="gam",  aes(color="GAM"))+
- # geom_smooth(method="rlm", se=FALSE,  aes(color="RLM"))+
-  #stat_regline_equation(label.y=120, label.x = 5)+
   stat_poly_line(method="rlm",  aes(color="RLM"))+
   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
   theme_classic()+
@@ -319,23 +301,20 @@ fig1b
 rlm(data = int2, len ~ Year)
 rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
 
-gls1_ml <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region), method = "ML")
-gls2_ml <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2, method="ML")
-len1_ml <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1(), method = "ML")
-
-
-anova(gls1_ml, gls2_ml, len1_ml)
-anova(gls1_ml)
-acf(residuals(len1_ml, type="normalized"))
-
-
 exactRLRT(len1)
 
-tidy(gls1_ml)
-tidy(gls1)
-tidy(len1_ml)
 
 # Rejected models ---------------------------------------------------------
+
+# library(lmtest)
+# library(sandwich)
+# bptest(lm) #p<0.05, will use robust standard errors
+# lm_results <- coeftest(lm, vcov = vcovHC(lm, type = 'HC0'))
+# lm_results
+# 
+# # Year is not significant when added as an explanatory variable
+# lm_year <- lm(Diff ~ Stratum + Year, data=sex_diff)
+# coeftest(lm_year, vcov = vcovHC(lm_year, type = 'HC0'))
 
 ### With median survey date
 # i1 <- lm(Diff ~ Stratum + Year + Region + med, data = int)  #autocorr, med not sig, fails ncvTest
@@ -441,3 +420,15 @@ tidy(len1_ml)
 
 #Median date - length between first and last sampling days per year is better
 #med1 <- lme(Diff ~ Stratum + Region + Year, random = ~1|med, data = int, correlation = corAR1())
+
+# Fit using ML rather than REML
+# gls1_ml <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region), method = "ML")
+# gls2_ml <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2, method="ML")
+# len1_ml <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1(), method = "ML")
+# 
+# anova(gls1_ml, gls2_ml, len1_ml)
+# anova(gls1_ml)
+# acf(residuals(len1_ml, type="normalized"))
+# 
+# tidy(gls1_ml)
+# tidy(len1_ml)

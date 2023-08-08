@@ -1119,6 +1119,7 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
   labs(x="Depth stratum")+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
 
+
 # catchTidy_strat_complete_j2 <- catchTidy_strat_complete_j %>% 
 #   mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
 #   ungroup()#%>% 

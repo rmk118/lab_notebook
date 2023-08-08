@@ -290,30 +290,6 @@ catchTidy_strat_complete<- complete(data = catchTidy_strat %>% ungroup(),Stratum
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Stratum) %>%
   filter(as.Date(date) > as.Date("2003-05-01")) %>% ungroup()
 
-## Fig. 7 - Jonah/rock by stratum --------------------------------------------------
-
-#Prep: Fig. 7 - Map of rock and Jonah crab abundance by strat
-regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
-regionsGrid <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_complete %>% filter(Type=="catch",) %>% group_by(Stratum, date, Species))
-
-new <- c("Jonah crab", "Rock crab")
-names(new) <- c("jonah", "rock")
-
-figDat <- regionsGrid %>% 
-  filter(Species != "scallop") %>% 
-  group_by(Species, Stratum) %>% 
-  summarise(avg = mean(value, na.rm=TRUE))
-
-# Figure 7
-fig7 <- ggplot()+
-  geom_sf(aes(fill=avg), data=figDat)+
-  coord_sf()+
-  scale_x_continuous(n.breaks = 2)+
-  facet_wrap(.~Species, labeller = labeller(Species = new))+
-  #theme(strip.text = element_text(size = 14))
-  labs(fill="Avg catch/tow")+
-  theme(axis.text.x = element_text(size = 10))
-fig7
 
 ## Fig. 5B - E (strat) --------------------------------------------------
 catchTidy_strat_complete_j <- catchTidy_strat_complete %>% 
@@ -349,7 +325,7 @@ fig5b
 
 
 # Area analysis --------------------------------------------------
-## Fig. 5C - E (areas) --------------------------------------------------
+
 
 summaryArea <- function(df) {
   df %>% group_by(Season, Year, Stratum, Region) %>%
@@ -393,7 +369,12 @@ catchTidy_area_complete_j <- catchTidy_area_complete %>%
   mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
   ungroup() 
 
+
+
+## Fig. 5C - E (areas) --------------------------------------------------
+
 areaList <- c(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54)
+
 areaE <- map_dfr(areaList, function(x) {
   reg <- substr(x, 1, 1)
   strat <- substr(x, 2, 2)
@@ -406,33 +387,23 @@ areaE <- map_dfr(areaList, function(x) {
   rho_E %>% mutate(Region = reg, Stratum = strat)
 })
 
-#Figure 5C
-fig5c <- ggplot()+
-  geom_line(data=areaE, aes(x=E, y=rho))+
+areaE <- areaE %>% mutate(method = "orig")
+
+#Figure 5C - single time series only
+ggplot()+
+  geom_line(data=areaE %>% filter(method=="orig"), aes(x=E, y=rho))+
   facet_grid(Region~Stratum)+
 theme_light()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
-  theme(text = element_text(size = 14),
-        panel.grid.major = element_line(colour = "grey70", linewidth = 0.2),
-        panel.grid.minor = element_blank())
-fig5c
-
-ggplot()+
-  geom_line(data=areaE, aes(x=E, y=rho, color=method))+
-  facet_grid(Region~Stratum)+
-  theme_light()+
-  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
-  scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         text = element_text(size = 14),
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))
-
-
 
 # Concatenation -----------------------------------------------------------
 
@@ -469,11 +440,12 @@ make_block_ID <- function(df,predictor,target,ID_col,E,cause_lag=1){
   return(df_out)
   
 }
-areaE <- areaE %>% mutate(method = "orig")
+
+
 catchTidy_area_complete_j <- catchTidy_area_complete_j %>% mutate(Region = as.integer(Region), Stratum = as.integer(Stratum))
 
 # Adding the other four regions to the library of points used to make predictions about the target region
-# i.e., concatenation of regions within a stratum
+# i.e., concatenation OF regions WITHIN a stratum
 
 areaReg <- pmap_dfr(areaList_E, function(E, reg, strat) {
   v <- catchTidy_area_complete_j %>% 
@@ -502,13 +474,12 @@ areaReg <- pmap_dfr(areaList_E, function(E, reg, strat) {
   out
   
 })
-areaReg <- areaReg %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_reg")
+areaReg <- areaReg %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_reg_in_strat")
 
 areaE <- rbind(areaE, areaReg)
 
-
 # Adding the other three strata to the library of points used to make predictions about the target stratum
-# i.e., concatenation of strata within a region
+# i.e., concatenation OF strata WITHIN a region
 
 areaStrat <- pmap_dfr(areaList_E, function(E, reg, strat) {
   v <- catchTidy_area_complete_j %>% 
@@ -538,7 +509,171 @@ areaStrat <- pmap_dfr(areaList_E, function(E, reg, strat) {
   
 })
 
-areaStrat <- areaStrat %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_strat")
+areaStrat <- areaStrat %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_strat_in_reg")
 
 areaE <- rbind(areaE, areaStrat)
 
+## Fig. 5C - E (multispatial) --------------------------------------------------
+# Figure 5C - with multispatial
+fig5c <- ggplot()+
+  geom_line(data=areaE, aes(x=E, y=rho, color=method))+
+  facet_grid(Region~Stratum)+
+  theme_light()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        text = element_text(size = 15),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white", color="black"),
+        strip.text = element_text(colour = "black"))+
+  scale_color_discrete(name="Method", 
+          labels=c('Incl. data from other regions', 'Incl. data from other strata', 'Single time series'),
+          guide = guide_legend(reverse = TRUE))
+fig5c
+
+areaE %>% group_by(method, Region, Stratum) %>% 
+  summarise(max = max(rho)) %>% 
+  pivot_wider(names_from = method, values_from = max) %>%
+  mutate(row_max = pmap_chr(across(where(is.double)), ~ names(c(...)[which.max(c(...))])))
+
+E_by_method <- areaE %>%
+  group_by(Region, Stratum, method) %>% 
+  slice_max(rho)
+
+ggplot(data=E_by_method, aes(x=method, y=E))+geom_boxplot()+geom_jitter(width=0.2, height=0)
+
+density_E <- ggplot(data=E_by_method)+geom_density(aes(x=E, color=method))+theme_bw()
+
+density_rho <- ggplot(data=E_by_method)+geom_density(aes(x=rho, color=method))+theme_bw()
+
+density_E + density_rho +
+  plot_layout(guides = 'collect')
+
+ggplot(data=E_by_method)+stat_ecdf(aes(x=E, color=method))+theme_bw()
+ggplot(data=E_by_method)+stat_ecdf(aes(x=rho, color=method))+theme_bw()
+ggplot(data=E_by_method)+stat_ecdf(aes(x=rho))+theme_bw()+facet_wrap(~method)
+
+
+
+# Strata - no time -----------------------------------------------------
+
+summaryStrat_no_time <- function(df) {
+  df %>% group_by(Stratum) %>%
+    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
+              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
+}
+
+#computes averages for each stratum
+j_cat_strat_no <- summaryStrat_no_time(j_cat_clean_seasons)
+r_cat_strat_no <- summaryStrat_no_time(r_cat_clean_seasons)
+
+catch_strat_no <- j_cat_strat_no %>% left_join(r_cat_strat_no, by=c("Stratum","temp"), suffix = c("_j", "_r"))
+
+catchTidy_strat_no <- pivot_longer(catch_strat_no,
+                                cols = starts_with("avg")) %>%
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>%
+  mutate(Species = case_when(
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy_strat_no <- catchTidy_strat_no %>%
+  mutate(Species = as.factor(Species), Stratum = as.factor(Stratum)) %>%
+  dplyr::select(-name)
+
+## Jonah/rock by stratum (no time) --------------------------------------------------
+
+#Prep: Fig. 7 - Map of rock and Jonah crab abundance by strat
+regionsGrid_orig <- surveyGrid %>% group_by(Stratum) %>% summarise(num = n_distinct(GridID))
+
+regionsGrid_no_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+                                 catchTidy_strat_no %>% filter(Type=="catch",) %>% group_by(Stratum, Species)) %>% filter(Species != "scallop")
+
+new <- c("Jonah crab", "Rock crab")
+names(new) <- c("jonah", "rock")
+
+# Figure 7
+fig7 <- ggplot()+
+  geom_sf(aes(fill=value), data=regionsGrid_no_seas)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_wrap(.~Species, labeller = labeller(Species = new))+
+  labs(fill="Avg catch/tow")+
+  theme(axis.text.x = element_text(size = 10))
+fig7
+
+## Jonah/rock by stratum by season --------------------------------------------------
+
+summaryStrat_seas <- function(df) {
+  df %>% group_by(Stratum, Season) %>%
+    summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+              avgWt = mean(Expanded_Weight_kg, na.rm=TRUE),
+              temp = mean(Bottom_WaterTemp_DegC, na.rm=TRUE))
+}
+
+#computes averages for each stratum
+j_cat_strat_seas <- summaryStrat_seas(j_cat_clean_seasons) %>% ungroup() %>% complete(Season, Stratum)
+r_cat_strat_seas <- summaryStrat_seas(r_cat_clean_seasons) %>% ungroup() %>% complete(Season, Stratum)
+
+catch_strat_seas <- j_cat_strat_seas %>% left_join(r_cat_strat_seas, by=c("Stratum","Season", "temp"), suffix = c("_j", "_r"))
+
+catchTidy_strat_seas <- pivot_longer(catch_strat_seas,
+                                   cols = starts_with("avg")) %>%
+  mutate(Type = case_when(
+    startsWith(name, "avgCatch_") ~"catch",
+    startsWith(name,"avgWt_") ~"wt")) %>%
+  mutate(Species = case_when(
+    endsWith(name, "r") ~"rock",
+    endsWith(name, "j") ~"jonah"))
+
+catchTidy_strat_seas <- catchTidy_strat_seas %>%
+  mutate(Species = as.factor(Species), Season = as.factor(Season), Stratum = as.factor(Stratum)) %>%
+  dplyr::select(-name) %>% filter(Type=="catch")
+
+catchTidy_strat_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+                                  catchTidy_strat_seas)
+
+
+ggplot()+
+  geom_sf(aes(fill=value), data=catchTidy_strat_seas)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_grid(Season~Species, labeller = labeller(Species = new))+
+  labs(fill="Avg catch/tow")+
+  theme(axis.text.x = element_text(size = 10))
+
+
+diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), catchTidy_strat_seas %>% st_drop_geometry() %>% pivot_wider(names_from = "Season", id_cols = c("Stratum", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs")
+
+ggplot()+
+  geom_sf(aes(fill=diff), data=diff_geom)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_wrap(.~Species, labeller = labeller(Species = new))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+
+seas_diff_geom <- catchTidy_strat_complete %>%filter(Type == "catch", Species != "scallop") %>% 
+  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring) %>% na.omit()
+
+seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff))) %>% mutate(avg = "avg of yearly diffs")
+
+ggplot()+
+  geom_sf(aes(fill=diff), data=seas_diff_geom)+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_wrap(.~Species, labeller = labeller(Species = new))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+ggplot()+
+  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom))+
+  coord_sf()+
+  scale_x_continuous(n.breaks = 2)+
+  facet_grid(avg~Species, labeller = labeller(Species = new))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
