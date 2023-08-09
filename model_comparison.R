@@ -527,12 +527,12 @@ fig5c <- ggplot()+
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))+
-  scale_color_discrete(name="Method", 
-          labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
-          guide = guide_legend(reverse = TRUE))
+  scale_color_brewer(palette = "Accent", name="Method", 
+  labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
+                     guide = guide_legend(reverse = TRUE))
 fig5c
 
-areaE %>% group_by(method, Region, Stratum) %>% 
+# areaE %>% group_by(method, Region, Stratum) %>% 
   summarise(max = max(rho)) %>% 
   pivot_wider(names_from = method, values_from = max) %>%
   mutate(row_max = pmap_chr(across(where(is.double)), ~ names(c(...)[which.max(c(...))])))
@@ -612,7 +612,8 @@ ggplot()+
   geom_sf(aes(fill=value), data=regionsGrid_no_seas %>% filter(Species=="jonah"))+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "GnBu", direction="reverse")+theme_light()
+  scale_fill_fermenter(palette = "BuPu", direction="reverse")+
+  theme_light()
 
 ## Jonah/rock by stratum by season --------------------------------------------------
 
@@ -721,7 +722,36 @@ ggplot()+
   labs(fill="fall-spring")+
   facet_wrap(~avg)+
   theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "GnBu", direction=1)+
+  scale_fill_fermenter(palette = "BuPu", direction=1)+
   theme_light()+
   theme(strip.background = element_rect(color="grey37", fill="white"),
         strip.text = element_text(color="black"))
+
+
+# Relative abundance ------------------------------------------------------
+regionsGrid_reg <- surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
+
+totals <- df_j_cat %>% group_by(Year, Season, Region, Stratum) %>% summarise(tot = sum(Expanded_Catch))  %>%
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% ungroup() %>% mutate(date = as.POSIXct(date)) %>% filter(Year > 2002)
+
+ggplot(data = totals, aes(x=date, y=tot))+
+  geom_line()+
+  facet_grid(Region ~ Stratum)
+
+totals2 <- left_join(totals, totals %>% group_by(Year) %>% summarise(sum = sum(tot))) %>% 
+  mutate(perc = tot/sum) %>% complete(Region, Stratum, Year, Season)
+  #mutate(across(where(is.numeric), replace_na,0))
+
+totals_geom <- left_join(regionsGrid_reg, totals2)
+       
+
+ggplot(data = totals2 %>% filter(Season=="Fall"), aes(x=Region, y=Stratum, fill=perc))+
+  geom_tile(color= "white",size=0.1)+
+  facet_wrap(~Year)+scale_fill_viridis_c()
+
+totals_no_time<- df_j_cat %>% group_by(Region, Stratum) %>% summarise(tot = sum(Expanded_Catch))
+s <- sum(totals_no_time$tot)
+totals_no_time <- totals_no_time %>% mutate(perc = tot/s)
+
+ggplot(data = totals_no_time, aes(x=Region, y=Stratum, fill=perc))+
+  geom_tile(color= "white",size=0.1)+scale_fill_viridis_c()
