@@ -533,9 +533,9 @@ fig5c <- ggplot()+
 fig5c
 
 # areaE %>% group_by(method, Region, Stratum) %>% 
-  summarise(max = max(rho)) %>% 
-  pivot_wider(names_from = method, values_from = max) %>%
-  mutate(row_max = pmap_chr(across(where(is.double)), ~ names(c(...)[which.max(c(...))])))
+  # summarise(max = max(rho)) %>% 
+  # pivot_wider(names_from = method, values_from = max) %>%
+  # mutate(row_max = pmap_chr(across(where(is.double)), ~ names(c(...)[which.max(c(...))])))
 
 E_by_method <- areaE %>%
   group_by(Region, Stratum, method) %>% 
@@ -755,3 +755,47 @@ totals_no_time <- totals_no_time %>% mutate(perc = tot/s)
 
 ggplot(data = totals_no_time, aes(x=Region, y=Stratum, fill=perc))+
   geom_tile(color= "white",size=0.1)+scale_fill_viridis_c()
+
+jplot1 <- ggplot(data = totals_geom %>% group_by(Region, Stratum) %>% summarise(perc = mean(perc, na.rm=TRUE)))+
+  geom_sf(aes(fill=perc))+
+  scale_fill_viridis_c()+
+  theme_light()
+
+            
+j_c_c_s<-j_cat_clean_seasons %>% group_by(Stratum, Region) %>%
+  summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+            avgWt = mean(Expanded_Weight_kg, na.rm=TRUE))
+
+j_c_c_s_geom <- left_join(regionsGrid_reg, j_c_c_s)
+
+jplot2 <- ggplot(data=j_c_c_s_geom)+geom_sf(aes(fill=avgCatch))+
+  scale_fill_viridis_c()+
+  theme_light()
+
+j_c_c_s_geom_no_time <- left_join(regionsGrid_reg, totals_no_time)
+
+jplot3 <- ggplot(data=j_c_c_s_geom_no_time)+geom_sf(aes(fill=perc))+scale_fill_viridis_c()
+
+(jplot1 + jplot3) / jplot2
+jplot1 + jplot2
+
+totals_no_time_strat<- df_j_cat %>% group_by(Stratum) %>% summarise(tot = sum(Expanded_Catch))
+s_strat <- sum(totals_no_time_strat$tot)
+totals_no_time_strat <- totals_no_time_strat %>% mutate(perc = tot/s_strat)
+
+jplot4 <- ggplot(data=left_join(regionsGrid_orig,totals_no_time_strat))+
+  geom_sf(aes(fill=perc))+
+ # scale_fill_fermenter(palette = "Blues", direction="reverse")+
+  scale_fill_viridis_c()+
+  theme_light()
+
+# Jonah only, avg catch/tow
+jplot5 <-ggplot()+
+  geom_sf(aes(fill=value), data=regionsGrid_no_seas %>% filter(Species=="jonah"))+
+  labs(fill="Avg catch/tow")+
+  theme(axis.text.x = element_text(size = 10))+
+ # scale_fill_fermenter(palette = "Blues", direction="reverse")+
+  scale_fill_viridis_c()+
+  theme_light()
+
+(jplot1 + jplot2)/(jplot4+jplot5)

@@ -219,3 +219,73 @@ catchTidy_reg_complete_j1 <- catchTidy_reg_complete %>%
 
 par(mfrow=c(2,3))
 findSpeciesGroups_both(catchTidy_reg_complete_j1, type="catch", g="Region", species="jonah")
+
+
+# Catch model testing -----------------------------------------------------
+
+#j_cat_area is from model_comparison.R
+
+lm1 <- lm(log(avgCatch+1) ~ Year + Region + Stratum + Season + temp, data=j_cat_area %>% na.omit())
+summary(lm1)
+par(mfrow=c(2,2))
+plot(lm1)
+AIC(lm1)
+
+lm2 <-lm(log(avgCatch+1) ~ Year + Region * Stratum, data=j_cat_area %>% na.omit())
+lm3 <-lm(log(avgCatch+1) ~ Year + Region + Stratum^2, data=j_cat_area %>% na.omit())
+lme1 <- lme(log(avgCatch+1) ~ Year + Region + Stratum, random = ~1|Season, data=j_cat_area %>% na.omit())
+
+
+gam1 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
+gam2 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + Stratum, data=j_cat_area %>% na.omit())
+gam3 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
+gam4 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
+gam5 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
+gam6 <- gam(log(avgCatch+1) ~ s(Year, k=23) + Region + poly(Stratum, 2, raw = TRUE),data=j_cat_area %>% na.omit())
+gam7 <- gam(avgCatch ~ s(Year) + s(Region, k=5, bs="ordinal") + s(Stratum, k=4, bs="ordinal"), data=j_cat_area %>% na.omit())
+
+summary(gam2)
+AIC(gam2)
+plot(gam1)
+gam.check(gam6)
+
+
+
+AIC(gam1, gam2, gam3, gam4, gam5, gam6)
+
+
+summary(gam4)
+AIC(gam4)
+plot(gam3)
+gam.check(gam4)
+anova(gam1, gam2)
+acf(residuals(gam4))
+
+gam5 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
+summary(gam5)
+gam.check(gam5)
+
++ poly(Stratum, 2, raw = TRUE)
+
+gamm1 <- gamm(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
+summary(gamm1$gam)
+
+gamm2 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
+summary(gamm2$gam)
+
+acf(residuals(gamm2$lme))
+
+anova(gamm1$lme, gamm2$lme)
+gam.check(gamm2$gam)
+
+gls1 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
+summary(gls3)
+acf(resid(gls3, type="normalized"))
+
+gls2 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(), data=j_cat_area %>% na.omit())
+
+
+gls3 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/as.factor(Season)), data=j_cat_area %>% na.omit())
+plot(gls3)
+
+AIC(gls1, gls2, gls3)
