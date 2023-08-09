@@ -597,7 +597,7 @@ regionsGrid_no_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor
 new <- c("Jonah crab", "Rock crab")
 names(new) <- c("jonah", "rock")
 
-# Figure 7
+# Figure 7 - Jonah and rock
 fig7 <- ggplot()+
   geom_sf(aes(fill=value), data=regionsGrid_no_seas)+
   coord_sf()+
@@ -607,6 +607,7 @@ fig7 <- ggplot()+
   theme(axis.text.x = element_text(size = 10))
 fig7
 
+# Jonah only, avg catch/tow
 ggplot()+
   geom_sf(aes(fill=value), data=regionsGrid_no_seas %>% filter(Species=="jonah"))+
   labs(fill="Avg catch/tow")+
@@ -646,7 +647,7 @@ catchTidy_strat_seas <- catchTidy_strat_seas %>%
 catchTidy_strat_seas <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
                                   catchTidy_strat_seas)
 
-
+# Jonah and rock avg catch/tow by stratum and season
 ggplot()+
   geom_sf(aes(fill=value), data=catchTidy_strat_seas)+
   coord_sf()+
@@ -660,22 +661,22 @@ diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum))
                mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs") %>% 
   mutate(pdiff = diff/Fall)
 
+# Jonah and rock crab fall-spring by stratum - diff of seasonal averages
 ggplot()+
   geom_sf(aes(fill=diff), data=diff_geom)+
   facet_wrap(.~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
+# Jonah only fall-spring by stratum - diff of seasonal averages
 ggplot()+
-  geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="(fall-spring)/fall")+
-  theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
+  geom_sf(aes(fill=diff ), data=diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
-# Jonah only
+# Jonah only (fall-spring)/fall by stratum (percentage) - diff of averages
 ggplot()+
   geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
-  coord_sf()+
   labs(fill="(fall-spring)/fall")+
   theme(axis.text.x = element_text(size = 10))+
   scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
@@ -683,19 +684,44 @@ ggplot()+
 
 
 seas_diff_geom <- catchTidy_strat_complete %>% filter(Type == "catch", Species != "scallop") %>% 
-  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% na.omit() %>% mutate(pdiff = diff/Fall)
+  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% mutate(pdiff = diff/Fall)
 
 seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
-                            seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff), pdiff=mean(pdiff))) %>% mutate(avg = "avg of yearly diffs")
+                            seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff, na.rm = TRUE), pdiff=mean(pdiff, na.rm = TRUE), med_pdiff = median(pdiff, na.rm=TRUE))) %>% mutate(avg = "avg of yearly diffs")
 
+# Jonah and rock fall-spring by stratum - avg of yearly differences
 ggplot()+
   geom_sf(aes(fill=diff), data=seas_diff_geom)+
   facet_wrap(.~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
+# Jonah only fall-spring by stratum - avg of yearly differences
 ggplot()+
-  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom))+
+  geom_sf(aes(fill=diff), data=seas_diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah only (fall-spring)/fall by stratum - avg of yearly differences
+ggplot()+
+  geom_sf(aes(fill=med_pdiff), data=seas_diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah and rock fall-spring by stratum - both methods
+ggplot()+
+  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom %>% dplyr::select(-med_pdiff)))+
   facet_grid(avg~Species, labeller = labeller(Species = new))+
   labs(fill="fall-spring")+
   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah only fall-spring by stratum - both methods
+ggplot()+
+  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)) %>% filter(Species=="jonah"), seas_diff_geom %>% filter(Species=="jonah")  %>% dplyr::select(-med_pdiff)))+
+  labs(fill="fall-spring")+
+  facet_wrap(~avg)+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "GnBu", direction=1)+
+  theme_light()+
+  theme(strip.background = element_rect(color="grey37", fill="white"),
+        strip.text = element_text(color="black"))
