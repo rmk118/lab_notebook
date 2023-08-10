@@ -234,7 +234,7 @@ AIC(lm1)
 lm2 <-lm(log(avgCatch+1) ~ Year + Region * Stratum, data=j_cat_area %>% na.omit())
 lm3 <-lm(log(avgCatch+1) ~ Year + Region + Stratum^2, data=j_cat_area %>% na.omit())
 lme1 <- lme(log(avgCatch+1) ~ Year + Region + Stratum, random = ~1|Season, data=j_cat_area %>% na.omit())
-
+summary(lme1)
 
 gam1 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
 gam2 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + Stratum, data=j_cat_area %>% na.omit())
@@ -242,7 +242,7 @@ gam3 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j
 gam4 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
 gam5 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
 gam6 <- gam(log(avgCatch+1) ~ s(Year, k=23) + Region + poly(Stratum, 2, raw = TRUE),data=j_cat_area %>% na.omit())
-gam7 <- gam(avgCatch ~ s(Year) + s(Region, k=5, bs="ordinal") + s(Stratum, k=4, bs="ordinal"), data=j_cat_area %>% na.omit())
+gam7 <- gam(log(avgCatch+1) ~ s(Year,k=23, bs="gp") + te(Region, Stratum, bs="mrf"), data=j_cat_area %>% na.omit())
 
 summary(gam2)
 AIC(gam2)
@@ -251,41 +251,71 @@ gam.check(gam6)
 
 
 
-AIC(gam1, gam2, gam3, gam4, gam5, gam6)
+AIC(gam1, gam2, gam3, gam4, gam5, gam6, gam7)
 
 
-summary(gam4)
-AIC(gam4)
-plot(gam3)
-gam.check(gam4)
-anova(gam1, gam2)
-acf(residuals(gam4))
-
-gam5 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
+gam5 <- gam(log(avgCatch) ~ Region + s(Stratum, k=4), data=j_c_c_s)
 summary(gam5)
 gam.check(gam5)
+acf(residuals(gam5))
 
-+ poly(Stratum, 2, raw = TRUE)
 
 gamm1 <- gamm(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
 summary(gamm1$gam)
 
+w <- 1/(j_cat_area %>% na.omit() %>% pull(Region))
+w2 <- 1/(j_cat_area %>% na.omit() %>% pull(Stratum))
+w3 <- 1/(j_cat_area %>% na.omit() %>% mutate(w = Region*Stratum) %>% pull(w))
+w4 <- 1/(j_cat_area %>% na.omit() %>% mutate(w = (Region^2)) %>% pull(w))
+
 gamm2 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
 summary(gamm2$gam)
 
-acf(residuals(gamm2$lme))
+gamm3 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE) , correlation=corAR1(), weights=w4, data=j_cat_area %>% na.omit())
 
+gamm4 <- gamm(log(avgCatch) ~ Region + s(Stratum, k=4) , correlation=corARMA(p=2),data=j_c_c_s)
+summary(gamm4$gam)
+summary(gamm4$lme)
+acf(residuals(gamm4$lme, type="normalized"))
+AIC(gamm4$lme)
 anova(gamm1$lme, gamm2$lme)
-gam.check(gamm2$gam)
 
 gls1 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
+
 summary(gls3)
 acf(resid(gls3, type="normalized"))
 
 gls2 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(), data=j_cat_area %>% na.omit())
 
 
-gls3 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/as.factor(Season)), data=j_cat_area %>% na.omit())
+AIC(gls1, gls2)
+acf(resid(gls2))
+
+lm4 <- lm(avgCatch ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
+lm5 <- lm(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
+summary(lm5)
+par(mfrow=c(2,2))
+plot(lm5)
+acf(resid(lm5))
+durbinWatsonTest(gam5, max.lag=20)
+AIC(gam5)
+
+ggplot(data=j_c_c_s)+geom_boxplot(aes(x=Region, y=avgCatch, group=Region))
+ggplot(data=j_c_c_s)+geom_boxplot(aes(x=Stratum, y=avgCatch, group=Stratum))
+plot(gam5)
+
+gls3<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
 plot(gls3)
 
-AIC(gls1, gls2, gls3)
+gls4<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), correlation = corARMA(p=2), data=j_c_c_s)
+plot(gls4)
+summary(gls4)
+bptest(gls3)
+ncvTest(c(residuals(gls3)), max.lag=20)
+
+mod.gls.3 <- update(gls4, correlation=corARMA(p=3))
+mod.gls.0 <- update(gls4, correlation=NULL)
+anova(gls4, mod.gls.3, mod.gls.0) 
+AIC(gls4)
+acf(resid(gls4, type="normalized"))
+
