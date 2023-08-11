@@ -225,97 +225,172 @@ findSpeciesGroups_both(catchTidy_reg_complete_j1, type="catch", g="Region", spec
 
 #j_cat_area is from model_comparison.R
 
-lm1 <- lm(log(avgCatch+1) ~ Year + Region + Stratum + Season + temp, data=j_cat_area %>% na.omit())
-summary(lm1)
-par(mfrow=c(2,2))
-plot(lm1)
-AIC(lm1)
+## With year ---------------------------------------------------------------
+# 
+# lm1 <- lm(log(avgCatch+1) ~ Year + Region + Stratum + Season + temp, data=j_cat_area %>% na.omit())
+# lm2 <-lm(log(avgCatch+1) ~ Year + Region * Stratum, data=j_cat_area %>% na.omit())
+# lm3 <-lm(log(avgCatch+1) ~ Year + Region + Stratum^2, data=j_cat_area %>% na.omit())
 
-lm2 <-lm(log(avgCatch+1) ~ Year + Region * Stratum, data=j_cat_area %>% na.omit())
-lm3 <-lm(log(avgCatch+1) ~ Year + Region + Stratum^2, data=j_cat_area %>% na.omit())
-lme1 <- lme(log(avgCatch+1) ~ Year + Region + Stratum, random = ~1|Season, data=j_cat_area %>% na.omit())
-summary(lme1)
+#lme1 <- lme(log(avgCatch+1) ~ Year + Region + Stratum, random = ~1|Season, data=j_cat_area %>% na.omit())
 
-gam1 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
-gam2 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + Stratum, data=j_cat_area %>% na.omit())
-gam3 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
-gam4 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
-gam5 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
-gam6 <- gam(log(avgCatch+1) ~ s(Year, k=23) + Region + poly(Stratum, 2, raw = TRUE),data=j_cat_area %>% na.omit())
-gam7 <- gam(log(avgCatch+1) ~ s(Year,k=23, bs="gp") + te(Region, Stratum, bs="mrf"), data=j_cat_area %>% na.omit())
+#gam1 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), data=j_cat_area %>% na.omit())
+#gam2 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + Stratum, data=j_cat_area %>% na.omit())
+#gam4 <- gam(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), family=tw(), data=j_cat_area %>% na.omit())
 
-summary(gam2)
-AIC(gam2)
-plot(gam1)
-gam.check(gam6)
+gam1 <- gam(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), 
+            data=j_cat_area %>% na.omit())
+gam2 <- gam(log(avgCatch+1) ~ s(Year, k=23) + Region + poly(Stratum, 2, raw = TRUE),
+            data=j_cat_area %>% na.omit())
+gam3 <- gam(log(avgCatch+1) ~ s(Year) + Region + s(Stratum, k=4), 
+            data=j_cat_area %>% na.omit())
 
+AIC(gam1, gam2, gam3)
 
+# gam6 <- gam(log(avgCatch+1) ~ s(Year,k=23, bs="gp") + te(Region, Stratum, bs="mrf"), data=j_cat_area %>% na.omit())
 
-AIC(gam1, gam2, gam3, gam4, gam5, gam6, gam7)
+gamm1 <- gamm(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), 
+              correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
 
-
-gam5 <- gam(log(avgCatch) ~ Region + s(Stratum, k=4), data=j_c_c_s)
-summary(gam5)
-gam.check(gam5)
-acf(residuals(gam5))
-
-
-gamm1 <- gamm(avgCatch ~ s(Year) + s(Region, k=5) + s(Stratum, k=4), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
-summary(gamm1$gam)
+gamm2 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
 
 w <- 1/(j_cat_area %>% na.omit() %>% pull(Region))
 w2 <- 1/(j_cat_area %>% na.omit() %>% pull(Stratum))
 w3 <- 1/(j_cat_area %>% na.omit() %>% mutate(w = Region*Stratum) %>% pull(w))
 w4 <- 1/(j_cat_area %>% na.omit() %>% mutate(w = (Region^2)) %>% pull(w))
 
-gamm2 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
-summary(gamm2$gam)
+gamm3 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE),
+              correlation=corAR1(), weights=w4, data=j_cat_area %>% na.omit())
 
-gamm3 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE) , correlation=corAR1(), weights=w4, data=j_cat_area %>% na.omit())
-
-gamm4 <- gamm(log(avgCatch) ~ Region + s(Stratum, k=4) , correlation=corARMA(p=2),data=j_c_c_s)
-summary(gamm4$gam)
-summary(gamm4$lme)
-acf(residuals(gamm4$lme, type="normalized"))
-AIC(gamm4$lme)
-anova(gamm1$lme, gamm2$lme)
+gamm4 <- gamm(log(avgCatch+1) ~ s(Year) + s(Region, k=5) + poly(Stratum, 2, raw = TRUE),
+              correlation=corAR1(), data=j_cat_area %>% filter(Year > 2002) %>% na.omit())
 
 gls1 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(form = ~Year|Region/Stratum/Season), data=j_cat_area %>% na.omit())
 
-summary(gls3)
-acf(resid(gls3, type="normalized"))
-
 gls2 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corAR1(), data=j_cat_area %>% na.omit())
 
+gls3 <- gls(log(avgCatch+1) ~ Year + Region + poly(Stratum, 2, raw = TRUE), correlation=corARMA(p=3), data=j_cat_area %>% na.omit())
 
-AIC(gls1, gls2)
-acf(resid(gls2))
+plot(gls3)
+hist(resid(gls3, type="normalized"))
+anova(gls1, gls2, gls3)
 
-lm4 <- lm(avgCatch ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
-lm5 <- lm(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
-summary(lm5)
-par(mfrow=c(2,2))
-plot(lm5)
-acf(resid(lm5))
-durbinWatsonTest(gam5, max.lag=20)
-AIC(gam5)
+## No year ---------------------------------------------------------------
+lm4 <- lm(log(avgCatch) ~ Region +Stratum, data=j_c_c_s)
+lm5 <- lm(avgCatch ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
+lm6 <- lm(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
+
+gam4 <- gam(log(avgCatch) ~ Region + s(Stratum, k=4), data=j_c_c_s)
+
+AIC(gam1, gam2, gam3, gam4, gam5, gam6)
+
+gls3<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s) #autocorrelated residuals
+gls4<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), correlation = corARMA(p=2), data=j_c_c_s)
+gls5<-gls(log(avgCatch) ~ Region +  I(Stratum^2), correlation = corARMA(p=2), data=j_c_c_s)
 
 ggplot(data=j_c_c_s)+geom_boxplot(aes(x=Region, y=avgCatch, group=Region))
 ggplot(data=j_c_c_s)+geom_boxplot(aes(x=Stratum, y=avgCatch, group=Stratum))
-plot(gam5)
+ggplot(data=j_cat_area)+geom_boxplot(aes(x=Stratum, y=avgCatch, group=Stratum))+facet_wrap(~Region)
 
-gls3<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), data=j_c_c_s)
-plot(gls3)
+gamm5 <- gamm(log(avgCatch) ~ Region + s(Stratum, k=4) , correlation=corARMA(p=2),data=j_c_c_s)
+gamm6 <- gamm(log(avgCatch) ~ Region + s(Stratum, k=4) , correlation=corARMA(p=3),data=j_c_c_s)
 
-gls4<-gls(log(avgCatch) ~ Region +  poly(Stratum, 2, raw = TRUE), correlation = corARMA(p=2), data=j_c_c_s)
-plot(gls4)
-summary(gls4)
-bptest(gls3)
-ncvTest(c(residuals(gls3)), max.lag=20)
+gamm7 <- gamm(log(avgCatch) ~ Region + s(Stratum, k=4, bs="cr") , correlation=corARMA(p=3),data=j_c_c_s)
+# mod.gls.3 <- update(gls4, correlation=corARMA(p=3))
 
-mod.gls.3 <- update(gls4, correlation=corARMA(p=3))
-mod.gls.0 <- update(gls4, correlation=NULL)
-anova(gls4, mod.gls.3, mod.gls.0) 
-AIC(gls4)
-acf(resid(gls4, type="normalized"))
+# anova(gls4, gls3, mod.gls.0) 
+# acf(resid(gls5, type="normalized"))
+# 
+# summary(gamm5$gam)
+# plot(gamm5$gam)
 
+
+### Poisson -----------------------------------------------------------------
+
+j <- j_cat_clean_seasons %>% mutate(Season = as.factor(Season), Date = as.numeric(Date),
+                                    lat = Start_Latitude, lon=Start_Longitude)
+
+100*sum(j$Number_Caught == 0)/nrow(j)
+
+glm1 <- glm(Number_Caught ~ Date + Region + Stratum, data=j, family="poisson")
+
+gamm8 <- gamm(Number_Caught ~ s(Date) + s(Start_Latitude, Start_Longitude, bs = 'gp', k = 100, m = 2), family="poisson",data = j)
+
+gam5 <- gam(Number_Caught ~ s(Date) + Region + s(Stratum, k=4), data=j, family=ziP())
+
+gam6 <- gam(Number_Caught ~ s(Date) + Region + s(Stratum, k=4), data=j, family="poisson")
+summary(gam5)
+gam.check(gam5)
+plot(gam6$fitted.values, resid(gam6))
+
+# NW_VCOV <- NeweyWest(lm(log(avgCatch) ~ Region + Stratum, data=j_c_c_s), 
+#                      prewhite = F, 
+#                      adjust = T)
+# acf(lm(log(avgCatch) ~ Region +Stratum, data=j_c_c_s)$residuals)
+# shapiro.test(lm1$residuals)
+# durbinWatsonTest(lm1)
+# coeftest(lm1, vcov = NW_VCOV)
+
+# gamm_spat = gamm(
+#   Expanded_Catch ~ s(Date) + s(Stratum,k=4) + Region + s(Start_Depth_fathoms), # choose your own features here
+#   data = j
+# )
+# summary(gamm_spat$gam)
+
+
+j_c_c_s_geom <- j_c_c_s_geom %>% mutate(Area = as.factor(paste(Region, Stratum, sep=" ")))
+
+library(spdep)
+nb <- poly2nb(j_c_c_s_geom, row.names = j_c_c_s_geom$Area) # queen shares point or border
+attr(nb, "region.id") <- j_c_c_s_geom$Area
+names(nb) = attr(nb, "region.id")
+names(nb)
+nbw <- nb2listw(nb, style = "W")
+
+# Global Moran's I
+gmoran <- moran.test(j_c_c_s_geom$avgCatch, nbw,
+                     alternative = "greater")
+gmoran
+
+j_cat_area <- j_cat_area %>% mutate(Area = as.factor(paste(Region, Stratum, sep=" ")))
+
+gam_mrf = gamm(
+  # define MRF smooth
+  log(avgCatch+1) ~ s(Year) + s(temp) + s(Area, bs = 'mrf', xt = list(nb = nb)),
+  data   = j_cat_area %>% na.omit() %>% filter(Year > 2003),
+ correlation = corAR1(form = ~Year|Season/Area),
+ method="REML",
+ family=Tweedie(p=1.01)
+)
+
+gam.check(gam_mrf$gam)
+summary(gam_mrf$lme)
+AIC(gam_mrf$lme)
+summary(gam_mrf$gam)
+plot(gam_mrf$gam)
+acf(resid(gam_mrf$lme, type="normalized"))
+
+gam_mrf2 = gamm(
+  # define MRF smooth
+  log(avgCatch+1) ~ s(Year) + s(temp) + s(Area, bs = 'mrf', xt = list(nb = nb)),
+  data   = j_cat_area %>% na.omit() %>% filter(Year > 2003),
+  correlation = corAR1(form = ~Year|Season/Area),
+  method="REML",
+  family=Tweedie(p=1.01)
+)
+
+
+gam_mrf2 = gamm(
+  # define MRF smooth
+  log(avgCatch+1) ~ s(Year) + s(temp) + Region + s(Stratum,k=4, bs="cr"),
+  data   = j_cat_area %>% na.omit() %>% filter(Year > 2003),
+  correlation = corAR1(form = ~Year|Season/Area),
+  method="REML",
+  family=Tweedie(p=1.01)
+)
+
+gam.check(gam_mrf2$gam)
+summary(gam_mrf2$lme)
+AIC(gam_mrf2$lme)
+summary(gam_mrf2$gam)
+plot(gam_mrf2$gam)
+acf(resid(gam_mrf2$lme, type="normalized"))
