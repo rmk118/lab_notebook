@@ -232,11 +232,13 @@ gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year
 gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
 len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
 
-summary(gls1)
+
+AIC(gls1, gls2, len1)
+summary(len1)
 plot(gls1)
 
 shapiro.test(residuals(gls1, type="normalized"))
-shapiro.test(residuals(gls2, type="normalized"))
+shapiro.test(residuals(len2, type="normalized"))
 shapiro.test(residuals(len1, type="normalized"))
 
 plot(gls1, resid(.) ~ Year, abline = 0, cex = 0.3)
@@ -244,7 +246,8 @@ plot(gls1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
 plot(gls1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
 plot(gls1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 
-Box.test(residuals(gls2), type="L")
+Box.test(residuals(gls1), type="L")
+Box.test(residuals(len1, type="normalized"), type="L")
 
 tidy(gls1)
 tidy(gls2)
@@ -252,7 +255,7 @@ tidy(len1)
 
 par(mfrow=c(3,1), mar=c(1,1,1,1))
 acf(residuals(gls1, type="normalized"))
-acf(residuals(gls2, type="normalized"))
+acf(residuals(len2, type="normalized"))
 acf(residuals(len1, type="normalized"))
 acf(residuals(len1))
 
@@ -308,6 +311,7 @@ fig1b
 rlm(data = int2, len ~ Year)
 rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
 
+library(RLRsim)
 exactRLRT(len1)
 
 

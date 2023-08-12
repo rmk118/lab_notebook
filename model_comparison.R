@@ -9,6 +9,8 @@ library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(scales) #plot scales
 library(sf) #spatial analysis
+library(car)
+library(mgcv)
 
 ## Time series packages
 library(rEDM) #EDM
