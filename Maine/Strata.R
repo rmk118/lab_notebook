@@ -429,13 +429,15 @@ acf(resid(gam_mrf2$lme, type="normalized"))
 # summary(lme1)
 # r2(lme1)
 
+library(MuMIn)
+library(spdep)
+
 # no temporal
 # gamm8 for simple confirmation of spatial differences, minimal representation of nonlinearity with smooth term, account for spatial autocorrelation, still satisfy regression assumptions (shapiro-wilk, bptest)
 
 #here's proof of spatial autocorrelation
 j_c_c_s_geom <- j_c_c_s_geom %>% mutate(Area = as.factor(paste(Region, Stratum, sep=" ")))
 
-library(spdep)
 nb <- poly2nb(j_c_c_s_geom, row.names = j_c_c_s_geom$Area) # queen shares point or border
 attr(nb, "region.id") <- j_c_c_s_geom$Area
 names(nb) = attr(nb, "region.id")
@@ -452,29 +454,34 @@ gamm8 <- gamm(avgCatch ~ Region + s(Stratum, k=4, bs="cr"),
               correlation=corGaus(form=~ Region + Stratum),
               data=j_c_c_s %>% ungroup())
 
+draw(gamm8$gam)
+
+summary(gamm8$gam)
+AIC(gamm8$lme)
+
+shapiro.test(resid(gamm8$lme, type="normalized"))
+Box.test(resid(gamm8$lme, type="normalized"), type="L")
+bptest(gamm8$gam)
 
 acf(resid(gamm8$lme, type="normalized"))
 pacf(resid(gamm8$lme, type="normalized"))
-summary(gamm8$gam)
-AIC(gamm8$lme)
-shapiro.test(resid(gamm8$lme, type="normalized"))
-bptest(gamm8$gam)
 
-# lme for highly linear sex differences, can still account for temporal autocorrelation and random effect of survey length
-len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
-summary(len1)
-plot(len1)
-shapiro.test(residuals(len1, type="normalized"))
-Box.test(residuals(len1, type="normalized"), type="L")
-acf(resid(len1, type="normalized"))
-pacf(residuals(len1, type="normalized"))
 
-plot(len1, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ Year, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+# gls for highly linear sex differences, can still account for autocorrelation
+len4 <- gls(Diff ~ Stratum + Year + Region, data = int2,
+            correlation = corExp(form = ~ Region + Stratum|Year))
+
+summary(len4)
+r.squaredLR(len4)
+plot(len4)
+AIC(len4)
+
+shapiro.test(residuals(len4, type="normalized"))
+Box.test(residuals(len4, type="normalized"), type="L")
+
+acf(resid(len4, type="normalized"))
+pacf(residuals(len4, type="normalized"))
+
 
 # EDM for forecasting/treating it as a dynamic system, insights into complexity and nonlinearity of the 
 # system and spatial heterogeneity with regards to these characteristics
@@ -483,3 +490,5 @@ plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 # "dewdrop regression" by adding other regions or strata into the library can improve predictive skill
 
 # all guided by fishermen's knowledge and priorities
+
+

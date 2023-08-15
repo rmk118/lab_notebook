@@ -443,3 +443,44 @@ exactRLRT(len1)
 # 
 # tidy(gls1_ml)
 # tidy(len1_ml)
+
+# len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
+# summary(len1)
+# plot(len1)
+# shapiro.test(residuals(len1, type="normalized"))
+# Box.test(residuals(len1, type="normalized"), type="L")
+# acf(resid(len1, type="normalized"))
+# pacf(residuals(len1, type="normalized"))
+# 
+# plot(len1, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
+# plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+# plot(len1, resid(.) ~ Year, abline = 0, cex = 0.3)
+# plot(len1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+# plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+# plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+
+#len2 <- gam(Diff ~ Stratum + s(Year, bs="cr") + Region, data = int2)
+
+# summary(len4)
+# acf(resid(len4, type="normalized"))
+# 
+# len3 <- gamm(Diff ~ Stratum + s(Year, bs="cr") + Region, data = int2,
+#              correlation = corLin(form = ~ Region + Stratum|Year))
+# 
+# len3 <- gamm(Diff ~ s(Year, bs="cr") + Stratum + Region, data = int2,
+#              correlation = corLin(form = ~ Region + Stratum|Year))
+
+# summary(len3$g)
+# hist(int2$Diff)
+# library(gratia)
+# draw(len2)
+# appraise(len2)
+# plot(len2)
+# gam.check(len2$g)
+# acf(resid(len2$lme, type="normalized"))
+
+len4 <- gls(Diff ~ Stratum + Year + Region, data = int2,
+             correlation = corExp(form = ~ Region + Stratum|Year))
+summary(len4)
+r.squaredLR(len4)
+acf(resid(len4, type="normalized"))
