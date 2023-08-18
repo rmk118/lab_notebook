@@ -1,6 +1,6 @@
 #Jonah crab seasonal sex ratio differences
 #Ruby Krasnow
-#Last modified: Aug 8, 2023
+#Last modified: Aug 18, 2023
 
 # Load packages
 library(tidyverse)
@@ -24,6 +24,8 @@ library(nlme)
 library(broom.mixed)
 library(RLRsim)
 library(MASS)
+library(MuMIn)
+library(lmtest)
 
 # Import data
 df_j_len<- read.csv("data/Maine_inshore_trawl/MEjonahLength.csv") #jonah crab length and sex data
@@ -91,15 +93,8 @@ sex_diff %>%
 
 tibble(sex_diff) #preview data
 
-# Ordinary least squares linear regression
-lm <- lm(Diff ~ Stratum, data=sex_diff)
-summary(lm)
-par(mfrow = c(2, 2))
-plot(lm)
-shapiro.test(lm$residuals) #good
-durbinWatsonTest(lm, max.lag=15) #good
 
-ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
+# ggplot(data=sex_diff, aes(x=Stratum, y=Diff, group=Stratum))+geom_violin()+theme_bw()
 
 # Figures -----------------------------------------------------------------
 
@@ -121,7 +116,7 @@ sex_diff_agg <- pivot_wider(data_agg, names_from="Season", values_from = "perc_f
   mutate(Stratum = as.numeric(Stratum))
 
 #Straight line with r^2 = 0.97
-r_squared_j <- ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
+ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
   geom_point()+
   theme_bw()+
   stat_smooth(method="lm", se=FALSE)+
@@ -153,67 +148,11 @@ sex_diff_reg <- pivot_wider(data_area, names_from="Season", values_from = "perc_
   mutate(Stratum = as.numeric(Stratum))
 
 regionsGrid_reg <- surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
+
 sex_diff_geom_reg <- left_join(regionsGrid_reg, sex_diff_reg) #join to sf for visualization
+
 ggplot(data=sex_diff_geom_reg)+geom_sf(aes(fill=Diff))
 
-# Many outliers, one extreme
-sex_diff_reg %>% 
-  group_by(Region, Stratum) %>% 
-  identify_outliers(Diff)
-
-# Areas 23 and 51 are not normal
-sex_diff_reg %>%
-  group_by(Region, Stratum) %>%
-  shapiro_test(Diff)
-
-min_date <- df_tows %>% 
-  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
-  group_by(Year, Season) %>% slice_min(Start_Date) %>% 
-  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
-  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
-  mutate(stdYear = date(stdYear))
-
-max_date <- df_tows %>% 
-  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
-group_by(Year, Season) %>% slice_max(Start_Date) %>% 
-  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
-  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
-  mutate(stdYear = date(stdYear))
-
-ggplot(data=min_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
-ggplot(data=min_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
-ggplot(data=min_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
-ggplot(data=max_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
-ggplot(data=max_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
-ggplot(data=max_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
-
-min(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
-median(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
-
-med_date <- df_tows  %>% 
-  filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% 
-  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
-  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
-  mutate(stdYear = date(stdYear)) %>% 
-  group_by(Year, Season, Region, Depth_Stratum) %>% 
-  summarise(med = median(stdYear)) %>% 
-  mutate(Stratum = Depth_Stratum, .keep="unused") %>%
-  ungroup() 
-
-med_date %>% 
-  group_by(Season, Year) %>% 
-  summarise(med = max(med) - min(med))
-
-int <- df_tows  %>% 
-  mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
-  mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
-  mutate(stdYear = date(stdYear)) %>% 
-  group_by(Year, Region, Depth_Stratum) %>% 
-  summarise(med = median(stdYear)) %>% 
-  mutate(Stratum = Depth_Stratum, .keep="unused") %>%
-  ungroup() #not grouped by season
-
-int <- left_join(int, sex_diff_reg) %>% na.omit()
 
 tot_date <- df_tows %>% 
   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% #errant February
@@ -223,99 +162,36 @@ tot_date <- df_tows %>%
   group_by(Year, Region, Depth_Stratum) %>% 
   summarise(len = max(stdYear) - min(stdYear)) %>% 
   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
-  ungroup() %>% filter(Year > 2004 & Year != 2020) %>% 
-  mutate(len = ifelse(len < 10, 151, len))
+  ungroup() %>% filter(Year > 2004 & Year != 2020) %>% mutate(len = ifelse(len < 10, 151, len))
 
 int2 <- left_join(tot_date, sex_diff_reg) %>% na.omit()
 
-gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
-gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
-len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
+len4 <- gls(Diff ~ Stratum + Year + Region, data = int2,
+            correlation = corExp(form = ~ (Region + Stratum)|Year))
+summary(len4)
+tidy(len4)
+
+r.squaredLR(len4)
+acf(resid(len4, type="normalized"))
+Box.test(residuals(len4, type="normalized"), type="L")
+shapiro.test(resid(len4, type="normalized"))
 
 
-AIC(gls1, gls2, len1)
-summary(len1)
-plot(gls1)
-
-shapiro.test(residuals(gls1, type="normalized"))
-shapiro.test(residuals(len2, type="normalized"))
-shapiro.test(residuals(len1, type="normalized"))
-
-plot(gls1, resid(.) ~ Year, abline = 0, cex = 0.3)
-plot(gls1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
-plot(gls1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
-plot(gls1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-
-Box.test(residuals(gls1), type="L")
-Box.test(residuals(len1, type="normalized"), type="L")
-
-tidy(gls1)
-tidy(gls2)
-tidy(len1)
-
-par(mfrow=c(3,1), mar=c(1,1,1,1))
-acf(residuals(gls1, type="normalized"))
-acf(residuals(len2, type="normalized"))
-acf(residuals(len1, type="normalized"))
-acf(residuals(len1))
-
-anova(gls1, gls2)
-anova(gls1, gls2, len1)
-
-plot(len1, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ Year, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+plot(len4)
+plot(len4, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
+plot(len4, resid(.) ~ Year, abline = 0, cex = 0.3)
+plot(len4, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
 plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
-plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
-
-summary(len1)
-plot(len1)
-
-ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
-  geom_smooth(method="lm", se=FALSE)+
-  facet_grid(Stratum~Region)
-
-fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
- geom_point(size=1)+
- geom_smooth(method="gam", aes(color="GAM"))+
-  stat_poly_line(method="rlm",  aes(color="RLM"))+
-  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
-  theme_classic()+
- ylim(110,170)+
-  labs(x="Years since 2005", y="Time elapsed (days)")+
-  scale_colour_manual(name="legend", values=c("blue", "red"))
-fig1a
-
-fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
-  geom_point(size=1)+
- geom_smooth(method="gam",  aes(color="GAM"))+
-  stat_poly_line(method="rlm",  aes(color="RLM"))+
-  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
-  theme_classic()+
-  ylim(110,170)+
-  labs(x="Years since 2005",y="")+
-  scale_colour_manual(name="legend", values=c("blue", "red"))
-fig1b
-
-(fig1a + fig1b) + 
-  plot_layout(guides = 'collect') +
-  plot_annotation(tag_levels = 'A') & 
-  theme(plot.tag = element_text(size = 12)) &
-  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
-        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-        axis.title = element_text(size = 12),
-        axis.text = element_text(size = 12),
-        axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
-
-rlm(data = int2, len ~ Year)
-rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
-
-library(RLRsim)
-exactRLRT(len1)
-
 
 # Rejected models ---------------------------------------------------------
+# Ordinary least squares linear regression
+# lm <- lm(Diff ~ Stratum, data=sex_diff)
+# summary(lm)
+# par(mfrow = c(2, 2))
+# plot(lm)
+# shapiro.test(lm$residuals) #good
+# durbinWatsonTest(lm, max.lag=15) #good
+# 
 
 # library(lmtest)
 # library(sandwich)
@@ -390,6 +266,16 @@ exactRLRT(len1)
 # plot(reg4, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 # 
 # anova(reg4, reg5)
+
+# tot_date <- df_tows %>% 
+#   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% #errant February
+#   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+#   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+#   mutate(stdYear = date(stdYear)) %>% 
+#   group_by(Year, Region, Depth_Stratum) %>% 
+#   summarise(len = max(stdYear) - min(stdYear)) %>% 
+#   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
+#   ungroup() %>% filter(Year > 2004 & Year != 2020) %>% mutate(len = ifelse(len < 10, 151, len))
 
 
 # reg5 <- lme(Diff ~ Stratum + Year, random = ~ 1|Region, data = sex_diff_reg, 
@@ -477,10 +363,130 @@ exactRLRT(len1)
 # appraise(len2)
 # plot(len2)
 # gam.check(len2$g)
-# acf(resid(len2$lme, type="normalized"))
+# acf(resid(len2$lme, type="normalized")) %>% 
 
-len4 <- gls(Diff ~ Stratum + Year + Region, data = int2,
-             correlation = corExp(form = ~ Region + Stratum|Year))
-summary(len4)
-r.squaredLR(len4)
-acf(resid(len4, type="normalized"))
+#len2 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corExp(form = ~ (Region + Stratum)|len/Year))
+
+# gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
+# gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
+# len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
+# 
+# summary(len1)
+# plot(gls1)
+# 
+# anova(gls1, gls2)
+# anova(gls1, gls2, len1, len2, len4)
+# 
+# plot(gls1, resid(.) ~ Year, abline = 0, cex = 0.3)
+# plot(gls1, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+# plot(gls1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+# plot(gls1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
+# 
+# par(mfrow=c(4,1), mar=c(1,1,1,1))
+# acf(residuals(gls1, type="normalized"))
+# acf(residuals(gls2, type="normalized"))
+# acf(residuals(len1, type="normalized"))
+# acf(residuals(len4, type="normalized"))
+# 
+# AIC(gls1, gls2, len1,len4)
+# 
+# # Many outliers, one extreme
+# sex_diff_reg %>% 
+#   group_by(Region, Stratum) %>% 
+#   identify_outliers(Diff)
+# 
+# # Areas 23 and 51 are not normal
+# sex_diff_reg %>%
+#   group_by(Region, Stratum) %>%
+#   shapiro_test(Diff)
+# 
+# min_date <- df_tows %>% 
+#   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
+#   group_by(Year, Season) %>% slice_min(Start_Date) %>% 
+#   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+#   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+#   mutate(stdYear = date(stdYear))
+# 
+# max_date <- df_tows %>% 
+#   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90))  %>% 
+#   group_by(Year, Season) %>% slice_max(Start_Date) %>% 
+#   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+#   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+#   mutate(stdYear = date(stdYear))
+# 
+# ggplot(data=min_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
+# ggplot(data=min_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
+# ggplot(data=min_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
+# ggplot(data=max_date %>% filter(Season=="Fall"))+geom_line(aes(x=Year, y=stdYear))
+# ggplot(data=max_date %>% filter(Season=="Spring"))+geom_line(aes(x=Year, y=stdYear))
+# ggplot(data=max_date)+geom_line(aes(x=Year, y=stdYear, color=Season))
+# 
+# min(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
+# median(min_date %>% filter(Season == "Fall") %>% pull(stdYear))
+# 
+# med_date <- df_tows  %>% 
+#   filter(!(Region==4 & Depth_Stratum==2 & Year==2017 & Tow_Number==90)) %>% 
+#   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+#   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+#   mutate(stdYear = date(stdYear)) %>% 
+#   group_by(Year, Season, Region, Depth_Stratum) %>% 
+#   summarise(med = median(stdYear)) %>% 
+#   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
+#   ungroup() 
+# 
+# med_date %>% 
+#   group_by(Season, Year) %>% 
+#   summarise(med = max(med) - min(med))
+# 
+# int <- df_tows  %>% 
+#   mutate(date = ymd_hms(Start_Date), .keep="unused", .before=Season) %>% 
+#   mutate(stdYear = `year<-`(date, 2000), .before=Season) %>% 
+#   mutate(stdYear = date(stdYear)) %>% 
+#   group_by(Year, Region, Depth_Stratum) %>% 
+#   summarise(med = median(stdYear)) %>% 
+#   mutate(Stratum = Depth_Stratum, .keep="unused") %>%
+#   ungroup() #not grouped by season
+# 
+# int <- left_join(int, sex_diff_reg) %>% na.omit()
+# 
+# ggplot(med_date, aes(x=Year, y=med, group=Season,color=Season))+geom_point()+
+#   geom_smooth(method="lm", se=FALSE)+
+#   facet_grid(Stratum~Region)
+# 
+# fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
+#   geom_point(size=1)+
+#   geom_smooth(method="gam", aes(color="GAM"))+
+#   stat_poly_line(method="rlm",  aes(color="RLM"))+
+#   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
+#   theme_classic()+
+#   ylim(110,170)+
+#   labs(x="Years since 2005", y="Time elapsed (days)")+
+#   scale_colour_manual(name="legend", values=c("blue", "red"))
+# fig1a
+# 
+# fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
+#   geom_point(size=1)+
+#   geom_smooth(method="gam",  aes(color="GAM"))+
+#   stat_poly_line(method="rlm",  aes(color="RLM"))+
+#   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
+#   theme_classic()+
+#   ylim(110,170)+
+#   labs(x="Years since 2005",y="")+
+#   scale_colour_manual(name="legend", values=c("blue", "red"))
+# fig1b
+# 
+# (fig1a + fig1b) + 
+#   plot_layout(guides = 'collect') +
+#   plot_annotation(tag_levels = 'A') & 
+#   theme(plot.tag = element_text(size = 12)) &
+#   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+#         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+#         axis.title = element_text(size = 12),
+#         axis.text = element_text(size = 12),
+#         axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
+# 
+# rlm(data = int2, len ~ Year)
+# rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
+# 
+# library(RLRsim)
+# exactRLRT(len1)

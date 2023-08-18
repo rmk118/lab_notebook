@@ -1,7 +1,7 @@
 # Comparing EDM models to linear models + Poster/presentation figures
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Aug 4, 2023
+# Last modified: Aug 17, 2023
 
 #Load packages
 library(tidyverse)
@@ -157,7 +157,7 @@ ggplot(data=landings %>% filter(species=="Crab Jonah"))+
 #Prep: Poster fig. 5 and slides 5a - Embedding dimension for aggregate catch
 fig <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
 
-ggplot(data=fig, aes(x=E, y=rho))+
+fig5a <- ggplot(data=fig, aes(x=E, y=rho))+
   geom_line()+
   scale_x_continuous(breaks=seq(0,10,2))+
   theme_classic()+
@@ -552,11 +552,12 @@ density_rho <- ggplot(data=E_by_method)+geom_density(aes(x=rho, color=method))+t
 density_E + density_rho +
   plot_layout(guides = 'collect')
 
-ggplot(data=E_by_method)+stat_ecdf(aes(x=E, color=method))+theme_bw()
-ggplot(data=E_by_method)+stat_ecdf(aes(x=rho, color=method))+theme_bw()
+ecdf_E <- ggplot(data=E_by_method)+stat_ecdf(aes(x=E, color=method))+theme_bw()
+ecdf_rho <- ggplot(data=E_by_method)+stat_ecdf(aes(x=rho, color=method))+theme_bw()
 ggplot(data=E_by_method)+stat_ecdf(aes(x=rho))+theme_bw()+facet_wrap(~method)
 
-
+ecdf_E + ecdf_rho +
+  plot_layout(guides = 'collect')
 
 # Strata - no time -----------------------------------------------------
 
@@ -684,39 +685,73 @@ ggplot()+
   theme(axis.text.x = element_text(size = 10))+
   scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
 
+seas_diff_geom1 <- catchTidy_strat_complete %>% filter(Type == "catch", Species != "scallop") %>% 
+  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% 
+  mutate(pdiff = diff/Fall) %>% filter(Species=="jonah")
 
+seas_diff_geom1 %>%  na.omit() %>% group_by(Stratum) %>% 
+  wilcox_test(pdiff ~ 1, mu=0, alternative="l") %>%
+  adjust_pvalue(method = "holm") %>%
+  add_significance("p.adj")
 
-seas_diff_geom <- catchTidy_strat_complete %>% filter(Type == "catch", Species != "scallop") %>% 
-  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% mutate(pdiff = diff/Fall)
+ggplot(data=seas_diff_geom1 %>% na.omit())+geom_histogram(aes(x=pdiff))+facet_wrap(~Stratum)+xlim(-5,5)
 
 seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
-                            seas_diff_geom %>% group_by(Stratum, Species) %>% summarise(diff = mean(diff, na.rm = TRUE), pdiff=mean(pdiff, na.rm = TRUE), med_pdiff = median(pdiff, na.rm=TRUE))) %>% mutate(avg = "avg of yearly diffs")
+                            seas_diff_geom1 %>% group_by(Stratum, Species) %>% 
+                              summarise(diff = mean(diff, na.rm = TRUE), 
+                                        mean_pdiff=mean(pdiff, na.rm = TRUE),
+                                        med_pdiff = median(pdiff, na.rm=TRUE))) %>% 
+  mutate(avg = "avg of yearly diffs")
+
 
 # Jonah and rock fall-spring by stratum - avg of yearly differences
-ggplot()+
-  geom_sf(aes(fill=diff), data=seas_diff_geom)+
-  facet_wrap(.~Species, labeller = labeller(Species = new))+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+# ggplot()+
+#   geom_sf(aes(fill=diff), data=seas_diff_geom)+
+#   facet_wrap(.~Species, labeller = labeller(Species = new))+
+#   labs(fill="fall-spring")+
+#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+seas_diff_geom1 %>% na.omit() %>% group_by(Stratum) %>% shapiro_test(diff)
+
+seas_diff_for_test <- catchTidy_strat_complete %>% 
+  filter(Type == "catch", Species=="jonah", Year!=2003, Year!=2020)
+
+seas_diff_for_test %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE)
+seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "g")
+seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "l")
 
 # Jonah only fall-spring by stratum - avg of yearly differences
 ggplot()+
   geom_sf(aes(fill=diff), data=seas_diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="(fall-spring)/fall")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "Blues", direction = 1)
+
+ggplot()+
+  geom_sf(aes(fill=diff), data=seas_diff_geom_wt)+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "Blues", direction = 1)
 
 # Jonah only (fall-spring)/fall by stratum - avg of yearly differences
 ggplot()+
+  geom_sf(aes(fill=mean_pdiff), data=seas_diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "Blues", direction = 1)
+
+ggplot()+
   geom_sf(aes(fill=med_pdiff), data=seas_diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "Blues", direction = 1)
 
 # Jonah and rock fall-spring by stratum - both methods
-ggplot()+
-  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom %>% dplyr::select(-med_pdiff)))+
-  facet_grid(avg~Species, labeller = labeller(Species = new))+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+# ggplot()+
+#   geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom %>% dplyr::select(-med_pdiff)))+
+#   facet_grid(avg~Species, labeller = labeller(Species = new))+
+#   labs(fill="fall-spring")+
+#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
 
 # Jonah only fall-spring by stratum - both methods
 ggplot()+

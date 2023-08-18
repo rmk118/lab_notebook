@@ -444,6 +444,7 @@ names(nb) = attr(nb, "region.id")
 names(nb)
 nbw <- nb2listw(nb, style = "W")
 
+library(gratia)
 # Global Moran's I
 gmoran <- moran.test(j_c_c_s_geom$avgCatch, nbw,
                      alternative = "greater")
@@ -454,10 +455,20 @@ gamm8 <- gamm(avgCatch ~ Region + s(Stratum, k=4, bs="cr"),
               correlation=corGaus(form=~ Region + Stratum),
               data=j_c_c_s %>% ungroup())
 
-draw(gamm8$gam)
+gamm8plot1 <- draw(gamm8$gam)+theme_bw()
+plot.para <- termplot(gamm8$gam, se = TRUE, plot = FALSE)
+
+gamm8plot2 <- ggplot(data=plot.para$Region)+
+  geom_line(aes(x=x,y=y))+
+ # ylim(-1,6)+
+geom_ribbon(data = plot.para$Region, aes(x = x, y =y, ymin = y-se, ymax = y+se), alpha = 0.2) +
+ labs(x="Region", y="Partial of region")+theme_bw()+ggtitle("Region")
+
+gamm8plot1+gamm8plot2 + plot_layout(ncol=2)
 
 summary(gamm8$gam)
 AIC(gamm8$lme)
+observed_fitted_plot(gamm8$gam)
 
 shapiro.test(resid(gamm8$lme, type="normalized"))
 Box.test(resid(gamm8$lme, type="normalized"), type="L")

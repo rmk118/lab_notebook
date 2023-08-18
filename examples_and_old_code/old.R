@@ -1119,7 +1119,7 @@ ggplot(data = complete_tidy_diff %>% filter(Type == "catch", Species != "scallop
   labs(x="Depth stratum")+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
 
-
+ 
 # catchTidy_strat_complete_j2 <- catchTidy_strat_complete_j %>% 
 #   mutate(temp = na.spline(temp),value = na.spline(value)) %>% 
 #   ungroup()#%>% 
@@ -1333,3 +1333,19 @@ arimaPlot_manual <- ggplot()+
   geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.80, ymax = Hi.80), fill = "blue", alpha = 0.4) +
   ylab("Catch")+scale_color_manual(values=c("blue"))
 arimaPlot_manual
+
+
+seas_diff_geom_wt <- catchTidy_strat_complete %>% filter(Type == "wt", Species == "jonah") %>% 
+  pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% 
+  mutate(pdiff = diff/Fall)
+
+seas_diff_geom_wt <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+                               seas_diff_geom_wt %>% group_by(Stratum) %>% 
+                                 summarise(diff = mean(diff, na.rm = TRUE), 
+                                           mean_pdiff=mean(pdiff, na.rm = TRUE),
+                                           med_pdiff = median(pdiff, na.rm=TRUE))) %>% 
+  mutate(avg = "avg of yearly diffs - wt")
+seas_diff_for_test_wt <- catchTidy_strat_complete %>% 
+  filter(Type == "wt", Species=="jonah", Year!=2003, Year!=2020)
+seas_diff_for_test_wt %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE)
+seas_diff_for_test_wt %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "g")
