@@ -490,3 +490,7 @@ plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
 # 
 # library(RLRsim)
 # exactRLRT(len1)
+
+# len3 <- gls(Diff ~ Stratum + Year * Region, data = int2,
+#     correlation = corExp(form = ~ (Region + Stratum)|Year))
+# summary(len3)

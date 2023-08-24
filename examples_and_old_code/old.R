@@ -1349,3 +1349,85 @@ seas_diff_for_test_wt <- catchTidy_strat_complete %>%
   filter(Type == "wt", Species=="jonah", Year!=2003, Year!=2020)
 seas_diff_for_test_wt %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE)
 seas_diff_for_test_wt %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "g")
+
+ggplot()+
+  geom_sf(aes(fill=diff), data=seas_diff_geom_wt)+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "Blues", direction = 1)
+
+# Jonah and rock fall-spring by stratum - avg of yearly differences
+# ggplot()+
+#   geom_sf(aes(fill=diff), data=seas_diff_geom)+
+#   facet_wrap(.~Species, labeller = labeller(Species = new))+
+#   labs(fill="fall-spring")+
+#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+seas_diff_for_test <- catchTidy_strat_complete %>% 
+  filter(Type == "catch", Species=="jonah", Year!=2003, Year!=2020)
+
+seas_diff_for_test %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE)
+seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "g")
+seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "l")
+
+seas_diff_geom1 %>%  na.omit() %>% group_by(Stratum) %>% 
+  wilcox_test(pdiff ~ 1, mu=0, alternative="l") %>%
+  adjust_pvalue(method = "holm") %>%
+  add_significance("p.adj")
+
+ggplot(data=seas_diff_geom1 %>% na.omit())+geom_histogram(aes(x=diff))+facet_wrap(~Stratum)
+ggplot(data=seas_diff_geom1 %>% na.omit())+geom_histogram(aes(x=pdiff))+facet_wrap(~Stratum)
+
+seas_diff_geom1 %>% na.omit() %>% group_by(Stratum) %>% shapiro_test(pdiff)
+
+diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
+                       catchTidy_strat_seas %>% st_drop_geometry() %>% 
+                         pivot_wider(names_from = "Season", id_cols = c("Stratum", "Species"), values_from = "value") %>%
+                         mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs") %>% 
+  mutate(pdiff = diff/Fall)
+
+# Jonah and rock crab fall-spring by stratum - diff of seasonal averages
+ggplot()+
+  geom_sf(aes(fill=diff), data=diff_geom)+
+  facet_wrap(.~Species, labeller = labeller(Species = new))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah only fall-spring by stratum - diff of seasonal averages
+ggplot()+
+  geom_sf(aes(fill=diff ), data=diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="fall-spring")+
+  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah only (fall-spring)/fall by stratum (percentage) - diff of averages
+ggplot()+
+  geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="(fall-spring)/fall")+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
+
+# Jonah and rock fall-spring by stratum - both methods
+# ggplot()+
+#   geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom %>% dplyr::select(-med_pdiff)))+
+#   facet_grid(avg~Species, labeller = labeller(Species = new))+
+#   labs(fill="fall-spring")+
+#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
+
+# Jonah only fall-spring by stratum - both methods
+ggplot()+
+  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)) %>% filter(Species=="jonah"), seas_diff_geom %>% filter(Species=="jonah")  %>% dplyr::select(-med_pdiff)))+
+  labs(fill="fall-spring")+
+  facet_wrap(~avg)+
+  theme(axis.text.x = element_text(size = 10))+
+  scale_fill_fermenter(palette = "BuPu", direction=1)+
+  theme_light()+
+  theme(strip.background = element_rect(color="grey37", fill="white"),
+        strip.text = element_text(color="black"))
+
+
+
+viridis_names <-c("magma", "inferno", "plasma", "viridis", "cividis", "rocket", "mako", "turbo")
+
+n <- 3
+par(mfrow=c(4,2), mar = c(1,1,1,1))
+f <- sapply(1:8, function(x) image(matrix(1:n, n, 1), col = viridis(n=n, option = LETTERS[x]), axes =FALSE, main = viridis_names[x]))

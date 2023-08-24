@@ -137,17 +137,44 @@ ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions
 ## Fig. 2 - Landings -----------------------------------------
 # Prep: poster and slides fig. 2 - Jonah crab landings in Maine
 landings <- read.csv("data/MaineDMR_Landings.csv")
+landings_all <- read.csv("data/MaineDMR_allCrabs.csv") %>% filter(year<2019)
+landings_all_mod <- read.csv("data/MaineDMR_all_crabs_modern.csv") %>% mutate(type="mod")
+
+landings_all <- rbind(landings_all %>% mutate(type="all_crab"), (landings %>% filter(species=="Crab Jonah") %>% dplyr::select(-species) %>% mutate(type="jonah")))
+landings_all <- rbind(landings_all, landings_all_mod)
+
 ggplot(data=landings)+geom_line(aes(x=year, y=total_weight, color=species))
 
+crab_landings <- ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value))+
+  theme_minimal()+
+  labs(x="Year", y="Total value ($)")+
+  scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
+  xlim(1950,2021)+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)),
+        text = element_text(size = 13))
 
-ggplot(data=landings %>% filter(species=="Crab Jonah"))+
+jonah_landings <- ggplot(data=landings %>% filter(species=="Crab Jonah"))+
   geom_line(aes(x=year, y=total_value))+
-  theme_classic()+
+  theme_minimal()+
   labs(x="Year", y="Total value ($)")+
   scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
   theme(axis.title.x = element_text(margin = margin(t = 10)),
         axis.title.y = element_text(margin = margin(r = 10)),
-        text = element_text(size = 14))
+        text = element_text(size = 13))
+
+# Paper figure 1
+ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value, lty=type))+
+  theme_minimal()+
+  labs(x="Year", y="Total value ($)")+
+  scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
+  xlim(1950,2023)+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)),
+        text = element_text(size = 15))+
+  scale_linetype_manual(name="",values=c(2,4,1),
+  labels=c('Crab uncl. (historical)', 'Jonah only', 'Jonah + rock + uncl. (modern)'))
+
 
 # Fig. 3 on poster is map of survey area
 # Fig. 3 on slides is Deyle et al., 2018 time delay diagram
@@ -516,10 +543,18 @@ areaStrat <- areaStrat %>% rename(rho = compute_stats.out_i.Observations..out_i.
 areaE <- rbind(areaE, areaStrat)
 
 ## Fig. 5C - E (multispatial) --------------------------------------------------
+library(viridis)
+
+reg_names <- c("NH/South", "Midcoast", "Penobscot", "MDI", "Downeast")
+names(reg_names) <- c(1,2,3,4,5)
+
+strat_names <- c("9-37m", "38-64m", "65-101m", ">101m")
+names(strat_names) <- c(1,2,3,4)
+
 # Figure 5C - with multispatial
 fig5c <- ggplot()+
   geom_line(data=areaE, aes(x=E, y=rho, color=method))+
-  facet_grid(Region~Stratum)+
+  facet_grid(Region~Stratum, labeller = labeller(Region = reg_names, Stratum=strat_names))+
   theme_light()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
   scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
@@ -529,7 +564,7 @@ fig5c <- ggplot()+
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))+
-  scale_color_brewer(palette = "Accent", name="Method", 
+ scale_color_brewer( name="Method",  palette = "Dark2",
   labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
                      guide = guide_legend(reverse = TRUE))
 fig5c
@@ -659,111 +694,35 @@ ggplot()+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))
 
-
-diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
-              catchTidy_strat_seas %>% st_drop_geometry() %>% pivot_wider(names_from = "Season", id_cols = c("Stratum", "Species"), values_from = "value") %>% 
-               mutate(diff = Fall-Spring)) %>% mutate(avg = "diff of yearly avgs") %>% 
-  mutate(pdiff = diff/Fall)
-
-# Jonah and rock crab fall-spring by stratum - diff of seasonal averages
-ggplot()+
-  geom_sf(aes(fill=diff), data=diff_geom)+
-  facet_wrap(.~Species, labeller = labeller(Species = new))+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
-
-# Jonah only fall-spring by stratum - diff of seasonal averages
-ggplot()+
-  geom_sf(aes(fill=diff ), data=diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
-
-# Jonah only (fall-spring)/fall by stratum (percentage) - diff of averages
-ggplot()+
-  geom_sf(aes(fill=pdiff), data=diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="(fall-spring)/fall")+
-  theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "GnBu", direction = "reverse")+theme_bw()
-
-seas_diff_geom1 <- catchTidy_strat_complete %>% filter(Type == "catch", Species != "scallop") %>% 
+seas_diff_geom1 <- catchTidy_strat_complete %>% filter(Type == "catch", Species =="jonah") %>% 
   pivot_wider(names_from = "Season", id_cols = c("Stratum", "Year", "Species"), values_from = "value") %>% mutate(diff = Fall-Spring)  %>% 
-  mutate(pdiff = diff/Fall) %>% filter(Species=="jonah")
-
-seas_diff_geom1 %>%  na.omit() %>% group_by(Stratum) %>% 
-  wilcox_test(pdiff ~ 1, mu=0, alternative="l") %>%
-  adjust_pvalue(method = "holm") %>%
-  add_significance("p.adj")
-
-ggplot(data=seas_diff_geom1 %>% na.omit())+geom_histogram(aes(x=pdiff))+facet_wrap(~Stratum)+xlim(-5,5)
+  mutate(pdiff = diff/Fall)
 
 seas_diff_geom <- left_join(regionsGrid_orig %>% mutate(Stratum = as.factor(Stratum)), 
                             seas_diff_geom1 %>% group_by(Stratum, Species) %>% 
-                              summarise(diff = mean(diff, na.rm = TRUE), 
+                              summarise(mean_diff = mean(diff, na.rm = TRUE), 
+                                        med_diff = median(diff, na.rm=TRUE),
                                         mean_pdiff=mean(pdiff, na.rm = TRUE),
                                         med_pdiff = median(pdiff, na.rm=TRUE))) %>% 
   mutate(avg = "avg of yearly diffs")
 
-
-# Jonah and rock fall-spring by stratum - avg of yearly differences
-# ggplot()+
-#   geom_sf(aes(fill=diff), data=seas_diff_geom)+
-#   facet_wrap(.~Species, labeller = labeller(Species = new))+
-#   labs(fill="fall-spring")+
-#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
-
-seas_diff_geom1 %>% na.omit() %>% group_by(Stratum) %>% shapiro_test(diff)
-
-seas_diff_for_test <- catchTidy_strat_complete %>% 
-  filter(Type == "catch", Species=="jonah", Year!=2003, Year!=2020)
-
-seas_diff_for_test %>% group_by(Stratum) %>% wilcox_test(value ~ Season, paired=TRUE)
-seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "g")
-seas_diff_for_test %>% filter(Stratum==1) %>% wilcox_test(value ~ Season, paired=TRUE, alternative = "l")
-
-# Jonah only fall-spring by stratum - avg of yearly differences
-ggplot()+
-  geom_sf(aes(fill=diff), data=seas_diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="fall-spring")+
+# Jonah only fall-spring by stratum - median
+abs_diff <- ggplot()+
+  geom_sf(aes(fill=med_diff), data=seas_diff_geom %>% filter(Species=="jonah"))+
+  labs(fill="Diff")+
   theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "Blues", direction = 1)
+  scale_fill_fermenter(palette = "Blues", direction = 1)+
+ ggtitle("Seasonal difference in catch/tow")
 
-ggplot()+
-  geom_sf(aes(fill=diff), data=seas_diff_geom_wt)+
-  labs(fill="fall-spring")+
-  theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "Blues", direction = 1)
-
-# Jonah only (fall-spring)/fall by stratum - avg of yearly differences
-ggplot()+
-  geom_sf(aes(fill=mean_pdiff), data=seas_diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="(fall-spring)/fall")+
-  theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "Blues", direction = 1)
-
-ggplot()+
+# Jonah only (fall-spring)/fall by stratum - median
+perc_diff <- ggplot()+
   geom_sf(aes(fill=med_pdiff), data=seas_diff_geom %>% filter(Species=="jonah"))+
-  labs(fill="(fall-spring)/fall")+
+  labs(fill="Perc. diff")+
   theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "Blues", direction = 1)
+  scale_fill_fermenter(palette = "Blues", direction = 1)+
+  ggtitle("Seasonal percent difference in catch/tow")
 
-# Jonah and rock fall-spring by stratum - both methods
-# ggplot()+
-#   geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)), seas_diff_geom %>% dplyr::select(-med_pdiff)))+
-#   facet_grid(avg~Species, labeller = labeller(Species = new))+
-#   labs(fill="fall-spring")+
-#   theme(axis.text.x = element_text(size = 10))+scale_fill_fermenter(palette = "RdBu")
-
-# Jonah only fall-spring by stratum - both methods
-ggplot()+
-  geom_sf(aes(fill=diff), data=rbind(diff_geom %>% dplyr::select(-c(Fall, Spring)) %>% filter(Species=="jonah"), seas_diff_geom %>% filter(Species=="jonah")  %>% dplyr::select(-med_pdiff)))+
-  labs(fill="fall-spring")+
-  facet_wrap(~avg)+
-  theme(axis.text.x = element_text(size = 10))+
-  scale_fill_fermenter(palette = "BuPu", direction=1)+
-  theme_light()+
-  theme(strip.background = element_rect(color="grey37", fill="white"),
-        strip.text = element_text(color="black"))
-
+abs_diff+perc_diff
 
 # Relative abundance ------------------------------------------------------
 regionsGrid_reg <- surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
@@ -777,11 +736,9 @@ ggplot(data = totals, aes(x=date, y=tot))+
 
 totals2 <- left_join(totals, totals %>% group_by(Year) %>% summarise(sum = sum(tot))) %>% 
   mutate(perc = tot/sum) %>% complete(Region, Stratum, Year, Season)
-  #mutate(across(where(is.numeric), replace_na,0))
 
 totals_geom <- left_join(regionsGrid_reg, totals2)
        
-
 ggplot(data = totals2 %>% filter(Season=="Fall"), aes(x=Region, y=Stratum, fill=perc))+
   geom_tile(color= "white",size=0.1)+
   facet_wrap(~Year)+scale_fill_viridis_c()
@@ -798,7 +755,6 @@ jplot1 <- ggplot(data = totals_geom %>% group_by(Region, Stratum) %>% summarise(
   scale_fill_viridis_c()+
   theme_light()
 
-            
 j_c_c_s<-j_cat_clean_seasons %>% group_by(Stratum, Region) %>%
   summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
             avgWt = mean(Expanded_Weight_kg, na.rm=TRUE))
