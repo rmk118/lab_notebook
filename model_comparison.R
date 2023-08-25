@@ -100,11 +100,13 @@ ggplot(data=tsdf)+geom_line(aes(x=date, y=value))
 
 EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44")
 
-PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3) #ballpark
+fig_rho <- PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3) #ballpark
 PredictNonlinear(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, #slightly more specific
                  theta="0.85 0.9 0.95 1 1.05 1.1") %>% filter(rho == max(rho))
  
 s_out <- SMap(dataFrame=tsdf, columns="value", target="value", lib = "1 30", pred="31 44", E=3, theta=1.05)
+
+
 
 ## ARIMA ----
 train <- 1:30
@@ -182,17 +184,28 @@ ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value, lty=type))+
 
 ## Fig. 5A - E (agg.)-----------------------------------------
 #Prep: Poster fig. 5 and slides 5a - Embedding dimension for aggregate catch
-fig <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
+fig_E <- EmbedDimension(dataFrame=tsdf, columns="value", target="value", lib = "1 44", pred="1 44")
 
-fig5a <- ggplot(data=fig, aes(x=E, y=rho))+
+fig5a <- ggplot(data=fig_E, aes(x=E, y=rho))+
   geom_line()+
   scale_x_continuous(breaks=seq(0,10,2))+
+  scale_y_continuous(limits = c(0,0.8))+
   theme_classic()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
   theme(text = element_text(size = 14))
 
+fig5a_2 <- ggplot(data=fig_rho, aes(x=Theta, y=rho))+
+  geom_line()+
+  theme_classic()+
+  scale_y_continuous(limits = c(0,0.8))+
+  labs(y="Prediction skill (\U03C1)", x="Theta")+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))+
+  theme(text = element_text(size = 14))
+
+fig5a+fig5a_2 + plot_annotation(tag_levels = 'A')
 
 ## Fig. 6 - EDM vs ARIMA -------------------------------------
 edm_df <- data.frame(obs = s_out$predictions$Observations[1:14], 

@@ -126,7 +126,7 @@ ggplot(data=sex_diff_agg, aes(x=Stratum, y=Diff))+
 
 sex_diff_geom_agg <- left_join(regionsGrid_orig, sex_diff_agg) #join to sf for visualization
 
-p1 <- ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))
+p1 <- ggplot(data=sex_diff_geom_agg)+geom_sf(aes(fill=Diff))+scale_fill_continuous(name="")
 
 p2 <- ggplot(data=sex_diff_geom %>% group_by(Stratum) %>% summarise(diff = mean(Diff)))+geom_sf(aes(fill=diff))
 p1+p2
