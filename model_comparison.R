@@ -122,17 +122,21 @@ arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
 
 # Compare stats - EDM has higher rho, lower error
 
-compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
+compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast) #rho=0.898
 
 # ASK ETHAN WHY THESE ARE DIFFERENT
 compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
-compute_stats(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
+compute_stats(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15]) #0.901
 ComputeError(s_out$predictions$Observations, s_out$predictions$Predictions)
 ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
 
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
-
+library(Metrics)
+rmse(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
+cor(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
+resids <- s_out$predictions$Observations[1:14]- s_out$predictions$Predictions[2:15]
+resids_arima <- s_out$predictions$Observations[1:14]- arima_preds$Point.Forecast
 
 # Poster figures ----------------------------------------------------------
 
@@ -567,6 +571,7 @@ names(strat_names) <- c(1,2,3,4)
 # Figure 5C - with multispatial
 fig5c <- ggplot()+
   geom_line(data=areaE, aes(x=E, y=rho, color=method))+
+  geom_abline(intercept = 0, slope = 0) +
   facet_grid(Region~Stratum, labeller = labeller(Region = reg_names, Stratum=strat_names))+
   theme_light()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
@@ -765,8 +770,9 @@ ggplot(data = totals_no_time, aes(x=Region, y=Stratum, fill=perc))+
 
 jplot1 <- ggplot(data = totals_geom %>% group_by(Region, Stratum) %>% summarise(perc = mean(perc, na.rm=TRUE)))+
   geom_sf(aes(fill=perc))+
-  scale_fill_viridis_c()+
-  theme_light()
+  labs(fill="Perc. total catch")+
+  scale_fill_viridis_c()
+#theme_light()
 
 j_c_c_s<-j_cat_clean_seasons %>% group_by(Stratum, Region) %>%
   summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
@@ -776,7 +782,7 @@ j_c_c_s_geom <- left_join(regionsGrid_reg, j_c_c_s)
 
 jplot2 <- ggplot(data=j_c_c_s_geom)+geom_sf(aes(fill=avgCatch))+
   scale_fill_viridis_c()+
-  theme_light()
+  labs(fill="Avg catch/tow")
 
 j_c_c_s_geom_no_time <- left_join(regionsGrid_reg, totals_no_time)
 
@@ -791,9 +797,9 @@ totals_no_time_strat <- totals_no_time_strat %>% mutate(perc = tot/s_strat)
 
 jplot4 <- ggplot(data=left_join(regionsGrid_orig,totals_no_time_strat))+
   geom_sf(aes(fill=perc))+
- # scale_fill_fermenter(palette = "Blues", direction="reverse")+
-  scale_fill_viridis_c()+
-  theme_light()
+  labs(fill="Perc. total catch")+
+  scale_fill_viridis_c()
+ # theme_light()
 
 # Jonah only, avg catch/tow
 jplot5 <-ggplot()+
@@ -801,7 +807,12 @@ jplot5 <-ggplot()+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))+
  # scale_fill_fermenter(palette = "Blues", direction="reverse")+
-  scale_fill_viridis_c()+
-  theme_light()
+  scale_fill_viridis_c()
 
-(jplot1 + jplot2)/(jplot4+jplot5)
+jplot1 + jplot2 +jplot4+jplot5 +
+  plot_annotation(tag_levels = 'A') + plot_layout(ncol=2) & 
+  theme(plot.margin = margin(t = 0.2,  # Top margin
+                     r = 0.2,  # Right margin
+                     b = 0.3,  # Bottom margin
+                     l = 0.2,  # Left margin
+                     unit = "cm"))

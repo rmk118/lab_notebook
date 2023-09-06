@@ -455,14 +455,23 @@ gamm8 <- gamm(avgCatch ~ Region + s(Stratum, k=4, bs="cr"),
               correlation=corGaus(form=~ Region + Stratum),
               data=j_c_c_s %>% ungroup())
 
-gamm8plot1 <- draw(gamm8$gam)+theme_bw()
+gamm8plot1 <- draw(gamm8$gam)+
+  theme_bw()+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)),
+        text = element_text(size = 13))
+
 plot.para <- termplot(gamm8$gam, se = TRUE, plot = FALSE)
 
 gamm8plot2 <- ggplot(data=plot.para$Region)+
   geom_line(aes(x=x,y=y))+
- # ylim(-1,6)+
 geom_ribbon(data = plot.para$Region, aes(x = x, y =y, ymin = y-se, ymax = y+se), alpha = 0.2) +
- labs(x="Region", y="Partial of region")+theme_bw()+ggtitle("Region")
+ labs(x="Region", y="Partial effect")+
+  theme_bw()+
+  ggtitle("Region")+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10, l=20)),
+        text = element_text(size = 13))
 
 gamm8plot1+gamm8plot2 + plot_layout(ncol=2)
 

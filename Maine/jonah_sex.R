@@ -172,6 +172,7 @@ summary(len4)
 tidy(len4)
 
 r.squaredLR(len4)
+r.squaredLR(len1)
 acf(resid(len4, type="normalized"))
 Box.test(residuals(len4, type="normalized"), type="L")
 shapiro.test(resid(len4, type="normalized"))
@@ -330,14 +331,14 @@ plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
 # tidy(gls1_ml)
 # tidy(len1_ml)
 
-# len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
-# summary(len1)
-# plot(len1)
-# shapiro.test(residuals(len1, type="normalized"))
-# Box.test(residuals(len1, type="normalized"), type="L")
-# acf(resid(len1, type="normalized"))
-# pacf(residuals(len1, type="normalized"))
-# 
+len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
+summary(len1)
+plot(len1)
+shapiro.test(residuals(len1, type="normalized"))
+Box.test(residuals(len1, type="normalized"), type="L")
+acf(resid(len1, type="normalized"))
+pacf(residuals(len1, type="normalized"))
+
 # plot(len1, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
 # plot(len1, resid(.) ~ fitted(.) | Region, abline = 0, cex = 0.3)
 # plot(len1, resid(.) ~ Year, abline = 0, cex = 0.3)
@@ -369,10 +370,10 @@ plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
 
 # gls1 <- gls(Diff ~ Stratum + Year + Region, data=int2, corr=corAR1(form =  ~Year|Stratum/Region))
 # gls2 <- gls(Diff ~ Stratum + Region + Year, correlation = corAR1(), data = int2)
-# len1 <- lme(Diff ~ Stratum + Year + Region, random = ~ 1|len, data = int2, correlation = corAR1())
-# 
+
+# # 
 # summary(len1)
-# plot(gls1)
+#plot(gls1)
 # 
 # anova(gls1, gls2)
 # anova(gls1, gls2, len1, len2, len4)
@@ -453,44 +454,41 @@ plot(len1, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
 #   geom_smooth(method="lm", se=FALSE)+
 #   facet_grid(Stratum~Region)
 # 
-# fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
-#   geom_point(size=1)+
-#   geom_smooth(method="gam", aes(color="GAM"))+
-#   stat_poly_line(method="rlm",  aes(color="RLM"))+
-#   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
-#   theme_classic()+
-#   ylim(110,170)+
-#   labs(x="Years since 2005", y="Time elapsed (days)")+
-#   scale_colour_manual(name="legend", values=c("blue", "red"))
-# fig1a
-# 
-# fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
-#   geom_point(size=1)+
-#   geom_smooth(method="gam",  aes(color="GAM"))+
-#   stat_poly_line(method="rlm",  aes(color="RLM"))+
-#   stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
-#   theme_classic()+
-#   ylim(110,170)+
-#   labs(x="Years since 2005",y="")+
-#   scale_colour_manual(name="legend", values=c("blue", "red"))
-# fig1b
-# 
-# (fig1a + fig1b) + 
-#   plot_layout(guides = 'collect') +
-#   plot_annotation(tag_levels = 'A') & 
-#   theme(plot.tag = element_text(size = 12)) &
-#   theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
-#         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-#         axis.title = element_text(size = 12),
-#         axis.text = element_text(size = 12),
-#         axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
+fig1a <- ggplot(int2, aes(x=Year-2005, y=len))+
+  geom_point(size=1)+
+  geom_smooth(method="gam", aes(color="GAM"))+
+  stat_poly_line(method="rlm",  aes(color="RLM"))+
+  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
+  theme_classic()+
+  ylim(110,170)+
+  labs(x="Years since 2005", y="Time elapsed (days)")+
+  scale_colour_manual(name="legend", values=c("blue", "red"))
+ fig1a
+
+fig1b <- ggplot(int2 %>% group_by(Year) %>% summarise(len=mean(len)), aes(x=Year-2005, y=len))+
+  geom_point(size=1)+
+  geom_smooth(method="gam",  aes(color="GAM"))+
+  stat_poly_line(method="rlm",  aes(color="RLM"))+
+  stat_poly_eq(method="rlm",aes(label = paste(after_stat(eq.label))), label.y=0.3)+
+  theme_classic()+
+  ylim(110,170)+
+  labs(x="Years since 2005",y="")+
+  scale_colour_manual(name="legend", values=c("blue", "red"))
+fig1b
+
+(fig1a + fig1b) +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 12)) &
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        axis.text.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
 # 
 # rlm(data = int2, len ~ Year)
-# rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
-# 
-# library(RLRsim)
-# exactRLRT(len1)
+#rlm(data = int2 %>% mutate(yr = Year-2005), len ~ yr)
+## 
+library(RLRsim)
+exactRLRT(len1)
 
-# len3 <- gls(Diff ~ Stratum + Year * Region, data = int2,
-#     correlation = corExp(form = ~ (Region + Stratum)|Year))
-# summary(len3)
