@@ -1,7 +1,7 @@
 # Comparing EDM models to linear models + Poster/presentation figures
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Aug 17, 2023
+# Last modified: Sep 13, 2023
 
 #Load packages
 library(tidyverse)
@@ -570,8 +570,8 @@ names(strat_names) <- c(1,2,3,4)
 
 # Figure 5C - with multispatial
 fig5c <- ggplot()+
+  geom_abline(intercept = 0, slope = 0, lty=2) +
   geom_line(data=areaE, aes(x=E, y=rho, color=method))+
-  geom_abline(intercept = 0, slope = 0) +
   facet_grid(Region~Stratum, labeller = labeller(Region = reg_names, Stratum=strat_names))+
   theme_light()+
   labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
