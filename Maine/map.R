@@ -35,14 +35,21 @@ factpalStrat <- colorFactor(palette=c(palStrat), domain=surveyGrid$Stratum)
 labelRegions <- c("1: NH & S. Maine", "2: Mid-Coast", "3: Penobscot Bay", "4: Mt. Desert Area", "5: Downeast Maine")
 labelStrat <- c("1: 9-37 m", "2: 38-64 m", "3: 65-101 m", "4: 101+ m")
 
+#base map options
+# Esri.WorldTerrain
+# CartoDB.Voyager
+# Esri.WorldShadedRelief
+# Stamen.TerrainBackground - least fav
+
 surveyMap <- leaflet(surveyGrid, options = leafletOptions(zoomControl = FALSE)) %>%
-  addProviderTiles(providers$CartoDB.Voyager) %>%
+  addProviderTiles(providers$Esri.WorldTerrain) %>%
   addPolygons(stroke=FALSE,
               color = ~ factpalArea(Area),
     fillOpacity = 1
   )  %>%
   addLegend("bottomright",colors = palReg, opacity = 1, labels= labelRegions, title="Region") %>%
   addLegend("bottomright", colors=palStrat, labels = labelStrat, opacity = 1, title="Depth Stratum")
+surveyMap
 
 png_fl = tempfile(fileext = ".png")
 mapshot(surveyMap, file = png_fl)
