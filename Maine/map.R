@@ -54,3 +54,15 @@ surveyMap
 png_fl = tempfile(fileext = ".png")
 mapshot(surveyMap, file = png_fl)
 browseURL(png_fl)
+
+states <-st_read("~/Downloads/lab_notebook/data/US_State_Boundaries/US_State_Boundaries.shp") #CRS: WGS 84/EPSG 4326
+
+leaflet(surveyGrid, options = leafletOptions(zoomControl = FALSE)) %>%
+  addProviderTiles(providers$Esri.WorldTerrain) %>%
+  addPolygons(stroke=FALSE,
+              color = ~ factpalArea(Area),
+              fillOpacity = 1
+  )  %>% 
+  addPolylines(data=states,color="black", weight=5 ) %>% 
+  addLegend("bottomright",colors = palReg, opacity = 1, labels= labelRegions, title="Region") %>%
+  addLegend("bottomright", colors=palStrat, labels = labelStrat, opacity = 1, title="Depth Stratum")
