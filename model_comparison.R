@@ -1,13 +1,14 @@
 # Comparing EDM models to linear models + Poster/presentation figures
 # Example: Jonah crab abundance in the Gulf of Maine
 # Ruby Krasnow
-# Last modified: Sep 13, 2023
+# Last modified: March 5, 2024
 
 #Load packages
 library(tidyverse)
 library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(scales) #plot scales
+library(viridis) #color palettes
 library(sf) #spatial analysis
 library(Metrics) #for r-squared
 library(mgcv) #GAMs
@@ -24,8 +25,8 @@ library(zoo)
 #Import data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #Jonah crab catch data
-#df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #Scallop catch data
-#df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #Atlantic rock crab catch data
+df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #Scallop catch data
+df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #Atlantic rock crab catch data
 
 # Remove unused columns
 cleanCatch <- function(x) {
@@ -39,11 +40,11 @@ cleanCatch <- function(x) {
     mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused")
 }
 
-# s_cat_clean_seasons <- cleanCatch(df_s_cat) %>% 
-#   mutate(Common_Name = "Scallop")
-# 
-# r_cat_clean_seasons <- cleanCatch(df_r_cat) %>% 
-#   mutate(Common_Name = "Rock")
+s_cat_clean_seasons <- cleanCatch(df_s_cat) %>%
+  mutate(Common_Name = "Scallop")
+
+r_cat_clean_seasons <- cleanCatch(df_r_cat) %>%
+  mutate(Common_Name = "Rock")
 
 j_cat_clean_seasons <- cleanCatch(df_j_cat) %>% 
   mutate(Common_Name = "Jonah")
@@ -59,8 +60,8 @@ summaryAgg <- function(df) {
 
 #computes averages
 j_cat_agg <- summaryAgg(j_cat_clean_seasons)
-# r_cat_agg <- summaryAgg(r_cat_clean_seasons)
-# s_cat_agg <- summaryAgg(s_cat_clean_seasons)
+r_cat_agg <- summaryAgg(r_cat_clean_seasons)
+s_cat_agg <- summaryAgg(s_cat_clean_seasons)
 
 catch_agg <- s_cat_agg %>% 
   left_join(j_cat_agg, by=c("Season", "Year", "temp"), suffix = c("_s", "_j"))
@@ -130,13 +131,11 @@ arima_preds <- data.frame(forecast(fit_train, h=14)) %>% mutate(yrs = yrs)
 
 # Compare stats - EDM has higher rho, lower error
 
-compute_stats(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast) #rho=0.898
+ComputeError(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast) #rho=0.898
 
 # ASK ETHAN WHY THESE ARE DIFFERENT
-compute_stats(s_out$predictions$Observations, s_out$predictions$Predictions)
-compute_stats(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15]) #0.901
-ComputeError(s_out$predictions$Observations, s_out$predictions$Predictions)
-ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
+ComputeError(s_out$predictions$Observations, s_out$predictions$Predictions) #0.77
+ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15]) #0.901
 
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
@@ -149,45 +148,45 @@ resids_arima <- s_out$predictions$Observations[1:14]- arima_preds$Point.Forecast
 # Poster figures ----------------------------------------------------------
 
 ## Fig. 2 - Landings -----------------------------------------
-# Prep: poster and slides fig. 2 - Jonah crab landings in Maine
-landings <- read.csv("data/MaineDMR_Landings.csv")
-landings_all <- read.csv("data/MaineDMR_allCrabs.csv") %>% filter(year<2019)
-landings_all_mod <- read.csv("data/MaineDMR_all_crabs_modern.csv") %>% mutate(type="mod")
-
-landings_all <- rbind(landings_all %>% mutate(type="all_crab"), (landings %>% filter(species=="Crab Jonah") %>% dplyr::select(-species) %>% mutate(type="jonah")))
-landings_all <- rbind(landings_all, landings_all_mod)
-
-ggplot(data=landings)+geom_line(aes(x=year, y=total_weight, color=species))
-
-crab_landings <- ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value))+
-  theme_minimal()+
-  labs(x="Year", y="Total value ($)")+
-  scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
-  xlim(1950,2021)+
-  theme(axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)),
-        text = element_text(size = 13))
-
-jonah_landings <- ggplot(data=landings %>% filter(species=="Crab Jonah"))+
-  geom_line(aes(x=year, y=total_value))+
-  theme_minimal()+
-  labs(x="Year", y="Total value ($)")+
-  scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
-  theme(axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)),
-        text = element_text(size = 13))
-
-# Paper figure 1
-ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value, lty=type))+
-  theme_minimal()+
-  labs(x="Year", y="Total value ($)")+
-  scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
-  xlim(1950,2023)+
-  theme(axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)),
-        text = element_text(size = 15))+
-  scale_linetype_manual(name="",values=c(2,4,1),
-  labels=c('Crab uncl. (historical)', 'Jonah only', 'Jonah + rock + uncl. (modern)'))
+# # Prep: poster and slides fig. 2 - Jonah crab landings in Maine
+# landings <- read.csv("data/MaineDMR_Landings.csv")
+# landings_all <- read.csv("data/MaineDMR_allCrabs.csv") %>% filter(year<2019)
+# landings_all_mod <- read.csv("data/MaineDMR_all_crabs_modern.csv") %>% mutate(type="mod")
+# 
+# landings_all <- rbind(landings_all %>% mutate(type="all_crab"), (landings %>% filter(species=="Crab Jonah") %>% dplyr::select(-species) %>% mutate(type="jonah")))
+# landings_all <- rbind(landings_all, landings_all_mod)
+# 
+# ggplot(data=landings)+geom_line(aes(x=year, y=total_weight, color=species))
+# 
+# crab_landings <- ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value))+
+#   theme_minimal()+
+#   labs(x="Year", y="Total value ($)")+
+#   scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
+#   xlim(1950,2021)+
+#   theme(axis.title.x = element_text(margin = margin(t = 10)),
+#         axis.title.y = element_text(margin = margin(r = 10)),
+#         text = element_text(size = 13))
+# 
+# jonah_landings <- ggplot(data=landings %>% filter(species=="Crab Jonah"))+
+#   geom_line(aes(x=year, y=total_value))+
+#   theme_minimal()+
+#   labs(x="Year", y="Total value ($)")+
+#   scale_y_continuous(limits=c(0,2E6), breaks=seq(0,2E6, 5E5) , expand=c(0,0), labels=comma)+
+#   theme(axis.title.x = element_text(margin = margin(t = 10)),
+#         axis.title.y = element_text(margin = margin(r = 10)),
+#         text = element_text(size = 13))
+# 
+# # Paper figure 1
+# ggplot(data=landings_all)+geom_line(aes(x=year, y=total_value, lty=type))+
+#   theme_minimal()+
+#   labs(x="Year", y="Total value ($)")+
+#   scale_y_continuous(limits=c(0,4.5E6), breaks=seq(0,5E6, 1E6) , expand=c(0,0), labels=comma)+
+#   xlim(1950,2023)+
+#   theme(axis.title.x = element_text(margin = margin(t = 10)),
+#         axis.title.y = element_text(margin = margin(r = 10)),
+#         text = element_text(size = 15))+
+#   scale_linetype_manual(name="",values=c(2,4,1),
+#   labels=c('Crab uncl. (historical)', 'Jonah only', 'Jonah + rock + uncl. (modern)'))
 
 
 # Fig. 3 on poster is map of survey area
@@ -523,12 +522,12 @@ areaReg <- pmap_dfr(areaList_E, function(E, reg, strat) {
                    columns=columns_i,
                    embedded=TRUE,
                    E=E)
-  out <- data.frame(compute_stats(out_i$Observations, out_i$Predictions)$rho) %>% 
+  out <- data.frame(ComputeError(out_i$Observations, out_i$Predictions)$rho) %>% 
     mutate(E = E, Region = reg, Stratum = strat) 
   out
   
 })
-areaReg <- areaReg %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_reg_in_strat")
+areaReg <- areaReg %>% rename(rho = ComputeError.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_reg_in_strat")
 
 areaE <- rbind(areaE, areaReg)
 
@@ -557,18 +556,18 @@ areaStrat <- pmap_dfr(areaList_E, function(E, reg, strat) {
                    columns=columns_i,
                    embedded=TRUE,
                    E=E)
-  out <- data.frame(compute_stats(out_i$Observations, out_i$Predictions)$rho) %>% 
+  out <- data.frame(ComputeError(out_i$Observations, out_i$Predictions)$rho) %>% 
     mutate(E = E, Region = reg, Stratum = strat) 
   out
   
 })
 
-areaStrat <- areaStrat %>% rename(rho = compute_stats.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_strat_in_reg")
+areaStrat <- areaStrat %>% rename(rho = ComputeError.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_strat_in_reg")
 
 areaE <- rbind(areaE, areaStrat)
 
 ## Fig. 5C - E (multispatial) --------------------------------------------------
-library(viridis)
+
 
 reg_names <- c("NH/South", "Midcoast", "Penobscot", "MDI", "Downeast")
 names(reg_names) <- c(1,2,3,4,5)
@@ -753,8 +752,10 @@ abs_diff+perc_diff
 # Relative abundance ------------------------------------------------------
 regionsGrid_reg <- surveyGrid %>% group_by(Region, Stratum) %>% summarise(num = n_distinct(GridID))
 
-totals <- df_j_cat %>% group_by(Year, Season, Region, Stratum) %>% summarise(tot = sum(Expanded_Catch))  %>%
-  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% ungroup() %>% mutate(date = as.POSIXct(date)) %>% filter(Year > 2002)
+totals <- df_j_cat %>% group_by(Year, Season, Region, Stratum) %>% 
+  summarise(tot = sum(Expanded_Catch))  %>%
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% ungroup() %>% 
+  mutate(date = as.POSIXct(date)) %>% filter(Year > 2002)
 
 ggplot(data = totals, aes(x=date, y=tot))+
   geom_line()+
@@ -780,7 +781,6 @@ jplot1 <- ggplot(data = totals_geom %>% group_by(Region, Stratum) %>% summarise(
   geom_sf(aes(fill=perc))+
   labs(fill="Perc. total catch")+
   scale_fill_viridis_c()
-#theme_light()
 
 j_c_c_s<-j_cat_clean_seasons %>% group_by(Stratum, Region) %>%
   summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
@@ -792,12 +792,12 @@ jplot2 <- ggplot(data=j_c_c_s_geom)+geom_sf(aes(fill=avgCatch))+
   scale_fill_viridis_c()+
   labs(fill="Avg catch/tow")
 
-j_c_c_s_geom_no_time <- left_join(regionsGrid_reg, totals_no_time)
-
-jplot3 <- ggplot(data=j_c_c_s_geom_no_time)+geom_sf(aes(fill=perc))+scale_fill_viridis_c()
-
-(jplot1 + jplot3) / jplot2
-jplot1 + jplot2
+# j_c_c_s_geom_no_time <- left_join(regionsGrid_reg, totals_no_time)
+# 
+# jplot3 <- ggplot(data=j_c_c_s_geom_no_time)+geom_sf(aes(fill=perc))+scale_fill_viridis_c()
+# 
+# (jplot1 + jplot3) / jplot2
+# jplot1 + jplot2
 
 totals_no_time_strat<- df_j_cat %>% group_by(Stratum) %>% summarise(tot = sum(Expanded_Catch))
 s_strat <- sum(totals_no_time_strat$tot)
@@ -807,14 +807,12 @@ jplot4 <- ggplot(data=left_join(regionsGrid_orig,totals_no_time_strat))+
   geom_sf(aes(fill=perc))+
   labs(fill="Perc. total catch")+
   scale_fill_viridis_c()
- # theme_light()
 
 # Jonah only, avg catch/tow
 jplot5 <-ggplot()+
   geom_sf(aes(fill=value), data=regionsGrid_no_seas %>% filter(Species=="jonah"))+
   labs(fill="Avg catch/tow")+
   theme(axis.text.x = element_text(size = 10))+
- # scale_fill_fermenter(palette = "Blues", direction="reverse")+
   scale_fill_viridis_c()
 
 jplot1 + jplot2 +jplot4+jplot5 +

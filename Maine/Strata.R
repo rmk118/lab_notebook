@@ -8,6 +8,10 @@ library(patchwork) #combining plots
 library(viridis)
 library(rEDM) #EDM
 library(mgcv) #GAMs
+library(gratia)
+library(sf)
+library(MuMIn)
+library(spdep)
 
 # Time series packages
 library(tseries)
@@ -52,7 +56,7 @@ s_cat_clean_seasons <- s_cat_clean_seasons %>% select(all_of(colOrder))
 
 
 # Strata analysis ---------------------------------------------------------
-library(sf)
+
 surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
 
 surveyGrid <- surveyGrid %>% 
@@ -224,7 +228,7 @@ findSpeciesGroups_both(catchTidy_reg_complete_j1, type="catch", g="Region", spec
 # Catch model testing -----------------------------------------------------
 
 #j_cat_area is from model_comparison.R
-library(mgcv)
+
 ## With year ---------------------------------------------------------------
 # 
 # lm1 <- lm(log(avgCatch+1) ~ Year + Region + Stratum + Season + temp, data=j_cat_area %>% na.omit())
@@ -329,10 +333,6 @@ gamm6 <- gamm(avgCatch ~ Region + s(Stratum, k=4) , correlation=corARMA(p=2),dat
 gamm7 <- gamm(avgCatch ~ Region + s(Stratum, k=4) , correlation=corGaus(form=~ Region + Stratum),
               data=j_c_c_s %>% ungroup())
 
-
-
-
-
 ### Poisson -----------------------------------------------------------------
 
 j <- j_cat_clean_seasons %>%
@@ -429,9 +429,6 @@ acf(resid(gam_mrf2$lme, type="normalized"))
 # summary(lme1)
 # r2(lme1)
 
-library(MuMIn)
-library(spdep)
-
 # no temporal
 # gamm8 for simple confirmation of spatial differences, minimal representation of nonlinearity with smooth term, account for spatial autocorrelation, still satisfy regression assumptions (shapiro-wilk, bptest)
 
@@ -444,7 +441,7 @@ names(nb) = attr(nb, "region.id")
 names(nb)
 nbw <- nb2listw(nb, style = "W")
 
-library(gratia)
+
 # Global Moran's I
 gmoran <- moran.test(j_c_c_s_geom$avgCatch, nbw,
                      alternative = "greater")

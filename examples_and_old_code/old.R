@@ -1699,3 +1699,18 @@ f <- sapply(1:8, function(x) image(matrix(1:n, n, 1), col = viridis(n=n, option 
 ## 
 #library(RLRsim)
 #exactRLRT(len1)
+
+
+
+# from model_comparison.R -------------------------------------------------
+
+# catch2 <- catch1 %>% group_by(Year, Season, Region, Stratum) %>% 
+#   summarise(tot = sum(Expanded_Catch))  %>%
+#   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% ungroup() %>% 
+#   mutate(date = as.POSIXct(date))
+# 
+# totals <- catch2 %>% left_join(catch2 %>% group_by(Year) %>% summarise(sum = sum(tot))) %>% 
+#   mutate(perc = tot/sum) %>% 
+#   complete(Region, Stratum, Year, Season)
+
+# totals_geom <- left_join(regionsGrid, totals)
