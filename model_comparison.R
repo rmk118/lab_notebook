@@ -9,8 +9,10 @@ library(lubridate) #date formatting
 library(patchwork) #combining plots
 library(scales) #plot scales
 library(sf) #spatial analysis
+library(Metrics) #for r-squared
+library(mgcv) #GAMs
 library(car)
-library(mgcv)
+
 
 ## Time series packages
 library(rEDM) #EDM
@@ -22,8 +24,8 @@ library(zoo)
 #Import data
 df_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
 df_j_cat<- read.csv("data/Maine_inshore_trawl/MEjonahCatch.csv") #Jonah crab catch data
-df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #Scallop catch data
-df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #Atlantic rock crab catch data
+#df_s_cat<- read.csv("data/Maine_inshore_trawl/MEscallopCatch.csv") #Scallop catch data
+#df_r_cat<- read.csv("data/Maine_inshore_trawl/MErockCatch.csv") #Atlantic rock crab catch data
 
 # Remove unused columns
 cleanCatch <- function(x) {
@@ -37,11 +39,11 @@ cleanCatch <- function(x) {
     mutate(Stratum = Depth_Stratum, Date = date(ymd_hms(Start_Date)), .keep="unused")
 }
 
-s_cat_clean_seasons <- cleanCatch(df_s_cat) %>% 
-  mutate(Common_Name = "Scallop")
-
-r_cat_clean_seasons <- cleanCatch(df_r_cat) %>% 
-  mutate(Common_Name = "Rock")
+# s_cat_clean_seasons <- cleanCatch(df_s_cat) %>% 
+#   mutate(Common_Name = "Scallop")
+# 
+# r_cat_clean_seasons <- cleanCatch(df_r_cat) %>% 
+#   mutate(Common_Name = "Rock")
 
 j_cat_clean_seasons <- cleanCatch(df_j_cat) %>% 
   mutate(Common_Name = "Jonah")
@@ -57,13 +59,17 @@ summaryAgg <- function(df) {
 
 #computes averages
 j_cat_agg <- summaryAgg(j_cat_clean_seasons)
-r_cat_agg <- summaryAgg(r_cat_clean_seasons)
-s_cat_agg <- summaryAgg(s_cat_clean_seasons)
+# r_cat_agg <- summaryAgg(r_cat_clean_seasons)
+# s_cat_agg <- summaryAgg(s_cat_clean_seasons)
 
-catch_agg <- s_cat_agg %>% left_join(j_cat_agg, by=c("Season", "Year", "temp"), suffix = c("_s", "_j"))
+catch_agg <- s_cat_agg %>% 
+  left_join(j_cat_agg, by=c("Season", "Year", "temp"), suffix = c("_s", "_j"))
 
-catch_agg <- catch_agg %>% left_join(r_cat_agg, by=c("Season", "Year", "temp")) %>% 
-  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused") %>% ungroup() %>% complete(Season, Year)
+catch_agg <- catch_agg %>% 
+  left_join(r_cat_agg, by=c("Season", "Year", "temp")) %>% 
+  mutate(avgCatch_r = avgCatch,avgWt_r = avgWt, .keep="unused") %>% 
+  ungroup() %>% 
+  complete(Season, Year)
 
 catchTidy_agg <- pivot_longer(catch_agg, 
                               cols = starts_with("avg")) %>% 
@@ -85,7 +91,9 @@ catch_agg <- catch_agg %>%
   mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) %>% 
   filter(Year > 2000)
 
-ts1 <- ts(catchTidy_agg %>% filter(Species=="jonah", Type=="catch") %>% mutate(date=as.Date(date)) %>% arrange(date), frequency = 2, start=c(2001, 1))
+ts1 <- ts(catchTidy_agg %>% filter(Species=="jonah", Type=="catch") %>% 
+            mutate(date=as.Date(date)) %>% 
+            arrange(date), frequency = 2, start=c(2001, 1))
 
 ts1<- na.spline(ts1) #using na.spline produces better EDM results than linear interpolation via na.approx
 
@@ -132,7 +140,7 @@ ComputeError(s_out$predictions$Observations[1:14], s_out$predictions$Predictions
 
 (tsdf[31:44, "value"] == s_out$predictions$Observations[1:14]) #sanity check
 
-library(Metrics)
+
 rmse(s_out$predictions$Observations[1:14], s_out$predictions$Predictions[2:15])
 cor(s_out$predictions$Observations[1:14], arima_preds$Point.Forecast)
 resids <- s_out$predictions$Observations[1:14]- s_out$predictions$Predictions[2:15]
