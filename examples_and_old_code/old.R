@@ -1714,3 +1714,32 @@ f <- sapply(1:8, function(x) image(matrix(1:n, n, 1), col = viridis(n=n, option 
 #   complete(Region, Stratum, Year, Season)
 
 # totals_geom <- left_join(regionsGrid, totals)
+
+# Fig. 8 - EDM vs ARIMA using 2024 data -------------------------------------
+
+train <- 1:30
+fit_train <- auto.arima(catch_ts[train,"avgCatch"])
+summary(fit_train)
+checkresiduals(fit_train)
+
+arima_preds <- data.frame(forecast(fit_train, h=16))
+ComputeError(smap_out$predictions$Observations[1:16], arima_preds$Point.Forecast) #rho=0.02
+
+arimaPlot_manual <- ggplot()+
+  geom_path(data = data.frame(catch_ts), aes(x = index(catch_ts), y = avgCatch), linewidth=0.6) +
+  geom_path(data = arima_preds, aes(x=yrs, y=Point.Forecast,color="ARIMA"), linewidth=0.7)+
+  geom_ribbon(data = arima_preds, aes(x = yrs, y = Point.Forecast, ymin = Lo.95, ymax = Hi.95), fill = "#c93237", alpha = 0.2) +
+  labs(x="Year", y="Avg. catch/tow")+
+  scale_color_manual(values=c("#c93237"), name="")+
+  ylim(c(-8, 45))+
+  theme_classic()+
+  theme(text = element_text(size=12),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(0,10,0,0)))
+arimaPlot_manual
+
+# Figure 6 (poster) combined A and B
+(edmPlot_manual/arimaPlot_manual) +
+  plot_layout(guides = 'collect')+
+  plot_annotation(tag_levels = 'A')
+

@@ -10,7 +10,7 @@
 library(tidyverse)
 library(lubridate) #date formatting
 library(mgcv) #Generalized Additive Models (GAMs)
-
+library(broom.mixed) #for tidy model output
 
 #plotting
 library(patchwork) #combining plots
@@ -242,3 +242,128 @@ abs_diff+perc_diff+
   plot_annotation(tag_levels = 'A')
 
 # Fig. 6 - Sex ratio -----------------------------------------------------------
+
+# Import data
+raw_len<- read.csv("data/Maine_inshore_trawl/jonahLength2024.csv") #jonah crab length and sex data
+
+length1 <- raw_len %>% 
+  filter(Year > 2003) %>% 
+  dplyr::select(c("Season", "Year", "Tow_Number", "Region", "Stratum", "Frequency", "Sex")) %>% 
+  arrange(Season, Year, Stratum, Region, Tow_Number)
+
+length_complete <- length1 %>% 
+  group_by(Season, Year, Region, Stratum) %>% 
+  complete(Sex, Tow_Number) #makes implicit NAs explicit by filling in all combinations of tow number and sex
+
+length_complete <- length_complete %>% 
+  group_by(Season, Year, Region, Stratum, Tow_Number, Sex) %>% 
+  mutate(Num_Each_Sex = cumsum(Frequency)) %>% #add up the number of crabs caught per tow of each sex
+  slice_tail()  %>% #retrieve the total
+  replace(is.na(.),0) %>% filter(Sex %in% c("Male", "Female"))
+
+length_perc <- length_complete %>%
+  group_by(Season, Year, Region, Stratum, Tow_Number) %>% 
+  mutate(Total = cumsum(Num_Each_Sex)) %>% #add both sexes to find the total number of crabs caught per tow
+  slice_tail() %>% 
+  mutate(perc_f = ifelse(Sex=="Female", Num_Each_Sex/Total, (1-(Num_Each_Sex/Total))), #calculate percent female
+         perc_m = 1-perc_f) #calculate percent male
+
+sex_by_area <- length_perc %>%
+  group_by(Season, Year, Stratum, Region) %>% 
+  summarise(perc_f = mean(perc_f, na.rm=TRUE)) %>% 
+  pivot_wider(names_from="Season", values_from = "perc_f", id_cols=c("Year", "Stratum", "Region")) %>% 
+  mutate(Diff = Fall-Spring, .keep="unused") %>%
+  na.omit() %>% 
+  filter(Year > 2004) %>% 
+  ungroup()
+
+sex_diff_geom <- stratGrid %>% left_join(sex_by_area %>% group_by(Stratum) %>% summarise(Diff=mean(Diff, na.rm = TRUE)) %>% mutate(Stratum=as.factor(Stratum)))
+
+# FIG 6
+ggplot()+
+  geom_sf(data=sex_diff_geom, aes(fill=Diff))+
+  labs(fill=NULL)
+
+# gls for highly linear sex differences, can still account for autocorrelation
+gls2024 <- gls(Diff ~ Stratum + Year + Region, data = sex_by_area,
+            correlation = corExp(form = ~ Region + Stratum|Year))
+
+summary(gls2024)
+tidy(gls2024) %>% view()
+
+acf(resid(gls2024, type="normalized"))
+Box.test(residuals(gls2024, type="normalized"), type="L")
+shapiro.test(resid(gls2024, type="normalized"))
+
+plot(gls2024)
+plot(gls2024, resid(.) ~ Stratum | Region, abline = 0, cex = 0.3)
+plot(gls2024, resid(.) ~ Year, abline = 0, cex = 0.3)
+plot(gls2024, resid(.) ~ Year | Region, abline = 0, cex = 0.3)
+plot(gls2024, resid(.) ~ Year | Stratum, abline = 0, cex = 0.3)
+
+# Fig. 7 - Aggregate EDM -----------------------------------------------------------
+
+catch1 <- raw_catch %>% full_join(raw_tows) %>%
+  arrange(Survey, Tow_Number) %>% 
+  dplyr::select(-c("Subsample_Weight_kg", "Subsample_Weight_kg_2", "Male_Wt_kg", "Female_Wt_kg","Date", "Surface_WaterTemp_DegC", "Surface_Salinity", "End_Latitude","End_Longitude", "Air_Temp", "Tow_Time")) %>%
+  mutate(Number_Caught = replace_na(Number_Caught,0), #make implicit zeros explicit
+         Weight_kg = replace_na(Weight_kg,0),
+         Expanded_Catch = replace_na(Expanded_Catch,0),
+         Expanded_Weight_kg = replace_na(Expanded_Weight_kg,0)) %>% 
+  mutate(Date = date(ymd_hms(Start_Date)), .keep="unused") %>% filter(Year > 2000)
+
+catch_agg <- catch1 %>% group_by(Season, Year) %>%
+  summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+            avgWt = mean(Expanded_Weight_kg, na.rm=TRUE))
+
+catch_dates <- catch_agg %>% 
+ungroup() %>% complete(Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = "")) 
+
+
+catch_ts <- ts(catch_dates %>% 
+            mutate(date=as.Date(date)) %>% 
+            arrange(date), frequency = 2, start=c(2001, 1))
+
+catch_ts<- na.spline(catch_ts) #using na.spline produces better EDM results than linear interpolation via na.approx
+
+tsdf <- data.frame(catch_ts)
+
+ggplot(data=tsdf)+geom_line(aes(x=date, y=avgCatch))
+
+EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 46", pred="1 46")
+EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46")
+
+PredictNonlinear(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", E=6)
+
+smap_out <- SMap(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", E=6, theta=6)
+
+ComputeError(smap_out$predictions$Observations, smap_out$predictions$Predictions)
+ComputeError(smap_out$predictions$Observations[1:16], smap_out$predictions$Predictions[2:17]) 
+cor(smap_out$predictions$Observations[1:16], smap_out$predictions$Predictions[2:17]) 
+
+yrs <- seq(2016, 2023.5, 0.5)
+
+edm_df <- data.frame(obs = smap_out$predictions$Observations[1:16], 
+                     preds = smap_out$predictions$Predictions[2:17], 
+                     pred_var = smap_out$predictions$Pred_Variance[2:17])
+
+edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
+                            Hi.95 = preds + 1.96*sqrt(pred_var),
+                            Lo.80 = preds - 1.28*sqrt(pred_var),
+                            Hi.80 = preds + 1.28*sqrt(pred_var),
+                            yrs = yrs)
+
+# FIG 7
+ggplot()+
+  geom_path(data = data.frame(catch_ts), aes(x = index(catch_ts), y = avgCatch), linewidth=0.6) +
+  geom_path(data = edm_df, aes(x=yrs, y=preds), linewidth=0.7, color="#4f9ff0")+
+  geom_ribbon(data = edm_df, aes(x = yrs, y =preds, ymin = Lo.80, ymax = Hi.80), fill = "#4f9ff0", alpha = 0.2) +
+  labs(x="", y="Avg. catch/tow", fill=NULL, color=NULL)+
+  ylim(c(-4.5, 36))+
+  theme_classic()+
+  theme(text = element_text(size=12),
+        legend.position = "right",
+        axis.title.y = element_text(margin = margin(0,10,0,0)))
+
+
