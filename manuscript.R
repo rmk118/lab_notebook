@@ -2,7 +2,7 @@
 # A holistic approach to modeling the growing fishery for Jonah crab (Cancer borealis) in the Gulf of Maine
 # in prep for ICES JMS
 # Ruby Krasnow
-# Last modified: March 6, 2023
+# Last modified: March 7, 2023
 
 
 # Packages ----------------------------------------------------------------
@@ -327,9 +327,6 @@ catch_ts<- na.spline(catch_ts) #using na.spline produces better EDM results than
 
 tsdf <- data.frame(catch_ts)
 
-ggplot(data=tsdf)+geom_line(aes(x=date, y=avgCatch))
-
-
 EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", maxE = 7)
 
 PredictNonlinear(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", E=6)
@@ -337,14 +334,12 @@ PredictNonlinear(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1
 smap_out <- SMap(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", E=6, theta=6)
 
 ComputeError(smap_out$predictions$Observations, smap_out$predictions$Predictions)
-ComputeError(smap_out$predictions$Observations[1:16], smap_out$predictions$Predictions[2:17]) 
-cor(smap_out$predictions$Observations[1:16], smap_out$predictions$Predictions[2:17]) 
 
-yrs <- seq(2016, 2023.5, 0.5)
+yrs <- seq(2016.5, 2023.5, 0.5)
 
-edm_df <- data.frame(obs = smap_out$predictions$Observations[1:16], 
-                     preds = smap_out$predictions$Predictions[2:17], 
-                     pred_var = smap_out$predictions$Pred_Variance[2:17])
+edm_df <- data.frame(obs = smap_out$predictions$Observations, 
+                     preds = smap_out$predictions$Predictions, 
+                     pred_var = smap_out$predictions$Pred_Variance) %>% na.omit()
 
 edm_df <- edm_df %>% mutate(Lo.95 = preds - 1.96*sqrt(pred_var),
                             Hi.95 = preds + 1.96*sqrt(pred_var),

@@ -50,6 +50,7 @@ preds[2:17]
 # Why are these different?
 ComputeError(obs, preds)
 ComputeError(obs[1:16], preds[2:17]) #this one is much worse
+ComputeError(obs[2:16], preds[2:16]) #this one is much worse
 
 # These agree with the second, less optimistic ComputeError results
 cor(obs[1:16], preds[2:17])
