@@ -198,10 +198,6 @@ gam_catch_2024plot2 <- ggplot(data=plot.para_catch$Region)+
 gam_catch_2024plot1+gam_catch_2024plot2 +
   plot_annotation(tag_levels = 'A') + plot_layout(nrow=2,ncol=2)
 
-#Supp. figure X
-gam_wt_2024plot1+gam_wt_2024plot2 +
-  plot_annotation(tag_levels = 'A') + plot_layout(nrow=2,ncol=2)
-
 
 # Fig. 5 - Seasonal differences -----------------------------------------------------------
 
@@ -289,7 +285,7 @@ gls2024 <- gls(Diff ~ Stratum + Year + Region, data = sex_by_area,
             correlation = corExp(form = ~ Region + Stratum|Year))
 
 summary(gls2024)
-tidy(gls2024) %>% view()
+tidy(gls2024)
 
 acf(resid(gls2024, type="normalized"))
 Box.test(residuals(gls2024, type="normalized"), type="L")
@@ -331,8 +327,8 @@ tsdf <- data.frame(catch_ts)
 
 ggplot(data=tsdf)+geom_line(aes(x=date, y=avgCatch))
 
-EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 46", pred="1 46")
-EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46")
+
+EmbedDimension(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", maxE = 7)
 
 PredictNonlinear(dataFrame=tsdf, columns="avgCatch", target="avgCatch", lib = "1 30", pred="31 46", E=6)
 
@@ -366,4 +362,207 @@ ggplot()+
         legend.position = "right",
         axis.title.y = element_text(margin = margin(0,10,0,0)))
 
+# Fig. 8 - Multispatial EDM -----------------------------------------------------------
 
+reg_names <- c("NH/South", "Midcoast", "Penobscot", "MDI", "Downeast")
+names(reg_names) <- c(1,2,3,4,5)
+
+strat_names <- c("9-37m", "38-64m", "65-101m", ">101m")
+names(strat_names) <- c(1,2,3,4)
+
+catch_area <- catch1 %>% group_by(Stratum, Region, Year, Season) %>%
+  summarise(avgCatch = mean(Expanded_Catch, na.rm=TRUE),
+            avgWt = mean(Expanded_Weight_kg, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  complete(Season, Year, Stratum, Region) %>%
+  mutate(Season = as.factor(Season), Stratum = as.factor(Stratum), Region = as.factor(Region), Area = paste0(Region, Stratum))
+
+catch_area_complete<- complete(data = catch_area %>% ungroup(),Region, Stratum, Season, Year) %>% 
+  mutate(date=paste(Year, case_when(Season== "Fall" ~ "-11-01", Season =="Spring" ~"-05-01"), sep = ""), .before=Season) %>%
+  filter(as.Date(date) > as.Date("2003-05-01")) %>% 
+  ungroup() %>% 
+  arrange(Area, date) %>% 
+  group_by(Region, Stratum, Area, Season) %>% 
+  mutate(avgCatch = na.spline(avgCatch),avgWt = na.spline(avgWt)) %>% 
+  ungroup() 
+
+
+
+areaList <- c(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54)
+
+areaE <- map_dfr(areaList, function(x) {
+  reg <- substr(x, 1, 1)
+  strat <- substr(x, 2, 2)
+  v <- catch_area_complete %>% filter(Region==reg, Stratum==strat) %>% pull(avgCatch)
+  lib_vec <- paste(1, length(v))
+  indices <- c(1:length(v))
+  df <- data.frame(indices,v)
+  colnames(df)<-c("index", "value")
+  rho_E<- EmbedDimension(dataFrame = df, lib = lib_vec, pred = lib_vec, columns = "value",target = "value", maxE = 7)
+  rho_E %>% mutate(Region = reg, Stratum = strat)
+})
+
+areaE <- areaE %>% mutate(method = "orig")
+
+delay <- function(x,n){
+  if(n>=0) 
+    lead(x,n) 
+  else 
+    lag(x,abs(n))
+}
+
+areaList_E <- expand_grid(E = c(1:7), reg = c(1:5), strat = c(1:4)) %>% arrange(reg, strat)
+
+make_block_ID <- function(df,predictor,target,ID_col,E,cause_lag=1){
+  
+  v_delays <- 0:-(E-1)
+  
+  df_ccm <- df %>%
+    dplyr::select({{ID_col}},{{target}}) %>%
+    group_by({{ID_col}}) %>%
+    transmute(target=delay({{target}},cause_lag))
+  
+  df_lags <- map_dfc(v_delays,function(d_i){
+    df %>%
+      group_by({{ID_col}}) %>%
+      transmute("pred_t{d_i}" := delay({{predictor}},d_i)) %>%
+      ungroup({{ID_col}}) %>% dplyr::select(-{{ID_col}})
+  })
+  
+  df_out <- bind_cols(df_ccm,df_lags) %>% 
+    ungroup() %>%
+    mutate(index=row_number()) %>%
+    dplyr::select(index,everything())
+  
+  return(df_out)
+  
+}
+
+
+catch_area_complete <- catch_area_complete %>% mutate(Region = as.integer(Region), Stratum = as.integer(Stratum))
+
+# Adding the other four regions to the library of points used to make predictions about the target region
+# i.e., concatenation OF regions WITHIN a stratum
+
+areaReg <- pmap_dfr(areaList_E, function(E, reg, strat) {
+  v <- catch_area_complete %>% 
+    filter(Stratum == strat) %>% 
+    dplyr::select(Region,avgCatch)
+  
+  block <- make_block_ID(df=v, predictor = avgCatch, target = avgCatch, ID_col = Region, E=E) %>% na.omit() %>% mutate(index = row_number())
+  
+  columns_i <- names(block)[4:(E+3)]
+  
+  lib_whole <- paste(1, nrow(block))
+  first <- block %>% filter(Region == reg) %>% slice_head() %>% pull(index)
+  last <- block %>% filter(Region == reg) %>% slice_tail() %>% pull(index)
+  lib_pred <- paste(first, last)
+  
+  out_i <- Simplex(dataFrame=block,
+                   lib=lib_whole,
+                   pred=lib_pred,
+                   Tp=0, # The target has already been manually lagged
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   E=E)
+  out <- data.frame(ComputeError(out_i$Observations, out_i$Predictions)$rho) %>% 
+    mutate(E = E, Region = reg, Stratum = strat) 
+  out
+  
+})
+areaReg <- areaReg %>% rename(rho = ComputeError.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_reg_in_strat")
+
+areaE <- rbind(areaE, areaReg)
+
+# Adding the other three strata to the library of points used to make predictions about the target stratum
+# i.e., concatenation OF strata WITHIN a region
+
+areaStrat <- pmap_dfr(areaList_E, function(E, reg, strat) {
+  v <- catch_area_complete %>% 
+    filter(Region == reg) %>% 
+    dplyr::select(Stratum,avgCatch)
+  
+  block <- make_block_ID(df=v, predictor = avgCatch, target = avgCatch, ID_col = Stratum, E=E) %>% na.omit() %>% mutate(index = row_number())
+  
+  columns_i <- names(block)[4:(E+3)]
+  
+  lib_whole <- paste(1, nrow(block))
+  first <- block %>% filter(Stratum == strat) %>% slice_head() %>% pull(index)
+  last <- block %>% filter(Stratum == strat) %>% slice_tail() %>% pull(index)
+  lib_pred <- paste(first, last)
+  
+  out_i <- Simplex(dataFrame=block,
+                   lib=lib_whole,
+                   pred=lib_pred,
+                   Tp=0, # The target has already been manually lagged
+                   target="target",
+                   columns=columns_i,
+                   embedded=TRUE,
+                   E=E)
+  out <- data.frame(ComputeError(out_i$Observations, out_i$Predictions)$rho) %>% 
+    mutate(E = E, Region = reg, Stratum = strat) 
+  out
+  
+})
+
+areaStrat <- areaStrat %>% rename(rho = ComputeError.out_i.Observations..out_i.Predictions..rho) %>% mutate(method = "cat_of_strat_in_reg")
+
+areaE <- rbind(areaE, areaStrat)
+
+# FIG 8
+ggplot()+
+  geom_abline(intercept = 0, slope = 0, lty=2) +
+  geom_line(data=areaE, aes(x=E, y=rho, color=method))+
+  facet_grid(Region~Stratum, labeller = labeller(Region = reg_names, Stratum=strat_names))+
+  theme_light()+
+  labs(y="Prediction skill (\U03C1)", x="Embedding dimension")+
+  scale_y_continuous(breaks=c(-0.2, 0, 0.2, 0.4, 0.6), labels=c("-0.2","", "0.2", "","0.6"))+
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        text = element_text(size = 15),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white", color="black"),
+        strip.text = element_text(colour = "black"))+
+  scale_color_brewer( name="Method",  palette = "Dark2",
+                      labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
+                      guide = guide_legend(reverse = TRUE))
+
+
+
+# Fig. S1 --------------------------------------------------------------
+
+gam_wt_2024plot1+gam_wt_2024plot2 +
+  plot_annotation(tag_levels = 'A') + plot_layout(nrow=2,ncol=2)
+
+# Fig. S2 --------------------------------------------------------------
+
+E_by_method <- areaE %>%
+  group_by(Region, Stratum, method) %>% 
+  slice_max(rho)
+
+density_E <- ggplot(data=E_by_method)+
+  geom_density(aes(x=E, color=method))+
+  theme_bw()+
+  labs(x="E", y="Density")+
+  scale_color_brewer( name="Method",  palette = "Dark2",
+                      labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
+                      guide = guide_legend(reverse = TRUE))
+
+density_rho <- ggplot(data=E_by_method)+
+  geom_density(aes(x=rho, color=method))+
+  theme_bw()+
+  labs(x="Prediction skill (\U03C1)", y="Density")+
+  scale_color_brewer( name="Method",  palette = "Dark2",
+                      labels=c('Including data from other regions', 'Including data from other strata', 'Single time series'),
+                      guide = guide_legend(reverse = TRUE))
+
+# FIG S2
+density_E + density_rho +
+  plot_layout(guides = 'collect') &
+  theme(axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        text = element_text(size = 12),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white", color="black"),
+        strip.text = element_text(colour = "black"))
