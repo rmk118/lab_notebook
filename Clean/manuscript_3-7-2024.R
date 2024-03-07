@@ -2,8 +2,10 @@
 # A holistic approach to modeling the growing fishery for Jonah crab (Cancer borealis) in the Gulf of Maine
 # in prep for ICES JMS
 # Ruby Krasnow
-# Last modified: March 7, 2023
+# Last modified: March 7, 2024
 
+# Set working directory to wherever you have the data files stored
+#setwd("")
 
 # Packages ----------------------------------------------------------------
 #general
@@ -27,7 +29,7 @@ library(leaflet) #to create map of ME-NH trawl survey areas
 
 
 # Fig. 1 - Landings -----------------------------------------
-landings <- read_csv("data/noaa_landings.csv", col_types = "inc") %>% 
+landings <- read_csv("noaa_landings.csv", col_types = "inc") %>% 
   rename(year=Year, total_value=Value) %>% 
   select(-Species) %>% 
   mutate(total_value = as.double(total_value))
@@ -45,7 +47,7 @@ ggplot(data=landings)+
 
 
 # Fig. 2 - Survey Map -----------------------------------------
-surveyGrid <-st_read("~/Downloads/lab_notebook/Maine/MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
+surveyGrid <-st_read("MaineDMR_-_Inshore_Trawl_Survey_Grid") #CRS: WGS 84/EPSG 4326
 
 surveyGrid <- surveyGrid %>% 
   mutate(Region = as.factor(region_id),
@@ -67,7 +69,7 @@ factpalStrat <- colorFactor(palette=c(palStrat), domain=surveyGrid$Stratum)
 labelRegions <- c("1: NH & S. Maine", "2: Mid-Coast", "3: Penobscot Bay", "4: Mt. Desert Area", "5: Downeast Maine")
 labelStrat <- c("1: 9-37 m", "2: 38-64 m", "3: 65-101 m", "4: 101+ m")
 
-states <-st_read("~/Downloads/lab_notebook/data/US_State_Boundaries/US_State_Boundaries.shp") #CRS: WGS 84/EPSG 4326
+states <-st_read("./US_State_Boundaries/US_State_Boundaries.shp") #CRS: WGS 84/EPSG 4326
 
 # FIG 2
 leaflet(surveyGrid, options = leafletOptions(zoomControl = FALSE)) %>%
@@ -84,8 +86,8 @@ leaflet(surveyGrid, options = leafletOptions(zoomControl = FALSE)) %>%
 
 
 # Fig. 3 - Relative Abundance -----------------------------------------
-raw_catch <- read.csv("data/Maine_inshore_trawl/jonahCatch2024.csv") #Jonah crab catch data
-raw_tows<-read.csv("data/Maine_inshore_trawl/MEtows.csv") #tow data
+raw_catch <- read.csv("jonahCatch2024.csv") #Jonah crab catch data
+raw_tows<-read.csv("MEtows.csv") #tow data
 
 catch1 <- raw_catch %>% full_join(raw_tows) %>%
   arrange(Survey, Tow_Number) %>% 
@@ -242,7 +244,7 @@ abs_diff+perc_diff+
 # Fig. 6 - Sex ratio -----------------------------------------------------------
 
 # Import data
-raw_len<- read.csv("data/Maine_inshore_trawl/jonahLength2024.csv") #jonah crab length and sex data
+raw_len<- read.csv("jonahLength2024.csv") #jonah crab length and sex data
 
 length1 <- raw_len %>% 
   filter(Year > 2003) %>% 
@@ -563,3 +565,4 @@ density_E + density_rho +
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "white", color="black"),
         strip.text = element_text(colour = "black"))
+
