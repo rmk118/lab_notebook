@@ -11,6 +11,8 @@ library(tidyverse)
 library(lubridate) #date formatting
 library(mgcv) #Generalized Additive Models (GAMs)
 library(broom.mixed) #for tidy model output
+library(zoo) #for time series functions
+library(rEDM) #for EDM functions
 
 #plotting
 library(patchwork) #combining plots
